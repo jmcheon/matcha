@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  front:
+    container_name: front
+      #restart: always
+    build:
+      context: ./front
+      dockerfile: ./Dockerfile
+      args:
+        - NODE_ENV
+    environment:
+      - NODE_ENV
+    depends_on:
+      - back
+    volumes:
+      - ./front:/usr/app
+      - /usr/app/node_modules
+      - /usr/app/.nuxt
+
+  back:
+    container_name: back
+    build:
+      context: ./back
+      dockerfile: ./Dockerfile
+      args:
+        - NODE_ENV
+    env_file: .env
+    ports:
+      - 8080:3000
+    depends_on:
+      - db
+    volumes:
+      - ./back:/app
+      - /app/node_modules
+
+  db:
+    image: mysql
+    container_name: mysql
+    restart: always
+    ports:
+      - 3306:3306
+    env_file: .env
+    volumes:
+      - api-db:/var/lib/mysql/
+
+volumes:
+  api-db:

@@ -1,3 +1,5 @@
+.env
+*.sw*
 # Logs
 logs
 *.log

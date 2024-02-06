@@ -5,4 +5,4 @@
 
 | Requirements | Skills |
 |--------------|--------|
-| - `Nuxt.js`<br> - `Express.js`<br> - `Docker`<br>- `Docker Compose`<br> - `MySQL`<br> - `Typescript` | - `Web`<br> - `DB & Data`<br> - `Security`<br> |
+| - `Node18`<br> - `Nuxt3`<br> - `Express`<br> - `Docker`<br>- `Docker Compose`<br> - `MySQL`<br> - `Typescript` | - `Web`<br> - `DB & Data`<br> - `Security`<br> |

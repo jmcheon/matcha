@@ -3,7 +3,7 @@ version: "3.8"
 services:
   front:
     container_name: front
-      #restart: always
+    restart: always
     build:
       context: ./front
       dockerfile: ./Dockerfile
@@ -22,6 +22,7 @@ services:
 
   back:
     container_name: back
+    restart: always
     build:
       context: ./back
       dockerfile: ./Dockerfile
@@ -34,6 +35,7 @@ services:
       - db
     volumes:
       - ./back:/app
+      - ./back/dist:/app/dist
       - /app/node_modules
 
   db:

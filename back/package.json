@@ -5,8 +5,9 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-  	"start:dev": "nodemon app.js",
+	"start": "node dist/app.js",
+    "start:dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/app.ts",
+    "build": "tsc",
 	"lint": "eslint .",
   	"prettier": "prettier --write \"**/*.js\""
   },

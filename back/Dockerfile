@@ -9,7 +9,7 @@ ENV NODE_ENV=$NODE_ENV
 
 COPY package*.json ./
 
-RUN if [ "$NODE_ENV" = "production" ]; then npm install -g npm@latest && npm install --production; else npm install -g npm@latest && npm install; fi
+RUN if [ "$NODE_ENV" = "production" ]; then npm install -g npm@latest && npm install --production; else npm install -g npm@latest && npm install && npm install -g nodemon; fi
 
 COPY . .
 

@@ -1,13 +1,23 @@
 module.exports = {
+  root: true,
   env: {
-    commonjs: true,
-    es2021: true,
+    browser: true,
     node: true,
   },
-  extends: ['eslint:recommended', 'plugin:prettier/recommended'],
   parserOptions: {
-    ecmaVersion: 12,
+    parser: '@typescript-eslint/parser',
+    ecmaVersion: 2020,
+    sourceType: 'module',
   },
-  rules: {},
+  extends: [
+    '@nuxtjs',
+    'prettier',
+    'prettier/vue',
+    'plugin:prettier/recommended',
+    'plugin:nuxt/recommended',
+  ],
+  plugins: ['prettier', '@typescript-eslint'],
+  rules: {
+    'nuxt/no-cjs-in-config': 'off',
+  },
 };
-

@@ -1,6 +1,4 @@
 {
-	"compilerOptions": {
-    "esModuleInterop": true
-  },
-	"lib": ["es6", "dom"]
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json"
 }

@@ -11,6 +11,8 @@ services:
         - NODE_ENV
     environment:
       - NODE_ENV
+    ports:
+      - 3000:3000
     depends_on:
       - back
     volumes:

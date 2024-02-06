@@ -1,5 +1,5 @@
 # back
-FROM node:18
+FROM node:18-slim As Base
 
 WORKDIR /app
 
@@ -9,8 +9,9 @@ ENV NODE_ENV=$NODE_ENV
 
 COPY package*.json ./
 
-RUN if [ "$NODE_ENV" = "production" ]; then npm install -g npm@latest && npm install --production; else npm install -g npm@latest && npm install && npm install -g nodemon; fi
+RUN if [ "$NODE_ENV" = "production" ]; then yarn global add yarn@latest && yarn install --production; else yarn global add yarn@latest && yarn install && yarn global add nodemon; fi
 
 COPY . .
 
-CMD if [ "$NODE_ENV" = "production" ]; then npm start; else npm run start:dev; fi
+CMD if [ "$NODE_ENV" = "production" ]; then yarn start; else yarn run start:dev; fi
+

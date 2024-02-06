@@ -5,12 +5,11 @@
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
-    "start": "nuxt start",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-	"lint": "eslint --ext .js,.vue --ignore-path .gitignore .",
-  	"prettier": "prettier --write \"**/*.{js,vue,ts}\""
+    "lint": "eslint .",
+  	"prettier": "prettier --write \"**/*.js\""
   },
   "dependencies": {
     "nuxt": "^3.10.1",

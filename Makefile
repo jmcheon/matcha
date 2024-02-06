@@ -4,6 +4,10 @@ NETWORK_LIST := $(shell docker volume ls)
 VOLUME_LIST := $(shell docker network ls)
 
 
+$COMPOSE_DOWN=down
+$COMPOSE_STOP=stop
+$COMPOSE_RESTART=restart
+
 all :
 	docker-compose up --build
 
@@ -16,13 +20,22 @@ fclean :
 
 re : fclean all
 
-front :
-	docker restart front
+SERVICES := back front db
 
-back :
-	docker restart back
+define run-command
+    @if [ "$$(echo $(MAKECMDGOALS) | wc -w)" -eq 1 ]; then \
+        echo $(MAKECMDGOALS); \
+        docker-compose $(1); \
+    else \
+        for service in $(SERVICES); do \
+            if echo "$(MAKECMDGOALS)" | grep -q $$service ; then \
+                docker-compose $(1) $$service; \
+            fi; \
+        done; \
+    fi
+endef
 
-down :
-	docker-compose down
+down stop restart:
+	$(call run-command,$@)
 
-.PHONY: all fclean re front back
+.PHONY: all fclean re front back db down stop restart 

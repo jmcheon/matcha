@@ -1,4 +1,5 @@
 #!/bin/sh
 
 cd front
-yarn lint-staged
+yarn prepare
+

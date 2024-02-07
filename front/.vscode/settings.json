@@ -3,7 +3,7 @@
   "editor.tabSize": 2,
   "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
+    "source.fixAll.eslint": "always",
     "source.fixAll.stylelint": "explicit"
   },
   "editor.quickSuggestions": {
@@ -41,5 +41,8 @@
   // "i18n-ally.pathMatcher": "{locale}.json",
   // "i18n-ally.keystyle": "nested",
   "vue.codeActions.enabled": false,
-  "files.autoSaveDelay": 500
+  "files.autoSaveDelay": 500,
+  "stylelint.validate": [
+    "vue" // 추가
+  ]
 }

@@ -3,5 +3,9 @@
   "tabWidth": 2,
   "semi": true,
   "singleQuote": true,
-  "printWidth": 120
+  "printWidth": 120,
+  "ignoreEmptyLines": true,
+  "endOfLine": "auto",
+  "no-multiple-empty-lines": ["error", { "max": 2, "maxBOF": 1, "maxEOF": 1 }],
+  "preserveEmptyLines": true
 }

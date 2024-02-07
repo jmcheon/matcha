@@ -3,6 +3,7 @@
     "browser": true,
     "es2021": true
   },
+  "ignorePatterns": ["presets/**/*.js"],
   "extends": ["@nuxtjs/eslint-config-typescript", "plugin:prettier/recommended"],
   "parser": "vue-eslint-parser",
   "parserOptions": {

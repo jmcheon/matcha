@@ -3,11 +3,11 @@
 
 // const { counter, state } = useAdder()
 
-import { counterStore } from '@/stores/counterStore'
 import { storeToRefs } from 'pinia'
+import { counterStore } from '@/stores/counterStore'
 
 const { state } = storeToRefs(counterStore())
-const store = counterStore()
+// const store = counterStore()
 </script>
 <template>
   <main>

@@ -59,7 +59,7 @@ onMounted(() => {
     <h1>ToDo App</h1>
     <form @submit.prevent="addTodo()">
       <label>New ToDo </label>
-      <input v-model="newTodo" name="newTodo" autocomplete="off" />
+      <input v-model="newTodo" name="newTodo" autocomplete="off" >
       <button class="text">Add ToDo</button>
     </form>
     <h2 :class="$style.text2">ToDo List</h2>

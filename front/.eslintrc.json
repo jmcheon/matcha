@@ -4,13 +4,24 @@
     "es2021": true
   },
   "ignorePatterns": ["presets/**/*.js"],
-  "extends": ["@nuxtjs/eslint-config-typescript", "plugin:prettier/recommended"],
+  "extends": [
+    "@nuxtjs/eslint-config-typescript",
+    "plugin:prettier/recommended",
+    "plugin:vue/vue3-recommended",
+    "eslint:recommended",
+    "@vue/typescript/recommended"
+  ],
+  "plugins": ["@typescript-eslint", "vue", "simple-import-sort", "unused-imports"],
   "parser": "vue-eslint-parser",
   "parserOptions": {
     "ecmaVersion": "latest",
     "parser": "@typescript-eslint/parser",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "vue"],
-  "rules": {}
+  "rules": {
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "unused-imports/no-unused-imports": "error",
+    "vue/multi-word-component-names": "off"
+  }
 }

@@ -4,7 +4,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
-})
+});
 </script>
 <template>
   <button>{{ props.text }}</button>

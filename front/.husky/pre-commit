@@ -2,4 +2,4 @@
 
 cd front
 yarn prepare
-
+yarn lint-staged

@@ -12,11 +12,23 @@
     "lint": "eslint './**/*.{js,ts,vue}' --fix",
     "stylelint": "stylelint './**/*.{scss,css,vue}' --fix",
     "prettier": "prettier --write \"**/*.js\"",
+    "lint-staged": "lint-staged",
     "prepare": "cd .. && husky front/.husky"
   },
   "lint-staged": {
-    "*.{js,vue}": "eslint",
-    "*.{scss,css,vue}": "stylelint --fix"
+    "*.scss": [
+      "stylelint --syntax=scss --fix"
+    ],
+    "*.{css,vue}": [
+      "stylelint --fix"
+    ],
+    "*.{js,ts,vue}": [
+      "eslint --ext '.js,.ts,.vue' --fix --max-warnings 0",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "husky": {
     "hooks": {
@@ -51,6 +63,7 @@
     "eslint-plugin-unused-imports": "^3.0.0",
     "eslint-plugin-vue": "^9.21.1",
     "husky": "^9.0.10",
+    "lint-staged": "^15.2.2",
     "nuxt-primevue": "^0.2.2",
     "postcss-html": "^1.6.0",
     "prettier": "^3.2.5",

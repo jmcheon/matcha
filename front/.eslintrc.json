@@ -3,7 +3,7 @@
     "browser": true,
     "es2021": true
   },
-  "ignorePatterns": ["presets/**/*.js"],
+  "ignorePatterns": ["presets/**/*.js", "package.json"],
   "extends": [
     "@nuxtjs/eslint-config-typescript",
     "plugin:prettier/recommended",

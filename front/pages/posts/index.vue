@@ -12,6 +12,7 @@
   justify-content: center;
   width: 100px;
   height: 100px;
+
   color: red;
 }
 </style>

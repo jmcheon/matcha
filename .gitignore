@@ -131,3 +131,17 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Ignore all files in the ./db/ directory except the schemas
+./db/*
+!./db/*.sql
+
+# Exclude specific files and directories
+!./db/auto.cnf
+!./db/mysql.sock
+!./db/mysql.ibd
+!./db/performance_schema/
+!./db/sys/
+!./db/undo_001/
+!./db/undo_002/
+!./db/matcha_db/

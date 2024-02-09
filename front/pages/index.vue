@@ -1,18 +1,12 @@
 <script setup>
-// const onUpdate = t => {}
-
-// const { counter, state } = useAdder()
-
-import { storeToRefs } from 'pinia';
-
-import { counterStore } from '@/stores/counterStore';
-
-const { state } = storeToRefs(counterStore());
-const store = counterStore();
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+const value = ref();
 </script>
+
 <template>
-  <main>
-    <button @click="counterStore().counter">Click</button>
-    {{ state }}
-  </main>
+  <div class="">
+    <InputText v-model="value" class="" />
+    <Button label="hello" small />
+  </div>
 </template>

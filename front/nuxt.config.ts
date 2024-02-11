@@ -4,7 +4,10 @@ import path from 'path';
 export default defineNuxtConfig({
   devtools: { enabled: true },
   srr: false,
-  modules: ['@pinia/nuxt', '@nuxtjs/eslint-module', 'nuxt-primevue', '@vueuse/nuxt'],
+  modules: ['@pinia/nuxt', '@nuxtjs/eslint-module', 'nuxt-primevue', '@vueuse/nuxt', '@nuxt/image'],
+  eslint: {
+    lintOnStart: false,
+  },
   primevue: {
     unstyled: true,
     importPT: { from: path.resolve(__dirname, './presets/lara/') }, // import and apply preset

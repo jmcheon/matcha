@@ -89,3 +89,50 @@ export class UserController {
     }
   }
 }
+
+
+{
+  "status":200,
+  "result":[
+  {
+    user_id: 1,
+    email: 'aaa@bbb.com',
+    password: 'aa',
+    google_username: '12',
+    intra_username: 'sucho',
+    status: 'incomplete',
+  },
+  {
+    user_id: 2,
+    email: 'aaaa@bb.com',
+    password: 'aaa',
+    google_username: 'bbb@aa.com',
+    intra_username: 'sssuu',
+    status: null,
+  },
+  {
+    user_id: 3,
+    email: 'aaaa@bbcccc.com',
+    password: 'aaa',
+    google_username: 'bbb@aa.com',
+    intra_username: 'sssuudd',
+    status: null,
+  },
+  {
+    user_id: 4,
+    email: 'aaaa@bbcddccc.com',
+    password: 'aaa',
+    google_username: 'bbb@aac.com',
+    intra_username: 'sssuudd',
+    status: null,
+  },
+  {
+    user_id: 5,
+    email: 'aaaa@bbcddccdc.com',
+    password: 'aaa',
+    google_username: 'bbb@aeeac.com',
+    intra_username: 'sssuudd',
+    status: null,
+  },
+]
+}

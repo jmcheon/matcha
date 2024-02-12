@@ -10,7 +10,8 @@ const password = ref('');
   <div class="flex flex-col items-center space-y-6">
     <div class="mt-40" />
     <div>
-      <img src="/logo.png" alt="Logo" />
+      <NuxtImg width="500" height="175" src="/logo.png" />
+      <img width="32" height="32" src="/favicon.ico" />
     </div>
     <div class="flex flex-row pb-2">
       <div class="flex flex-col pr-2">

@@ -1,5 +1,5 @@
 # back
-FROM node:18-slim As Base
+FROM node:lts As Base
 
 WORKDIR /app
 

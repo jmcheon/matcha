@@ -1,9 +1,7 @@
 <template>
-  <div class="flex flex-col min-h-screen">
+  <div class="flex flex-col min-h-screen items-center justify-center">
     <header>
-      <div class="flex flex-col items-center justify-center">
-        <img class="w-3" src="public/logo.png" alt="Logo" />
-      </div>
+      <img class="h-1px" src="public/logo.png" alt="Logo" />
     </header>
     <slot class="flex-grow" />
     <footer class="mt-auto h-1/5">

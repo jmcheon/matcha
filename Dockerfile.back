@@ -1,0 +1,30 @@
+FROM node:lts-slim AS base
+RUN npm i -g pnpm express @types/express typescript
+RUN pnpm i glob rimraf
+
+FROM base AS dependencies
+WORKDIR ./back-express/package.json ./
+RUN mkdir -p /.pnpm-store
+RUN pnpm config set store-dir /.pnpm-store
+RUN pnpm i --prod=false
+
+FROM base AS build
+WORKDIR /usr/src/app
+COPY ./back-express .
+COPY --from=dependencies /usr/src/app/node_modules ./node_modules
+RUN pnpm run build
+
+FROM base AS development
+WORKDIR /usr/src/app
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+CMD [ "pnpm", "run", "dev" ]
+
+FROM base AS production
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+WORKDIR /usr/src/app
+RUN pnpm prune --prod
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/node_modules ./node_modules
+CMD [ "node", "dist/main" ]

@@ -3,10 +3,11 @@ RUN npm i -g pnpm express @types/express typescript
 RUN pnpm i glob rimraf
 
 FROM base AS dependencies
-WORKDIR ./back-express/package.json ./
+WORKDIR /usr/src/app
+COPY ./back-express/package.json ./
 RUN mkdir -p /.pnpm-store
 RUN pnpm config set store-dir /.pnpm-store
-RUN pnpm i --prod=false
+RUN pnpm i nodemon jest ts-node --prod=false
 
 FROM base AS build
 WORKDIR /usr/src/app
@@ -27,4 +28,4 @@ WORKDIR /usr/src/app
 RUN pnpm prune --prod
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
-CMD [ "node", "dist/main" ]
+CMD [ "node", "dist/index.js" ]

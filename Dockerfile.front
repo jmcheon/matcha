@@ -8,7 +8,6 @@ RUN mkdir -p /.pnpm-store
 RUN pnpm config set store-dir /.pnpm-store
 RUN pnpm i --prod=false
 
-
 FROM base AS build
 WORKDIR /usr/src/app
 COPY ./front-nuxt .
@@ -19,14 +18,12 @@ FROM base AS development
 WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/node_modules ./node_modules
 CMD [ "pnpm", "run", "dev" ]
-# EXPOSE 3000
+EXPOSE 3000
 
 FROM base AS production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-
 WORKDIR /usr/src/app
 RUN pnpm prune --prod
 COPY --from=build /usr/src/app/node_modules ./node_modules
 CMD [ "node", ".output/server/index.mjs" ]
-# EXPOSE 3000

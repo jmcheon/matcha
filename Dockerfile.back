@@ -1,13 +1,14 @@
 FROM node:lts-slim AS base
-RUN npm i -g pnpm express @types/express typescript
-RUN pnpm i glob rimraf
+RUN npm i -g pnpm 
+RUN pnpm i --save-dev glob rimraf @types/express typescript nodemon jest ts-node \
+	&& pnpm i express
 
 FROM base AS dependencies
 WORKDIR /usr/src/app
 COPY ./back-express/package.json ./
 RUN mkdir -p /.pnpm-store
 RUN pnpm config set store-dir /.pnpm-store
-RUN pnpm i nodemon jest ts-node --prod=false
+RUN pnpm i --prod=false
 
 FROM base AS build
 WORKDIR /usr/src/app
@@ -20,6 +21,7 @@ WORKDIR /usr/src/app
 COPY --from=build /usr/src/app/dist ./dist
 COPY --from=build /usr/src/app/node_modules ./node_modules
 CMD [ "pnpm", "run", "dev" ]
+EXPOSE 3005
 
 FROM base AS production
 ARG NODE_ENV=production

@@ -24,8 +24,6 @@ services:
       dockerfile: Dockerfile.front
     env_file:
       - ./.env
-    # ports:
-    #   - "${FRONT_PORT}:3000"
     networks:
       - server_network
 
@@ -36,8 +34,6 @@ services:
       dockerfile: Dockerfile.back
     env_file:
       - ./.env
-    # ports:
-    #   - "${BACK_PORT}:3005"
     depends_on:
       - db
     networks:

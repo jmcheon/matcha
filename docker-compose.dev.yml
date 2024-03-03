@@ -3,9 +3,8 @@ services:
   front:
     build:
       target: development
-    # ports:
-    # # any reason for the ports?
-    #   - "24678:24678"
+    ports:
+      - "${FRONT_PORT}:3000"
     volumes:
       - ./front-nuxt:/usr/src/app
       - /usr/src/app/node_modules
@@ -13,6 +12,8 @@ services:
   back:
     build:
       target: development
+    ports:
+      - "${BACK_PORT}:3005"
     volumes:
       - ./back-express:/usr/src/app
       - /usr/src/app/node_modules

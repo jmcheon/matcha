@@ -1,0 +1,9 @@
+{
+  "test": "test",
+  "Navbar": {
+    "LoginSelector": {
+      "login": "Se connecter",
+      "register": "S'inscrire"
+    }
+  }
+}

@@ -1,8 +1,5 @@
-<script setup>
-</script>
+<script setup></script>
 
 <template>
-	<main>
-		test main
-	</main>
+  <main class="min-h-[calc(100vh-64px)]">test main</main>
 </template>

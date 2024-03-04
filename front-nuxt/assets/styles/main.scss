@@ -1,4 +1,4 @@
-@layer tailwind-base, tailwind-utilities;
+@layer tailwind-base, vuetify, tailwind-utilities;
 
 @layer tailwind-base {
   @tailwind base;
@@ -7,4 +7,9 @@
 @layer tailwind-utilities {
   @tailwind components;
   @tailwind utilities;
+}
+
+:root {
+	--media-brand: 245 245 245;
+	--media-focus: 78 156 246;
 }

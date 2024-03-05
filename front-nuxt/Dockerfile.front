@@ -1,0 +1,24 @@
+FROM node:20-slim AS base
+WORKDIR /usr/src/app
+RUN npm i -g pnpm
+
+FROM base AS dependencies
+COPY ./package.json ./
+RUN mkdir -p /.pnpm-store && \
+    pnpm config set store-dir /.pnpm-store
+RUN pnpm i --prod=false
+
+FROM dependencies AS build
+COPY ./ .
+RUN pnpm run build
+
+FROM build AS development
+CMD [ "pnpm", "run", "dev" ]
+EXPOSE 3000
+
+FROM base AS production
+ENV NODE_ENV=production
+COPY --from=build /usr/src/app .
+RUN pnpm prune --prod
+CMD [ "node", ".output/server/index.mjs" ]
+EXPOSE 3000

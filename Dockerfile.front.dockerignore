@@ -1,0 +1,4 @@
+./front-nuxt/node_modules
+./front-nuxt/dist
+./front-nuxt/.pnpm-store
+./front-nuxt/pnpm-lock.ymal

@@ -1,0 +1,4 @@
+./back-express/node_modules
+./back-express/dist
+./back-express/.pnpm-store
+./back-express/pnpm-lock.ymal

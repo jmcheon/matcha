@@ -1,12 +1,14 @@
-dist/
-.env
-.pnpm-store
+**/node_modules
+**/dist/
+**/.pnpm-store
+**/pnpm-lock.yaml
+
 db-mysql/*
 !db/dev/.gitkeep
 !db/prod/.gitkeep
-**/pnpm-lock.yaml
-**/node_modules
+
 *.sw*
+
 # Logs
 logs
 *.log

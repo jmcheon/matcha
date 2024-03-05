@@ -7,7 +7,7 @@ services:
       - "${FRONT_PORT}:3000"
     volumes:
       - ./front-nuxt:/usr/src/app
-      - /usr/src/app/node_modules
+      - front_node_modules:/usr/src/app/node_modules
 
   back:
     build:
@@ -16,8 +16,12 @@ services:
       - "${BACK_PORT}:3005"
     volumes:
       - ./back-express:/usr/src/app
-      - /usr/src/app/node_modules
+      - back_node_modules:/usr/src/app/node_modules
 
   db:
     volumes:
       - ./db-mysql/dev:/var/lib/mysql
+
+volumes:
+  front_node_modules:
+  back_node_modules:

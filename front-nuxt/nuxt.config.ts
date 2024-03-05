@@ -20,6 +20,7 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n',
     '@vueuse/nuxt',
     '@pinia/nuxt',
+    'nuxt-svgo',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error
@@ -41,6 +42,12 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
+  svgo: {
+    defaultImport: 'components',
+  },
   i18n: {
     defaultLocale: 'en',
     vueI18n: './i18n.config.ts',
@@ -48,5 +55,17 @@ export default defineNuxtConfig({
       useCookie: true,
       fallbackLocale: 'en',
     },
+    locales: [
+      {
+        code: 'fr',
+        iso: 'fr-FR',
+        name: 'Français',
+      },
+      {
+        code: 'en',
+        iso: 'en-US',
+        name: 'English',
+      },
+    ],
   },
 });

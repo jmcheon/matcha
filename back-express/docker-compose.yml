@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  back:
+      container_name: "back-express"
+      build:
+        context: .
+        dockerfile: Dockerfile.back
+      env_file:
+        - ./.env
+      depends_on:
+        - db
+      restart: unless-stopped
+
+  db:
+    container_name: "db-mysql"
+    image: mysql:latest
+    environment:
+      - TZ=Europe/Paris
+    env_file:
+      - ./.env

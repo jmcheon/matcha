@@ -1,23 +1,26 @@
 FROM node:20-slim AS base
 WORKDIR /usr/src/app
-RUN npm i -g pnpm
+# RUN npm i -g pnpm
 
 FROM base AS dependencies
 COPY ./front-nuxt/package.json ./
-RUN mkdir -p /.pnpm-store && \
-    pnpm config set store-dir /.pnpm-store
-RUN pnpm i --prod=false
+COPY ./front-nuxt/*-lock.json ./
+# RUN mkdir -p /.pnpm-store && \
+#     pnpm config set store-dir /.pnpm-store
+RUN npm i --prod=false
+
+FROM dependencies AS development
+CMD [ "npm", "run", "dev" ]
+EXPOSE 3000
 
 FROM dependencies AS build
 COPY ./front-nuxt .
-RUN pnpm run build
-
-FROM build AS development
-CMD [ "pnpm", "run", "dev" ]
-EXPOSE 3000
+COPY ./env .
+RUN npm run build
 
 FROM base AS production
+COPY ./front-nuxt/package.json ./
 ENV NODE_ENV=production
 COPY --from=build /usr/src/app .
-RUN pnpm prune --prod
+RUN npm prune --prod
 CMD [ "node", ".output/server/index.mjs" ]

@@ -1,25 +1,24 @@
 FROM node:20-slim AS base
 WORKDIR /usr/src/app
-RUN npm i -g pnpm
+# RUN npm i -g pnpm
 
 FROM base AS dependencies
-COPY ./back-express/package.json ./ \
-	./back-express/*-lock.json ./
-RUN mkdir -p /.pnpm-store && \
-	pnpm config set store-dir /.pnpm-store
-RUN pnpm i --prod=false
+COPY ./back-express/package.json ./
+COPY ./back-express/*-lock.json ./
+RUN npm i --prod=false
+
+FROM dependencies AS development
+CMD [ "npm", "run", "dev" ]
+EXPOSE 3005
 
 FROM dependencies AS build
 COPY ./back-express .
-RUN pnpm run build
-
-FROM build AS development
-CMD [ "pnpm", "run", "dev" ]
-EXPOSE 3005
+RUN npm run build
 
 FROM base AS production
+COPY ./back-express/package.json ./
 COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 ENV NODE_ENV=production
 COPY --from=build /usr/src/app/dist ./dist
-RUN pnpm prune --prod
+RUN npm prune --prod
 CMD [ "node", "dist/index.js" ]

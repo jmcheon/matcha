@@ -1,0 +1,5 @@
+version: "3"
+services:
+  db:
+    volumes:
+      - ./db-mysql/prod:/var/lib/mysql

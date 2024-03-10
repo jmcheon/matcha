@@ -2,7 +2,7 @@ version: "3.8"
 services:
   server:
     container_name: "server-nginx"
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile.server
     ports:
@@ -35,7 +35,8 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - server_network
       - data_network
@@ -50,6 +51,10 @@ services:
       - ./.env
     networks:
       - data_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
 networks:
   server_network:

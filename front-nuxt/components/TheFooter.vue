@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <footer class="h-[64px] bg-black p-4 text-center">
-    <p>© {{ year }} Matcha.</p>
+  <footer class="h-[64px] bg-pink-500 p-4 text-center">
+    <p>© {{ year }} Matcha. {{ $t('Footer.copyright') }}</p>
   </footer>
 </template>

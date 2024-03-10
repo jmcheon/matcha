@@ -3,6 +3,14 @@
     "LoginSelector": {
       "login": "Login",
       "register": "Register"
+    },
+    "MenuSelector": {
+      "chat": "Chat",
+      "noti": "Notification",
+      "profile": "Profile"
     }
+  },
+  "Footer": {
+    "copyright": "All Rights Reserved."
   }
 }

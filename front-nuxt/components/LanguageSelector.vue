@@ -3,6 +3,7 @@
   import EnFlag from '~/assets/icons/en.svg';
   import FrFlag from '~/assets/icons/fr.svg';
 
+  const switchLocalePath = useSwitchLocalePath();
   const { locale } = useI18n();
   const options = [
     { name: 'English', value: 'en' },
@@ -25,18 +26,22 @@
 
 <template>
   <div ref="target" class="relative">
-    <v-btn @click.stop="toggleDropdown">
-      <component :is="currentLangFlag" class="h-6 w-6 full-primary-400" />
+    <v-btn rounded @click.stop="toggleDropdown">
+      <component :is="currentLangFlag" class="h-6 w-6 fill-primary-400" />
     </v-btn>
     <ul
       v-if="showDropdown"
       :class="$style.dropdown"
-      class="absolute flex flex-col top-full min-x-[100px] left-0 bg-white text-black rounded-lg p-1 gap-1"
+      class="absolute flex flex-col top-full min-w-[100px] left-0 bg-white text-black rounded-lg p-1 gap-1"
     >
       <li v-for="option in options" :key="option.value">
-        <div class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200">
+        <NuxtLink
+          :to="switchLocalePath(option.value)"
+          class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200"
+          @click.stop="() => (showDropdown = false)"
+        >
           {{ option.name }}
-        </div>
+        </NuxtLink>
       </li>
     </ul>
   </div>

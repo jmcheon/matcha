@@ -3,6 +3,8 @@ import fr from './langs/fr.json';
 
 export default defineI18nConfig(() => ({
   strategy: 'prefix_and_default',
+  silentTranslationWarn: true,
+  silentFallbackWarn: true,
   warnHtmlMessage: false,
   locales: [
     {

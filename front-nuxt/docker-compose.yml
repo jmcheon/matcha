@@ -1,9 +1,0 @@
-version: "3.8"
-services:
-  front:
-    container_name: "front-nuxt"
-    build:
-      context: .
-      dockerfile: Dockerfile.front
-    env_file:
-      - ./.env

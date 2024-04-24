@@ -4,7 +4,8 @@
 **/pnpm-lock.yaml
 **/package-lock.json
 
-db-mysql/*
+db-mysql/dev/
+db-mysql/prod/
 !db/dev/.gitkeep
 !db/prod/.gitkeep
 

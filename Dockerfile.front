@@ -1,12 +1,8 @@
 FROM node:20-slim AS base
 WORKDIR /usr/src/app
-# RUN npm i -g pnpm
 
 FROM base AS dependencies
-COPY ./front-nuxt/package.json ./
-COPY ./front-nuxt/*-lock.json ./
-# RUN mkdir -p /.pnpm-store && \
-#     pnpm config set store-dir /.pnpm-store
+COPY ./front-nuxt/package*.json ./
 RUN npm i --prod=false
 
 FROM dependencies AS development

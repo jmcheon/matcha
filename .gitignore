@@ -2,6 +2,7 @@
 **/dist/
 **/.pnpm-store
 **/pnpm-lock.yaml
+**/package-lock.json
 
 db-mysql/*
 !db/dev/.gitkeep

@@ -8,7 +8,7 @@ COPY ./back-express/*-lock.json ./
 RUN npm i --prod=false
 
 FROM dependencies AS development
-CMD [ "npm", "run", "dev" ]
+CMD [ "npm", "run", "start" ]
 EXPOSE 3005
 
 FROM dependencies AS build

@@ -34,13 +34,13 @@ services:
       dockerfile: Dockerfile.back
     env_file:
       - ./.env
-    depends_on:
-      db:
-        condition: service_healthy
+    # depends_on:
+    #   db:
+    #     condition: service_healthy
     networks:
       - server_network
       - data_network
-    restart: unless-stopped
+    # restart: unless-stopped
 
   db:
     ports:

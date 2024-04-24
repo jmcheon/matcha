@@ -19,7 +19,7 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 
 // Your other Express app configurations and route setups
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  res.send('Hello Worl2d');
 });
 
 app.listen(port, () => {

@@ -5,7 +5,10 @@ import swaggerFile from "./swagger/swagger-output.json"
 import genSwagger from './swagger';
 
 import dotenv from 'dotenv';
+
+import { init, connect } from './db'
 dotenv.config()
+
 
 const app: Express = express();
 const port: number = Number(process.env.BACK_PORT) || 3005;
@@ -21,6 +24,10 @@ app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
 app.get('/', (req, res) => {
   res.send('Hello Worl2d');
 });
+
+const connection = init();
+connect(connection)
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`)

@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile.server
     ports:
-      - "80:80"
+      - "${NGINX_PORT}:80"
     depends_on:
       - front
       - back

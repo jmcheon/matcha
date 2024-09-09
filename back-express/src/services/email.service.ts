@@ -19,13 +19,15 @@ class EmailService {
   }
 
   async sendVerifyEmail(
-    data: { id: string; email: string },
+    data: { id: number; email: string },
     lang: 'en' | 'fr'
   ) {
     console.log(process.env.GMAIL_ID)
     console.log(process.env.GMAIL_PASSWORD)
     try {
+      console.log(data)
       const token = jwt.sign(
+        //TODO: account_id
         { userId: data.id },
         process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
         { expiresIn: '24h' }
@@ -34,11 +36,11 @@ class EmailService {
       const template = {
         en: {
           subject: 'Verify your email',
-          html: `<a href="${process.env.BACK_HOST}/auth/verify-email?token=${token}&lang=${lang}">Verify your email</a>`,
+          html: `<a href="${process.env.BACK_HOST}/verify-email?token=${token}&lang=${lang}">Verify your email</a>`,
         },
         fr: {
           subject: 'Verifier votre email',
-          html: `<a href="${process.env.BACK_HOST}/auth/verify-email?token=${token}&lang=${lang}">Verifier votre email</a>`,
+          html: `<a href="${process.env.BACK_HOST}/verify-email?token=${token}&lang=${lang}">Verifier votre email</a>`,
         },
       };
 

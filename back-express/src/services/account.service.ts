@@ -55,3 +55,35 @@ export const getAccountBySocial = async (social: string, username: string): Prom
     connection.release();
   }
 };
+
+
+// export const update = async (account_id: number, status: string): Promise<Account | null> => {
+//   const connection = await pool.getConnection();
+//   try {
+//     let query;
+//     const [rows]: any = await connection.query(query, [username]);
+//     console.log(rows)
+//     if ((rows as Account[]).length) {
+//       return rows[0] as Account;
+//     }
+//     return null;
+//   } finally {
+//     connection.release();
+//   }
+// };
+
+export const update = async (accountId: number, status: string): Promise<void> => {
+  const connection = await pool.getConnection();
+  try {
+    const query = 'UPDATE account SET status = ? WHERE account_id = ?';
+    const [result]: any = await connection.query(query, [status, accountId]);
+
+    if (result.affectedRows === 0) {
+      throw new Error(`Account with ID ${accountId} not found`);
+    }
+
+    console.log(`Account ${accountId} updated successfully to status ${status}`);
+  } finally {
+    connection.release();
+  }
+};

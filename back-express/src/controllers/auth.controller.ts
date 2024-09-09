@@ -4,6 +4,14 @@ import bcrypt from 'bcrypt';
 import { Account } from '../models/account.model';
 import { FieldPacket, RowDataPacket } from 'mysql2';
 import EmailService from '../services/email.service';
+import { getAccountById, update } from '../services/account.service';
+
+import jwt from 'jsonwebtoken'
+
+interface JwtPayload {
+  userId: number; // Define your payload structure
+}
+
 
 export default class AuthentificationController {
 
@@ -29,11 +37,11 @@ export default class AuthentificationController {
 
       // Insert user into the database
       const [result] = await pool.query(
-        'INSERT INTO account (email, password) VALUES (?, ?)',
-        [email, hashedPassword]
+        'INSERT INTO account (email, password, status) VALUES (?, ?, ?)',
+        [email, hashedPassword, 'pending_verification']
       );
 
-      const userId = (result as any).account_id;
+      const userId = (result as any).insertId;
 
       console.log(result, userId);
 
@@ -51,6 +59,39 @@ export default class AuthentificationController {
       res.status(500).json({ error: 'Server error' });
     }
   }
+
+  static async verifyEmail(req: Request, res: Response) {
+    let { token, lang } = req.query;
+
+    // Set default language if not provided or unsupported
+    const language = ['en', 'fr'].includes(lang as string) ? lang : 'en';
+
+    console.log(token, lang)
+    try {
+      if (!token) {
+        return res.status(400).json({ error: 'Token is required' });
+      }
+
+      // Verify the token
+      const payload = jwt.verify(token as string, process.env.JWT_SECRET as string) as JwtPayload;
+
+      console.log("check check", payload)
+      // Handle user verification here
+      const user = await getAccountById(payload.userId);
+      if (!user) {
+        throw Error("Error")
+      }
+      console.log("user", user)
+      await update(user.account_id, "incomplete_profile");
+
+      // Redirect to the confirmation page
+      res.redirect(`${process.env.FRONT_HOST}/${language}/auth/email-confirmed`);
+    } catch (err) {
+      // Handle token verification errors
+      return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+  }
+
   static async socialRegister(req: any, res: Response) {
     try {
       const uinfo = req.body;

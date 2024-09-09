@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `account` (
     `password` VARCHAR(60) NULL,
     `google_username` VARCHAR(50) NULL,
     `intra_username` VARCHAR(50) NULL,
-    `status` ENUM('email_sent', 'email_verified', 'online', 'offline') NULL,
+    `status` ENUM('pending_verification', 'incomplete_profile', 'online', 'offline') NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `last_modified_at` DATETIME NULL,
     `deleted_at` DATETIME NULL,

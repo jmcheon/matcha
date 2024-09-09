@@ -1,9 +1,6 @@
-export interface UserData {
-  id?: String;
-  username?: String;
-  firstName?: String;
-  lastName?: String;
+export interface AccountData {
+  id?: number;
   email?: String;
-  emailValified?: String;
+  status?: String;
   accessToken?: String;
 }

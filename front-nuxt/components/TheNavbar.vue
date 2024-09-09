@@ -1,5 +1,5 @@
 <script setup>
-  import { useUserStore } from '@/stores/user.store';
+  import { useUserStore } from '@/stores/account.store';
 
   const { isLoggedIn } = storeToRefs(useUserStore());
 </script>

@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS `account` (
     `account_id` INT NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(50) NULL,
-    `password` VARCHAR(50) NULL,
+    `password` VARCHAR(60) NULL,
     `google_username` VARCHAR(50) NULL,
     `intra_username` VARCHAR(50) NULL,
-    `status` ENUM('incomplete', 'online', 'offline') NULL,
+    `status` ENUM('email_sent', 'email_verified', 'online', 'offline') NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `last_modified_at` DATETIME NULL,
     `deleted_at` DATETIME NULL,
@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS `account` (
 CREATE TABLE IF NOT EXISTS `profile` (
     `profile_id` INT NOT NULL AUTO_INCREMENT,
     `account_id` INT NOT NULL,
-    `firstname` VARCHAR(50) NULL,
-    `lastname` VARCHAR(50) NULL,
+    `first_name` VARCHAR(50) NULL,
+    `last_name` VARCHAR(50) NULL,
     `image_paths` JSON NULL,
     `location` VARCHAR(50) NULL,
     `gender` ENUM('male', 'female', 'other') NULL,

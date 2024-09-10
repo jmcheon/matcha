@@ -74,7 +74,10 @@
   const email = ref('');
   const password = ref('');
   const retypePassword = ref('');
+  const axios = useAxios();
   const localePath = useLocalePath();
+  const { doRegister } = useAuth();
+  const { locale } = useI18n();
 
   const redirectToLogin = () => {
     navigateTo({ path: localePath('auth-login') });
@@ -88,29 +91,28 @@
       return;
     }
 
+    const userInfo = {
+      email: email.value,
+      password: password.value,
+    };
+
     try {
-      const response = await fetch('http://localhost:3005/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: email.value,
-          password: password.value,
-        }),
-      });
+      // const response = await fetch('http://localhost:3005/register', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     email: email.value,
+      //     password: password.value,
+      //   }),
+      // });
+      await doRegister(axios, userInfo, locale.value);
 
-      const result = await response.json();
-
-      if (response.ok) {
-        // eslint-disable-next-line no-alert
-        alert('Registration successful!');
-        await navigateTo({ path: localePath('auth-verify-email') });
-        // Redirect to login or handle success further
-      } else {
-        // eslint-disable-next-line no-alert
-        alert(result.error || 'Registration failed');
-      }
+      // eslint-disable-next-line no-alert
+      alert('Registration successful!');
+      await navigateTo({ path: localePath('auth-verify-email') });
+      // Redirect to login or handle success further
     } catch (error) {
       console.error('Error during registration:', error);
       // eslint-disable-next-line no-alert

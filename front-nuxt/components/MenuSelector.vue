@@ -14,6 +14,10 @@
       name: t('Navbar.MenuSelector.profile'),
       value: 'menu-profile',
     },
+    {
+      name: t('Navbar.MenuSelector.logout'),
+      value: 'menu-logout',
+    },
   ]);
   const showDropdown = ref(false);
   const toggleDropdown = () => {

@@ -10,7 +10,7 @@ export const createAccount = async (accountData: Omit<Account, 'account_id' | 'c
       accountData.password,
       accountData.google_username,
       accountData.intra_username,
-      accountData.status || 'incomplete',
+      accountData.status || 'pending_verification',
     ]);
     return {
       account_id: (result as any).insertId,
@@ -72,7 +72,7 @@ export const getAccountBySocial = async (social: string, username: string): Prom
 //   }
 // };
 
-export const update = async (accountId: number, status: string): Promise<void> => {
+export const updateAccountStatus = async (accountId: number, status: string): Promise<void> => {
   const connection = await pool.getConnection();
   try {
     const query = 'UPDATE account SET status = ? WHERE account_id = ?';
@@ -87,3 +87,19 @@ export const update = async (accountId: number, status: string): Promise<void> =
     connection.release();
   }
 };
+
+export const saveRefreshToken = async (accountId: number, token: string): Promise<void> => {
+  const connection = await pool.getConnection();
+  try {
+    const query = 'UPDATE account SET refresh_token = ? WHERE account_id = ?';
+    const [result]: any = await connection.query(query, [token, accountId]);
+
+    if (result.affectedRows === 0) {
+      throw new Error(`Account with ID ${accountId} not found`);
+    }
+
+    console.log(`Account ${accountId} refresh token successfully saved`);
+  } finally {
+    connection.release();
+  }
+}

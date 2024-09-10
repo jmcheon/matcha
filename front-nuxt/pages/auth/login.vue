@@ -77,13 +77,34 @@
     middleware: ['non-auth'],
   });
   const localePath = useLocalePath();
+  const axios = useAxios();
   const email = ref('');
   const password = ref('');
+  const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
+  const { isEmailVerified } = storeToRefs(useUserStore());
+  const { t } = useI18n();
 
   // Handle traditional login form submission
-  const handleLogin = () => {
+  const handleLogin = async () => {
     console.log('Login attempted with', email.value, password.value);
     // Add your login logic here
+    try {
+      await doLogin(axios, {
+        email: email.value,
+        password: password.value,
+      });
+      if (isEmailVerified.value) {
+        await navigateTo({ path: localePath('index') });
+      } else {
+        await navigateTo({ path: localePath('auth-verify-email') });
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      // eslint-disable-next-line no-alert
+      alert('Error during registration');
+    } finally {
+      console.log('hi');
+    }
   };
 
   // Redirect to backend which handles Google OAuth2

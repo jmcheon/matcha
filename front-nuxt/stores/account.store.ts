@@ -5,7 +5,10 @@ export const useUserStore = defineStore('user', () => {
   const refreshTokenIntervalId = ref();
 
   const isLoggedIn = computed(() => !!userData.value.accessToken);
-  const isEmailVerified = computed(() => userData.value.status);
+  const isEmailVerified = computed(() => {
+    if (userData.value.status === 'pending_verification') return false;
+    else return true;
+  });
 
   return {
     isLoggedIn,

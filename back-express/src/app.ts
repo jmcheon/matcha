@@ -3,7 +3,7 @@ import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import accountRoutes from './routes/account.routes';
 import authRoutes from './routes/auth.routes';
-
+import cookieParser from 'cookie-parser';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 
@@ -18,9 +18,11 @@ const app: Express = express();
 const port: number = Number(process.env.BACK_PORT) || 3005;
 
 app.use(cors({
-  origin: 'http://localhost:8080' // or '*' to allow all origins (use this with caution)
+  origin: 'http://localhost:8080', // or '*' to allow all origins (use this with caution)
+  credentials: true
 }));
 
+app.use(cookieParser());
 app.use(express.json())
 
 // Your other Express app configurations and route setups

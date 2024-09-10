@@ -27,6 +27,17 @@
   onClickOutside(target, () => {
     showDropdown.value = false;
   });
+  const axios = useAxios();
+  const { doLogout } = useAuth();
+
+  // Handle logout functionality
+  const handleAction = async (value) => {
+    if (value === 'menu-logout') {
+      await doLogout(axios);
+      // Add your actual logout logic here
+      navigateTo({ path: localePath('index') });
+    }
+  };
 </script>
 
 <template>
@@ -41,7 +52,11 @@
       :class="$style.dropdown"
       class="absolute min-w-[80px] top-[calc(100%+10px)] right-0 gap-1 rounded-lg bg-white text-balck p-1 flex flex-col"
     >
-      <li v-for="option in options" :key="option.value">
+      <li
+        v-for="option in options"
+        :key="option.value"
+        @click="handleAction(option.value)"
+      >
         <div class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200">
           {{ option.name }}
         </div>

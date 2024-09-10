@@ -225,5 +225,25 @@ export default class AuthentificationController {
       return res.status(401).json({ error });
     }
   }
+  static async logout(req: Request, res: Response) {
+
+    const cookieOptions = {
+      domain: process.env.DOMAIN,
+      path: '/',
+      httpOnly: true,
+      expires: new Date(),
+    };
+    console.log(req.cookies)
+
+    res.cookie('accessToken', '', cookieOptions);
+    res.cookie('refreshToken', '', cookieOptions);
+
+    const accessToken = req.cookies['accessToken'];
+    if (!accessToken) return {};
+    const payload: any = await jwt.verify(accessToken, process.env.JWT_SECRET as string);
+    await saveRefreshToken(payload.userId, '');
+    return res.status(200).json({ success: 'Logged out' });
+  }
 }
+
 

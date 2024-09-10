@@ -62,7 +62,7 @@ export const useAuth = () => {
   };
 
   const doLogout = async (api: AxiosInstance) => {
-    await api.post('/auth/logout');
+    await api.delete('/logout');
     userData.value = {} as AccountData;
     stopRefreshAuth();
   };

@@ -8,6 +8,7 @@ const router = express.Router();
 router.get('/social', AuthentificationController.socialRegister);
 router.post('/register', AuthentificationController.register);
 router.post('/login', AuthentificationController.login);
+router.delete('/logout', AuthentificationController.logout);
 router.post('/refresh', AuthentificationController.refresh);
 router.get('/verify-email', AuthentificationController.verifyEmail);
 

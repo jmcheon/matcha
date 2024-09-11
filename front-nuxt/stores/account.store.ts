@@ -9,10 +9,19 @@ export const useUserStore = defineStore('user', () => {
     if (userData.value.status === 'pending_verification') return false;
     else return true;
   });
+  const isProfileGenerated = computed(() => {
+    if (
+      userData.value.status === 'online' ||
+      userData.value.status === 'offline'
+    )
+      return true;
+    else return false;
+  });
 
   return {
     isLoggedIn,
     isEmailVerified,
+    isProfileGenerated,
     userData,
     refreshTokenIntervalId,
   };

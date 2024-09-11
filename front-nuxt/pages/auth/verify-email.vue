@@ -1,6 +1,6 @@
 <script setup>
   definePageMeta({
-    layout: 'auth',
+    // layout: 'auth',
     middleware: ['loose-auth'],
   });
 </script>

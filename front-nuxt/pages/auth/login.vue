@@ -81,7 +81,7 @@
   const email = ref('');
   const password = ref('');
   const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
-  const { isEmailVerified } = storeToRefs(useUserStore());
+  const { isEmailVerified, isProfileGenerated } = storeToRefs(useUserStore());
   const { t } = useI18n();
 
   // Handle traditional login form submission
@@ -94,8 +94,15 @@
         password: password.value,
       });
       if (isEmailVerified.value) {
-        await navigateTo({ path: localePath('index') });
+        if (isProfileGenerated.value) {
+          // User is verified and has a generated profile
+          await navigateTo({ path: localePath('index') });
+        } else {
+          // User is verified but does not have a generated profile
+          await navigateTo({ path: localePath('auth-generate-profile') });
+        }
       } else {
+        // User is not verified
         await navigateTo({ path: localePath('auth-verify-email') });
       }
     } catch (error) {

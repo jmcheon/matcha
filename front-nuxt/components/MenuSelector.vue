@@ -1,6 +1,9 @@
 <script setup>
   import { onClickOutside } from '@vueuse/core';
+  import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
   const { t } = useI18n();
+  const localePath = useLocalePath();
   const options = computed(() => [
     {
       name: t('Navbar.MenuSelector.chat'),
@@ -35,7 +38,7 @@
     if (value === 'menu-logout') {
       await doLogout(axios);
       // Add your actual logout logic here
-      navigateTo({ path: localePath('index') });
+      await navigateTo({ path: localePath('index') });
     }
   };
 </script>

@@ -78,11 +78,6 @@
   const localePath = useLocalePath();
   const { doRegister } = useAuth();
   const { locale } = useI18n();
-
-  const redirectToLogin = () => {
-    navigateTo({ path: localePath('auth-login') });
-  };
-
   // Handle registration form submission
   const handleRegister = async () => {
     if (password.value !== retypePassword.value) {
@@ -97,16 +92,6 @@
     };
 
     try {
-      // const response = await fetch('http://localhost:3005/register', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify({
-      //     email: email.value,
-      //     password: password.value,
-      //   }),
-      // });
       await doRegister(axios, userInfo, locale.value);
 
       // eslint-disable-next-line no-alert
@@ -120,6 +105,10 @@
     } finally {
       console.log('hi');
     }
+  };
+
+  const redirectToLogin = async () => {
+    await navigateTo({ path: localePath('auth-login') });
   };
 </script>
 

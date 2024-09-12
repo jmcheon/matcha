@@ -1,4 +1,4 @@
-import { CookieOptions, Request, Response } from 'express';
+import { CookieOptions, NextFunction, Request, Response } from 'express';
 import { pool } from '../utils/db';
 import bcrypt from 'bcrypt';
 import { Account } from '../models/account.model';
@@ -7,6 +7,7 @@ import EmailService from '../services/email.service';
 import { getAccountById, saveRefreshToken, updateAccountStatus } from '../services/account.service';
 import { getCookieWithJwtAccessToken, getCookieWithJwtRefreshToken } from '../services/auth.service'
 import jwt from 'jsonwebtoken'
+import passport from 'passport';
 
 interface JwtPayload {
   userId: number; // Define your payload structure
@@ -110,41 +111,28 @@ export default class AuthentificationController {
     }
   }
 
-  static async login(req: Request, res: Response) {
-    const { email, password } = req.body;
-    console.log(req.body)
-    console.log(email, password)
-    if (!email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
-    }
+  static login(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('local', async (err: any, account: Account | false, info: { message: string }) => {
+      if (err) return next(err);
+      if (!account) {
+        return res.status(400).json({ error: info.message });
+      }
 
-    try {
-      const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE email = ? LIMIT 1', [email]);
-
-      const account = rows[0]; // Assuming you want the first result (since LIMIT 1)
-      console.log(account); // This will log the account details (e.g., email, id, etc.)
-
-      const { accessToken, ...accessOption } =
-        getCookieWithJwtAccessToken(account.account_id);
-      const { refreshToken, ...refreshOption } =
-        getCookieWithJwtRefreshToken(account.account_id);
+      const { accessToken, ...accessOption } = getCookieWithJwtAccessToken(account.account_id);
+      const { refreshToken, ...refreshOption } = getCookieWithJwtRefreshToken(account.account_id);
 
       res.cookie('accessToken', accessToken, accessOption as CookieOptions);
       res.cookie('refreshToken', refreshToken, refreshOption as CookieOptions);
 
-      await saveRefreshToken(account.account_id, refreshToken)
+      await saveRefreshToken(account.account_id, refreshToken);
 
-      return res.status(201).json({
+      return res.status(200).json({
         ...account,
         accessToken,
       });
-
-    }
-    catch (e) {
-      console.log(e)
-    }
-
+    })(req, res, next);
   }
+
   static async socialRegister(req: any, res: Response) {
     try {
       const uinfo = req.body;

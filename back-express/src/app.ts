@@ -6,24 +6,37 @@ import authRoutes from './routes/auth.routes';
 import cookieParser from 'cookie-parser';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
-
+import passport from 'passport'
 import cors from 'cors';
 
+import passportConfig from './passport'
+
 import { getAccountBySocial } from './services/account.service';
+import session from 'express-session';
+
 
 dotenv.config()
 
 
 const app: Express = express();
 const port: number = Number(process.env.BACK_PORT) || 3005;
-
+passportConfig()
 app.use(cors({
   origin: 'http://localhost:8080', // or '*' to allow all origins (use this with caution)
   credentials: true
 }));
 
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key', // Replace with your own secret
+  resave: false,
+  saveUninitialized: false,
+  cookie: { secure: false } // Set to true if you're using HTTPS
+}));
 app.use(cookieParser());
 app.use(express.json())
+
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Your other Express app configurations and route setups
 app.get('/', (req, res) => {

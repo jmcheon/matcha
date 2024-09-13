@@ -14,6 +14,7 @@
             class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             placeholder="Enter your email"
             required
+            :readonly="isSocialLogin"
           />
         </div>
         <div class="mb-4">
@@ -66,18 +67,32 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'; // Ensure `navigateTo` and `useLocalePath` are imported
-  definePageMeta({
-    // layout: 'auth',
-    middleware: ['non-auth'],
-  });
+  import { ref, onMounted } from 'vue';
+  import { useRoute } from 'vue-router';
+  import { useAxios, useLocalePath, useI18n, navigateTo } from '#imports';
+
   const email = ref('');
   const password = ref('');
   const retypePassword = ref('');
+  const isSocialLogin = ref(false); // To track if the login was through social
+
   const axios = useAxios();
   const localePath = useLocalePath();
   const { doRegister } = useAuth();
   const { locale } = useI18n();
+  const route = useRoute(); // To access query parameters
+
+  // On component mount, check if email is pre-filled from query parameters
+  onMounted(() => {
+    const queryEmail = route.query.email;
+    const socialLogin = route.query.socialLogin === 'true';
+
+    if (queryEmail) {
+      email.value = queryEmail;
+      isSocialLogin.value = socialLogin; // Set flag for social login
+    }
+  });
+
   // Handle registration form submission
   const handleRegister = async () => {
     if (password.value !== retypePassword.value) {
@@ -92,18 +107,14 @@
     };
 
     try {
-      await doRegister(axios, userInfo, locale.value);
-
+      await doRegister(axios, userInfo, locale.value, isSocialLogin.value);
       // eslint-disable-next-line no-alert
       alert('Registration successful!');
       await navigateTo({ path: localePath('auth-verify-email') });
-      // Redirect to login or handle success further
     } catch (error) {
       console.error('Error during registration:', error);
       // eslint-disable-next-line no-alert
       alert('Error during registration');
-    } finally {
-      console.log('hi');
     }
   };
 
@@ -112,7 +123,7 @@
   };
 </script>
 
-<style>
+<style scoped>
   main {
     min-height: 100vh;
     display: flex;

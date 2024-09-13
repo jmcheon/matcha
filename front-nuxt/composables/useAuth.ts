@@ -79,14 +79,32 @@ export const useAuth = () => {
     api: AxiosInstance,
     info: AccountData,
     lang: string,
+    isSocialLogin: boolean = false,
   ) => {
-    const { data } = await api.post(`/register?lang=${lang}`, { ...info });
-    userData.value = data;
-    startRefreshAuth();
+    try {
+      let endpoint = '/register'; // Default to plain register
+
+      // If it's a social login, use the social registration endpoint
+      if (isSocialLogin) {
+        endpoint = '/social-register';
+      }
+
+      // Make API request to the appropriate endpoint
+      const { data } = await api.post(`${endpoint}?lang=${lang}`, { ...info });
+
+      // Set user data and trigger the refresh auth process
+      userData.value = data;
+      startRefreshAuth();
+
+      return data; // Return data if needed for further handling
+    } catch (error) {
+      console.error('Error during registration:', error);
+      throw error; // Rethrow error for caller to handle
+    }
   };
 
-  const onGoogleLogin = () =>
-    (window.location.href = `${BACK_HOST}/auth/google/login`);
+  const onGoogleLogin = () => (window.location.href = `${BACK_HOST}/google`);
+
   const onFtLogin = () => (window.location.href = `${BACK_HOST}/auth/ft/login`);
   const onGithubLogin = () => {
     window.location.href = `${BACK_HOST}/auth/github/login`;

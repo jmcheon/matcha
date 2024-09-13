@@ -79,6 +79,56 @@ export default class AuthentificationController {
     }
   }
 
+  static async registerAfterSocialLogin(req: Request, res: Response) {
+    const { email, password } = req.body;
+    const { lang } = req.query;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    try {
+      const selectedLang: 'en' | 'fr' = lang === 'fr' ? 'fr' : 'en'; // Default to 'en' if not 'fr'
+      const [existingUser] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE email = ?', [email]);
+      if (existingUser.length === 0) {
+        return res.status(404).json({ error: 'No account associated with this email' });
+      }
+
+      let hashedPassword = null;
+      if (password) {
+        hashedPassword = await bcrypt.hash(password, 10);
+        await pool.query('UPDATE account SET password = ?, status = ? WHERE account_id = ?', [hashedPassword, 'pending_verification', existingUser[0].account_id]);
+      }
+
+      const userId = existingUser[0].account_id;
+      const createdUser = {
+        id: userId,
+        email,
+      }
+
+      const { accessToken, ...accessOption } = getCookieWithJwtAccessToken(userId);
+      const { refreshToken, ...refreshOption } = getCookieWithJwtRefreshToken(userId);
+
+      res.cookie('accessToken', accessToken, accessOption as CookieOptions);
+      res.cookie('refreshToken', refreshToken, refreshOption as CookieOptions);
+      await saveRefreshToken(userId, refreshToken);
+      // Send verification email
+      const emailService = new EmailService();
+
+      await emailService.sendVerifyEmail({ id: userId, email }, selectedLang);
+
+      console.log(createdUser)
+      return res.status(201).json({
+        ...createdUser,
+        accessToken,
+      });
+
+    } catch (error) {
+      res.status(500).json({ error: 'Server error' });
+    }
+  }
+
+
   static async verifyEmail(req: Request, res: Response) {
     let { token, lang } = req.query;
 
@@ -132,6 +182,43 @@ export default class AuthentificationController {
       });
     })(req, res, next);
   }
+
+  static googleLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+  }
+
+  // Google callback controller
+  static googleCallback(req: Request, res: Response, next: NextFunction) {
+    let { token, lang } = req.query;
+
+    // Set default language if not provided or unsupported
+    const language = ['en', 'fr'].includes(lang as string) ? lang : 'en';
+
+    passport.authenticate('google', async (err: any, account: Account | false, info: { message: string }) => {
+      if (err) return next(err);
+      if (!account) {
+        return res.status(400).json({ error: info?.message || 'Google login failed' });
+      }
+
+      if (account.status === 'incomplete_profile') {
+        return res.redirect(`http://localhost:8080/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`);
+      }
+      const { accessToken, ...accessOption } = getCookieWithJwtAccessToken(account.account_id);
+      const { refreshToken, ...refreshOption } = getCookieWithJwtRefreshToken(account.account_id);
+
+      res.cookie('accessToken', accessToken, accessOption as CookieOptions);
+      res.cookie('refreshToken', refreshToken, refreshOption as CookieOptions);
+
+      await saveRefreshToken(account.account_id, refreshToken);
+
+      if (account.status === 'pending_verification') {
+        return res.redirect(`http://localhost:8080/${language}/auth/verify-email`);
+      } else {
+        return res.redirect(`http://localhost:8080/${language}`);
+      }
+    })(req, res, next);
+  }
+
 
   static async socialRegister(req: any, res: Response) {
     try {

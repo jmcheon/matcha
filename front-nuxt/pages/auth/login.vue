@@ -55,7 +55,7 @@
     <div class="flex space-x-4">
       <button
         class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-md shadow-md"
-        @click="redirectToGoogle"
+        @click="onGoogleLogin"
       >
         Sign in with Google
       </button>
@@ -115,10 +115,6 @@
   };
 
   // Redirect to backend which handles Google OAuth2
-  const redirectToGoogle = () => {
-    const googleOAuthUrl = `http://localhost:3005/social/google`;
-    window.location.href = googleOAuthUrl;
-  };
 
   const redirectToRegister = () => {
     navigateTo({ path: localePath('auth-register') });

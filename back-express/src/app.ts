@@ -17,7 +17,6 @@ import session from 'express-session';
 
 dotenv.config()
 
-
 const app: Express = express();
 const port: number = Number(process.env.BACK_PORT) || 3005;
 passportConfig()

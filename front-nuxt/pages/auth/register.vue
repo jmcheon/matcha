@@ -1,6 +1,6 @@
 <template>
-  <main class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-blue-500 p-6 rounded-lg shadow-lg w-80">
+  <main class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-green-500">
+    <div class="bg-blue-500 dark:bg-gray-100 p-6 rounded-lg shadow-lg w-80">
       <h2 class="text-center text-xl font-bold mb-4">Register</h2>
       <form @submit.prevent="handleRegister">
         <div class="mb-4">

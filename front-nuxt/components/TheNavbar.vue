@@ -11,6 +11,7 @@
     <div class="mx-auto flex max-w-[1280px] justify-between p-4">
       <div>
         <LanguageSelector />
+        <DarkModeSelector />
       </div>
       <div class="absolute left-[50%] translate-x-1/2">Logo</div>
 

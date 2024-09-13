@@ -1,15 +1,15 @@
 <template>
   <main
-    class="min-h-screen flex flex-col items-center justify-center bg-gray-100"
+    class="min-h-screen flex flex-col items-center justify-center"
   >
     <p class="mb-4 text-lg">hello world</p>
     <button
-      class="bg-blue-500 text-black py-2 px-4 rounded"
+      class="text-black py-2 px-4 rounded"
       @click="goToRegister"
     >
       Register
     </button>
-    <button class="bg-blue-500 text-black py-2 px-4 rounded" @click="goToLogin">
+    <button class=" text-black py-2 px-4 rounded" @click="goToLogin">
       login
     </button>
   </main>

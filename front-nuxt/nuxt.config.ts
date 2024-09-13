@@ -28,6 +28,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@pinia/nuxt',
     'nuxt-svgo',
+    '@nuxtjs/color-mode', // Add this line to include the color-mode module
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error
@@ -36,6 +37,11 @@ export default defineNuxtConfig({
     },
     // ...
   ],
+  colorMode: {
+    classSuffix: '',
+    preference: 'system',
+    fallback: 'dark',
+  },
   vite: {
     vue: {
       template: {

@@ -13,7 +13,7 @@ export const generateProfile = async (req: Request, res: Response): Promise<Resp
 
   try {
     const user: any = await jwt.verify(access_token, process.env.JWT_SECRET as string);
-    const account_id = user.userId; // Assuming req.user is populated via authentication middleware
+    const account_id = user.accountId; // Assuming req.user is populated via authentication middleware
     const {
       firstName: first_name,
       lastName: last_name,

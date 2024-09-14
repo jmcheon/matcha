@@ -3,7 +3,8 @@ WORKDIR /usr/src/app
 
 FROM base AS dependencies
 COPY ./back-express/package*.json ./
-RUN npm i --prod=false
+# RUN npm i --prod=false
+RUN npm i
 
 FROM dependencies AS development
 CMD [ "npm", "run", "start" ]

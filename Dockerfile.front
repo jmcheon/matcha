@@ -3,7 +3,8 @@ WORKDIR /usr/src/app
 
 FROM base AS dependencies
 COPY ./front-nuxt/package*.json ./
-RUN npm i --prod=false
+# RUN npm i --prod=false
+RUN npm i
 
 FROM dependencies AS development
 CMD [ "npm", "run", "dev" ]

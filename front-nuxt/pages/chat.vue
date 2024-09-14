@@ -1,6 +1,6 @@
 <!-- Your Page Component -->
 <template>
   <div class="flex items-center justify-center h-full dark:bg-black">
-    <p class="text-lg text-center dark:text-white">hello world</p>
+    <p class="text-lg text-center dark:text-white">chat</p>
   </div>
 </template>

@@ -45,11 +45,7 @@
 
 <template>
   <div ref="target" class="relative">
-    <v-btn
-      icon="mdi-account"
-      aria-label="User Menu"
-      @click.stop="toggleDropdown"
-    />
+    <v-btn icon="mdi-cog" aria-label="User Menu" @click.stop="toggleDropdown" />
     <ul
       v-if="showDropdown"
       :class="$style.dropdown"

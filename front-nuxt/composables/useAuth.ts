@@ -15,7 +15,7 @@ export const useAuth = () => {
 
     const cookie = useRequestHeaders(['cookie']);
     try {
-      const data: UserData = await $fetch(`http://back-nestjs:3005/refresh`, {
+      const data: AccountData = await $fetch(`http://localhost:3005/refresh`, {
         method: 'POST',
         headers: {
           ...cookie,

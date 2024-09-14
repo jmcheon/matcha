@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
+import { Response, CookieOptions } from "express";
 import { pool } from "../utils/db"
+[]
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; // You should set this securely
 const ACCESS_TOKEN_EXPIRATION = 900; // Example: 15 minutes in seconds
@@ -65,3 +67,4 @@ export const saveRefreshToken = async (accountId: number, token: string): Promis
     connection.release();
   }
 }
+

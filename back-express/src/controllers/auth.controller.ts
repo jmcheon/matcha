@@ -109,7 +109,6 @@ export default class AuthenticationController {
       if (!existingUser) {
         return res.status(404).json({ error: 'No account associated with this email' });
       }
-      console.log("error2")
 
       if (password) {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -120,7 +119,6 @@ export default class AuthenticationController {
         );
       }
 
-      console.log("error3")
       const userId = existingUser.account_id;
       const createdUser = {
         id: userId,
@@ -130,18 +128,15 @@ export default class AuthenticationController {
       // Use the helper function to generate tokens and set cookies
       const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, userId);
 
-      console.log("error4")
       // Send verification email
       const emailService = new EmailService();
       await emailService.sendVerifyEmail({ id: userId, email }, selectedLang);
 
-      console.log("error5")
       return res.status(201).json({
         ...createdUser,
         accessToken,
       });
     } catch (error) {
-      console.log("errorrrrr", error)
       res.status(500).json({ error: 'Server error' });
     }
   }
@@ -168,7 +163,7 @@ export default class AuthenticationController {
       await updateAccountStatus(user.account_id, 'incomplete_profile');
 
       // Redirect to the confirmation page
-      res.redirect(`${process.env.FRONT_HOST}/${language}/auth/generate-profile`);
+      res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
     } catch (err) {
       // Handle token verification errors
       return res.status(400).json({ error: 'Invalid or expired token' });

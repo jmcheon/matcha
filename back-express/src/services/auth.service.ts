@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+import { pool } from "../utils/db"
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; // You should set this securely
 const ACCESS_TOKEN_EXPIRATION = 900; // Example: 15 minutes in seconds
@@ -47,4 +48,20 @@ export function getCookieWithJwtRefreshToken(userId: number) {
       expires: new Date(Date.now() + 1000 * expiration), // Set expiration in ms
     },
   };
+}
+
+export const saveRefreshToken = async (accountId: number, token: string): Promise<void> => {
+  const connection = await pool.getConnection();
+  try {
+    const query = 'UPDATE account SET refresh_token = ? WHERE account_id = ?';
+    const [result]: any = await connection.query(query, [token, accountId]);
+
+    if (result.affectedRows === 0) {
+      throw new Error(`Account with ID ${accountId} not found`);
+    }
+
+    console.log(`Account ${accountId} refresh token successfully saved`);
+  } finally {
+    connection.release();
+  }
 }

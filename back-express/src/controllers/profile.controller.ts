@@ -1,17 +1,16 @@
-import { pool } from '../utils/db';
-import { Account } from '../models/account.model';
+import { getAccountById, updateAccountStatus } from '../models/account.model';
 const jwt = require('jsonwebtoken');
 import { Request, Response } from 'express';
-import { RowDataPacket } from 'mysql2';
-
-// Assuming you already have a JWT/Auth utility for accessing the current user's account_id
+import { createProfile, getProfileByAccountId, Profile } from '../models/profile.model';
 
 export const generateProfile = async (req: Request, res: Response): Promise<Response> => {
-  let access_token = req.cookies['accessToken'];
+  //TODO: remove
+  const access_token = req.cookies['accessToken'];
   if (!access_token) {
-    console.log("here")
-    return res.json({ error: 'refresh_token not exist' });
+    console.log('Access token not found');
+    return res.status(401).json({ error: 'Access token not provided' });
   }
+
   try {
     const user: any = await jwt.verify(access_token, process.env.JWT_SECRET as string);
     const account_id = user.userId; // Assuming req.user is populated via authentication middleware
@@ -26,32 +25,26 @@ export const generateProfile = async (req: Request, res: Response): Promise<Resp
       interests,
       bio
     } = req.body;
+
     // Validate input
     if (!first_name || !last_name || !location || !gender || !like_gender || !height || !bio) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     // Check if account exists
-    const [accountRows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM account WHERE account_id = ? LIMIT 1',
-      [account_id]
-    );
-    if (accountRows.length === 0) {
+    const account = await getAccountById(account_id);
+    if (!account) {
       return res.status(404).json({ error: 'Account not found' });
     }
 
     // Check if a profile already exists for this account
-    const [profileCheck] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM profile WHERE account_id = ? LIMIT 1',
-      [account_id]
-    );
-
-    if (profileCheck.length > 0) {
+    const existingProfile = await getProfileByAccountId(account_id);
+    if (existingProfile) {
       return res.status(400).json({ error: 'Profile already exists for this account' });
     }
 
-    // Insert new profile
-    const [insertResult] = await pool.query('INSERT INTO profile (account_id, first_name, last_name, location, gender, like_gender, height, user_language, interests, bio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [
+    // Create new profile data
+    const profileData: Profile = {
       account_id,
       first_name,
       last_name,
@@ -60,22 +53,22 @@ export const generateProfile = async (req: Request, res: Response): Promise<Resp
       like_gender,
       height,
       user_language,
-      interests, // This can be a comma-separated string, e.g. "music,travel"
+      interests,
       bio,
-    ]);
+    };
+
+    const insertResult = await createProfile(profileData);
+    await updateAccountStatus(account_id, "online");
 
     // Check if the profile was successfully created
-    if (!insertResult) {
+    if (!insertResult || insertResult.affectedRows === 0) {
       return res.status(500).json({ error: 'Profile creation failed' });
     }
 
-    // Return the created profile
-    const [newProfile] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM profile WHERE account_id = ? LIMIT 1',
-      [account_id]
-    );
-    console.log("checker 2", newProfile[0])
-    return res.status(201).json(newProfile[0]);
+    // Retrieve and return the created profile
+    const newProfile = await getProfileByAccountId(account_id);
+    return res.status(201).json(newProfile);
+
   } catch (error) {
     console.error('Error generating profile:', error);
     return res.status(500).json({ error: 'An error occurred while generating the profile' });

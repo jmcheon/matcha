@@ -1,7 +1,7 @@
 import passport from 'passport';
-import { getAccountById } from '../services/account.service';
 import local from './localStrategy'
 import google from './googleStrategy'
+import { getAccountById } from '../models/account.model';
 export default () => {
   passport.serializeUser((user: any, done) => {
     done(null, user.id);

@@ -1,6 +1,6 @@
 // controllers/accountController.ts
 import { Request, Response } from 'express';
-import { getAccountById } from '../services/account.service';
+import { getAccountById } from '../models/account.model';
 
 export const getAccountByIdController = async (req: Request, res: Response) => {
   try {

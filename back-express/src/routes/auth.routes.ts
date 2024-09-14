@@ -6,7 +6,6 @@ import { isNotLoggedIn } from '../middleware/authGuard';
 const router = express.Router();
 
 // Define the route to get account by ID
-router.get('/social', AuthentificationController.socialRegister);
 router.post('/register', AuthentificationController.register);
 router.post('/social-register', AuthentificationController.registerAfterSocialLogin);
 router.post('/login', isNotLoggedIn, AuthentificationController.login);

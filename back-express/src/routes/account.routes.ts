@@ -1,7 +1,7 @@
 // routes/accountRoutes.ts
 import express from 'express';
 import { getAccountByIdController } from '../controllers/account.controller';
-import { generateProfile } from '../services/profile.service';
+import { generateProfile } from '../controllers/profile.controller';
 
 const router = express.Router();
 

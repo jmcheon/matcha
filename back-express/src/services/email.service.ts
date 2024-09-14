@@ -22,8 +22,6 @@ class EmailService {
     data: { id: number; email: string },
     lang: 'en' | 'fr'
   ) {
-    console.log(process.env.GMAIL_ID)
-    console.log(process.env.GMAIL_PASSWORD)
     try {
       console.log(data)
       const token = jwt.sign(

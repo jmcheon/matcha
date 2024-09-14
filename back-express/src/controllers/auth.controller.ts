@@ -180,6 +180,7 @@ export default class AuthenticationController {
       // Use the helper function to generate tokens and set cookies
       const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, account.account_id);
 
+      await updateAccountStatus(account.account_id, 'online');
       return res.status(200).json({
         ...account,
         accessToken,
@@ -271,6 +272,8 @@ export default class AuthenticationController {
     try {
       const payload = jwt.verify(accessToken, process.env.JWT_SECRET as string) as JwtPayload;
       await saveRefreshToken(payload.userId, '');
+
+      await updateAccountStatus(payload.userId, 'offline');
     } catch (error) {
       // Token is invalid or expired; proceed with logout
     }

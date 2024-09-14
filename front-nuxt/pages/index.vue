@@ -1,10 +1,12 @@
 <template>
-  <main class="min-h-screen flex flex-col items-center justify-center">
-    <p class="mb-4 text-lg">hello world</p>
-    <button class="text-black py-2 px-4 rounded" @click="goToRegister">
+  <main
+    class="min-h-screen flex flex-col items-center justify-center dark:bg-black"
+  >
+    <p class="mb-4 text-lg dark:text-white">hello world</p>
+    <button class="py-2 px-4 rounded dark:text-white" @click="goToRegister">
       Register
     </button>
-    <button class="text-black py-2 px-4 rounded" @click="goToLogin">
+    <button class="py-2 px-4 rounded dark:text-white" @click="goToLogin">
       login
     </button>
   </main>

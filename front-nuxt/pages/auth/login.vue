@@ -82,7 +82,6 @@
   const password = ref('');
   const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
   const { isEmailVerified, isProfileGenerated } = storeToRefs(useUserStore());
-  const { t } = useI18n();
 
   // Handle traditional login form submission
   const handleLogin = async () => {

@@ -26,18 +26,20 @@
 
 <template>
   <div ref="target" class="relative">
-    <v-btn rounded @click.stop="toggleDropdown">
-      <component :is="currentLangFlag" class="h-6 w-6 fill-primary-400" />
+    <!-- Match the circular style with the LoginSelector -->
+    <v-btn icon class="dark:bg-gray-500" @click.stop="toggleDropdown">
+      <component :is="currentLangFlag" class="h-6 w-6" />
     </v-btn>
+
     <ul
       v-if="showDropdown"
       :class="$style.dropdown"
-      class="absolute flex flex-col top-full min-w-[100px] left-0 bg-white text-black rounded-lg p-1 gap-1"
+      class="absolute flex flex-col top-full min-w-[100px] left-0 rounded-lg p-1 gap-1 dark:bg-gray-500"
     >
       <li v-for="option in options" :key="option.value">
         <NuxtLink
           :to="switchLocalePath(option.value)"
-          class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200"
+          class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200 dark:hover:bg-surface-700 dark:text-white dark:bg-gray-5"
           @click.stop="() => (showDropdown = false)"
         >
           {{ option.name }}

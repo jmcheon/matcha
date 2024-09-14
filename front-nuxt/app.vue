@@ -1,6 +1,3 @@
-<script setup>
-  console.log('test');
-</script>
 <template>
   <NuxtLayout>
     <v-app>

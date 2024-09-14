@@ -1,8 +1,26 @@
 <template>
-  <main class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-green-500">
+  <main
+    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-green-500"
+  >
     <div class="bg-blue-500 dark:bg-gray-100 p-6 rounded-lg shadow-lg w-80">
       <h2 class="text-center text-xl font-bold mb-4">Register</h2>
       <form @submit.prevent="handleRegister">
+        <!-- Username Input Field -->
+        <div class="mb-4">
+          <label for="username" class="block text-sm font-medium text-gray-700"
+            >Username</label
+          >
+          <input
+            id="username"
+            v-model="username"
+            type="text"
+            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+
+        <!-- Email Input Field -->
         <div class="mb-4">
           <label for="email" class="block text-sm font-medium text-gray-700"
             >Email</label
@@ -17,6 +35,8 @@
             :readonly="isSocialLogin"
           />
         </div>
+
+        <!-- Password Input Field -->
         <div class="mb-4">
           <label for="password" class="block text-sm font-medium text-gray-700"
             >Password</label
@@ -30,6 +50,8 @@
             required
           />
         </div>
+
+        <!-- Retype Password Input Field -->
         <div class="mb-4">
           <label
             for="retypePassword"
@@ -45,6 +67,7 @@
             required
           />
         </div>
+
         <button
           type="submit"
           class="w-full px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow-md"
@@ -52,6 +75,7 @@
           Register
         </button>
       </form>
+
       <p class="mt-4 text-center text-sm text-gray-600">
         Already have an account?
         <button
@@ -74,6 +98,7 @@
   const email = ref('');
   const password = ref('');
   const retypePassword = ref('');
+  const username = ref(''); // New username field
   const isSocialLogin = ref(false); // To track if the login was through social
 
   const axios = useAxios();
@@ -102,6 +127,7 @@
     }
 
     const userInfo = {
+      username: username.value, // Add username to registration data
       email: email.value,
       password: password.value,
     };
@@ -118,6 +144,7 @@
     }
   };
 
+  // Redirect to login page
   const redirectToLogin = async () => {
     await navigateTo({ path: localePath('auth-login') });
   };

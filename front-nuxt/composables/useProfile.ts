@@ -39,13 +39,13 @@ export const useProfile = () => {
     }
   }
 
-  const updateProfile = async (
-    api: AxiosInstance,
-    userId: string,
-    userInfo: UserData,
-  ) => {
-    await api.patch('/users/' + userId, userInfo);
-  };
+  // const updateProfile = async (
+  //   api: AxiosInstance,
+  //   userId: string,
+  //   userInfo: UserData,
+  // ) => {
+  //   await api.patch('/users/' + userId, userInfo);
+  // };
 
   const generateProfile = async (api: AxiosInstance, userInfo: ProfileData) => {
     await api.post('/api/profile', userInfo);
@@ -55,6 +55,6 @@ export const useProfile = () => {
     imageAlertActive,
     generateProfile,
     updateAvatar,
-    updateProfile,
+    // updateProfile,
   };
 };

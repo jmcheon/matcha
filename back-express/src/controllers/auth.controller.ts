@@ -3,9 +3,11 @@ import bcrypt from 'bcrypt';
 import {
   Account,
   checkIfEmailExists,
+  checkIfUsernameExists,
   createAccount,
   getAccountByEmail,
   getAccountById,
+  getAccountStatus,
   updateAccountStatus,
 } from '../models/account.model';
 import { pool } from '../utils/db'
@@ -17,10 +19,7 @@ import {
 } from '../services/auth.service';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
-
-interface JwtPayload {
-  userId: number;
-}
+import { JwtPayloadModel } from '../models/payload.model';
 
 export default class AuthenticationController {
   // Helper function to generate tokens, set cookies, and save refresh token
@@ -28,7 +27,6 @@ export default class AuthenticationController {
     res: Response,
     userId: number
   ): Promise<string> {
-    console.log('Entered generateTokensAndSetCookies with userId:', userId);
     try {
       const { accessToken, ...accessOption } = getCookieWithJwtAccessToken(userId);
       const { refreshToken, ...refreshOption } = getCookieWithJwtRefreshToken(userId);
@@ -38,25 +36,29 @@ export default class AuthenticationController {
 
       await saveRefreshToken(userId, refreshToken);
 
-      console.log('Exiting generateTokensAndSetCookies');
 
       return accessToken;
     } catch (error) {
-      console.log('Error in generateTokensAndSetCookies:', error);
-      throw error; // Re-throw the error to be caught in the calling method
+      throw error;
     }
   }
 
   static async register(req: Request, res: Response) {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
     const { lang } = req.query;
 
-    if (!email || !password) {
+    if (!username || !email || !password) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
     try {
       const selectedLang: 'en' | 'fr' = lang === 'fr' ? 'fr' : 'en';
+
+      const usernameExists = await checkIfUsernameExists(username);
+      if (usernameExists) {
+        return res.status(409).json({ error: 'Username is already in use' });
+      }
+
 
       // Check if email is already in use
       const emailExists = await checkIfEmailExists(email);
@@ -68,19 +70,20 @@ export default class AuthenticationController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Create a new account
-      const userId = await createAccount(email, hashedPassword, 'pending_verification');
+      const accountId = await createAccount(username, email, hashedPassword, 'pending_verification');
 
       const createdUser = {
-        id: userId,
+        accountId: accountId,
+        username,
         email,
       };
 
       // Use the helper function to generate tokens and set cookies
-      const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, userId);
+      const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, accountId);
 
       // Send verification email
       const emailService = new EmailService();
-      await emailService.sendVerifyEmail({ id: userId, email }, selectedLang);
+      await emailService.sendVerifyEmail(createdUser, selectedLang);
 
       // Respond with success
       return res.status(201).json({
@@ -94,43 +97,46 @@ export default class AuthenticationController {
   }
 
   static async registerAfterSocialLogin(req: Request, res: Response) {
-    const { email, password } = req.body;
+    const { username, email, password } = req.body;
     const { lang } = req.query;
 
-    if (!email) {
+    if (!username || !email || !password) {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-
     try {
       const selectedLang: 'en' | 'fr' = lang === 'fr' ? 'fr' : 'en';
-      console.log("error1")
+
+      const usernameExists = await checkIfUsernameExists(username);
+      if (usernameExists) {
+        return res.status(409).json({ error: 'Username is already in use' });
+      }
+
       const existingUser = await getAccountByEmail(email);
       if (!existingUser) {
-        return res.status(404).json({ error: 'No account associated with this email' });
+        return res.status(409).json({ error: 'No account associated with this email' });
       }
 
-      if (password) {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        await updateAccountStatus(existingUser.account_id, 'pending_verification');
-        await pool.query(
-          'UPDATE account SET password = ? WHERE account_id = ?',
-          [hashedPassword, existingUser.account_id]
-        );
-      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await updateAccountStatus(existingUser.account_id, 'pending_verification');
+      await pool.query(
+        'UPDATE account SET username =?, email=?, password = ? WHERE account_id = ?',
+        [username, email, hashedPassword, existingUser.account_id]
+      );
 
-      const userId = existingUser.account_id;
+      const accountId = existingUser.account_id;
       const createdUser = {
-        id: userId,
+        accountId: accountId,
+        username,
         email,
       };
 
       // Use the helper function to generate tokens and set cookies
-      const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, userId);
+      const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, accountId);
 
       // Send verification email
       const emailService = new EmailService();
-      await emailService.sendVerifyEmail({ id: userId, email }, selectedLang);
+      await emailService.sendVerifyEmail(createdUser, selectedLang);
 
       return res.status(201).json({
         ...createdUser,
@@ -141,34 +147,6 @@ export default class AuthenticationController {
     }
   }
 
-  static async verifyEmail(req: Request, res: Response) {
-    const { token, lang } = req.query;
-
-    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
-
-    try {
-      if (!token) {
-        return res.status(400).json({ error: 'Token is required' });
-      }
-
-      // Verify the token
-      const payload = jwt.verify(token as string, process.env.JWT_SECRET as string) as JwtPayload;
-
-      // Handle user verification here
-      const user = await getAccountById(payload.userId);
-      if (!user) {
-        throw new Error('User not found');
-      }
-
-      await updateAccountStatus(user.account_id, 'incomplete_profile');
-
-      // Redirect to the confirmation page
-      res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-    } catch (err) {
-      // Handle token verification errors
-      return res.status(400).json({ error: 'Invalid or expired token' });
-    }
-  }
 
   static login(req: Request, res: Response, next: NextFunction) {
     passport.authenticate('local', async (err: any, account: Account | false, info: { message: string }) => {
@@ -180,12 +158,46 @@ export default class AuthenticationController {
       // Use the helper function to generate tokens and set cookies
       const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, account.account_id);
 
-      await updateAccountStatus(account.account_id, 'online');
+      // check if the account needs to be verified or not, change to online
+      const accountStatus = await getAccountStatus(account.account_id);
+      if (accountStatus === "offline")
+        await updateAccountStatus(account.account_id, 'online');
       return res.status(200).json({
         ...account,
         accessToken,
       });
     })(req, res, next);
+  }
+
+  static async logout(req: Request, res: Response) {
+    const cookieOptions = {
+      domain: process.env.DOMAIN,
+      path: '/',
+      httpOnly: true,
+      expires: new Date(),
+    };
+
+    const accessToken = req.cookies['accessToken'];
+    if (!accessToken) return res.status(200).json({ success: 'Logged out' });
+
+    try {
+      const payload = jwt.verify(accessToken, process.env.JWT_SECRET as string) as JwtPayloadModel;
+      console.log(payload)
+      await saveRefreshToken(payload.accountId, '');
+      console.log("testing")
+      // check if the account needs to be verified or not, change to online
+      const accountStatus = await getAccountStatus(payload.accountId);
+      console.log("logout", accountStatus)
+      if (accountStatus === "online")
+        await updateAccountStatus(payload.accountId, 'offline');
+
+      res.cookie('accessToken', '', cookieOptions);
+      res.cookie('refreshToken', '', cookieOptions);
+    } catch (error) {
+      // Token is invalid or expired; proceed with logout
+    } finally {
+      return res.status(200).json({ success: 'Logged out' });
+    }
   }
 
   static googleLogin(req: Request, res: Response, next: NextFunction) {
@@ -226,8 +238,8 @@ export default class AuthenticationController {
       return res.status(400).json({ error: 'Refresh token not provided' });
     }
     try {
-      const payload = jwt.verify(oldRefreshToken, process.env.JWT_SECRET as string) as JwtPayload;
-      const userId = payload.userId;
+      const payload = jwt.verify(oldRefreshToken, process.env.JWT_SECRET as string) as JwtPayloadModel;
+      const userId = payload.accountId;
 
       if (!userId) {
         throw new Error('User not found');
@@ -240,6 +252,7 @@ export default class AuthenticationController {
         httpOnly: true,
         expires: new Date(),
       };
+
       res.cookie('accessToken', '', cookieOptions);
       res.cookie('refreshToken', '', cookieOptions);
 
@@ -256,27 +269,4 @@ export default class AuthenticationController {
     }
   }
 
-  static async logout(req: Request, res: Response) {
-    const cookieOptions = {
-      domain: process.env.DOMAIN,
-      path: '/',
-      httpOnly: true,
-      expires: new Date(),
-    };
-
-    res.cookie('accessToken', '', cookieOptions);
-    res.cookie('refreshToken', '', cookieOptions);
-
-    const accessToken = req.cookies['accessToken'];
-    if (!accessToken) return res.status(200).json({ success: 'Logged out' });
-    try {
-      const payload = jwt.verify(accessToken, process.env.JWT_SECRET as string) as JwtPayload;
-      await saveRefreshToken(payload.userId, '');
-
-      await updateAccountStatus(payload.userId, 'offline');
-    } catch (error) {
-      // Token is invalid or expired; proceed with logout
-    }
-    return res.status(200).json({ success: 'Logged out' });
-  }
 }

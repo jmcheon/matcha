@@ -16,7 +16,7 @@ function getExpirationRefresh() {
 }
 
 export function getCookieWithJwtAccessToken(userId: number) {
-  const payload = { userId };
+  const payload = { "accountId": userId };
   const token = jwt.sign(payload, JWT_SECRET, {
     expiresIn: `${getExpirationAccess()}s`,
   });
@@ -34,7 +34,7 @@ export function getCookieWithJwtAccessToken(userId: number) {
 }
 
 export function getCookieWithJwtRefreshToken(userId: number) {
-  const payload = { userId };
+  const payload = { "accountId": userId };
   const expiration = getExpirationRefresh();
   const token = jwt.sign(payload, JWT_SECRET, {
     expiresIn: expiration,
@@ -55,7 +55,12 @@ export function getCookieWithJwtRefreshToken(userId: number) {
 export const saveRefreshToken = async (accountId: number, token: string): Promise<void> => {
   const connection = await pool.getConnection();
   try {
+    console.log("DB connection established for account", accountId);
     const query = 'UPDATE account SET refresh_token = ? WHERE account_id = ?';
+
+    // Log the query and values
+    console.log("Running query:", query, "with values:", [token, accountId]);
+
     const [result]: any = await connection.query(query, [token, accountId]);
 
     if (result.affectedRows === 0) {
@@ -63,8 +68,11 @@ export const saveRefreshToken = async (accountId: number, token: string): Promis
     }
 
     console.log(`Account ${accountId} refresh token successfully saved`);
+  } catch (error) {
+    console.error(`Error saving refresh token for account ${accountId}:`, error);
+    throw error;
   } finally {
     connection.release();
+    console.log("DB connection released for account", accountId);
   }
-}
-
+};

@@ -7,15 +7,15 @@
       <h2 class="text-center text-xl font-bold mb-4">Login</h2>
       <form @submit.prevent="handleLogin">
         <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700"
-            >Email</label
+          <label for="username" class="block text-sm font-medium text-gray-700"
+            >Username</label
           >
           <input
-            id="email"
-            v-model="email"
-            type="email"
+            id="username"
+            v-model="username"
+            type="username"
             class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your email"
+            placeholder="Enter your username"
             required
           />
         </div>
@@ -78,7 +78,7 @@
   });
   const localePath = useLocalePath();
   const axios = useAxios();
-  const email = ref('');
+  const username = ref('');
   const password = ref('');
   const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
   const { isEmailVerified, isProfileGenerated } = storeToRefs(useUserStore());
@@ -86,11 +86,11 @@
 
   // Handle traditional login form submission
   const handleLogin = async () => {
-    console.log('Login attempted with', email.value, password.value);
+    console.log('Login attempted with', username.value, password.value);
     // Add your login logic here
     try {
       await doLogin(axios, {
-        email: email.value,
+        username: username.value,
         password: password.value,
       });
       if (isEmailVerified.value) {

@@ -2,6 +2,7 @@
 import express from 'express';
 import AuthentificationController from '../controllers/auth.controller';
 import { isNotLoggedIn } from '../middleware/authGuard';
+import EmailService from '../services/email.service';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.post('/social-register', AuthentificationController.registerAfterSocialLo
 router.post('/login', isNotLoggedIn, AuthentificationController.login);
 router.delete('/logout', AuthentificationController.logout);
 router.post('/refresh', AuthentificationController.refresh);
-router.get('/verify-email', AuthentificationController.verifyEmail);
+router.get('/verify-email', EmailService.verifyEmail);
 router.get('/google', AuthentificationController.googleLogin);
 
 router.get('/auth/google/callback', AuthentificationController.googleCallback);

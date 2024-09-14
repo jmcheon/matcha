@@ -51,10 +51,10 @@ export const useAuth = () => {
 
   const doLogin = async (
     api: AxiosInstance,
-    info: { email: string; password: string },
+    info: { username: string; password: string },
   ) => {
     const { data } = await api.post('/login', {
-      email: info.email,
+      username: info.username,
       password: info.password,
     });
     userData.value = data;

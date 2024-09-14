@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS `account` (
     `account_id` INT NOT NULL AUTO_INCREMENT,
+    `username` VARCHAR(50) NULL,
     `email` VARCHAR(50) NULL,
     `password` VARCHAR(60) NULL,
-    `google_username` VARCHAR(50) NULL,
+    `google_id` VARCHAR(50) NULL,
     `intra_username` VARCHAR(50) NULL,
-    `access_token` VARCHAR(600) NULL,
     `refresh_token` VARCHAR(600) NULL,
     `status` ENUM('pending_verification', 'incomplete_profile', 'online', 'offline') NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

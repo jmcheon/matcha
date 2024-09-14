@@ -27,8 +27,8 @@ export default function google() {
 
           if (!account) {
             // If account does not exist, create a new account
-            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (email, google_username, status) VALUES (?, ?, ?)', [email, googleId, 'incomplete_profile']);
-            account = { account_id: result.insertId, email, status: 'incomplete_profile', google_username: googleId, created_at: new Date() }; // Return newly created account
+            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (email, google_id, status) VALUES (?, ?, ?)', [email, googleId, 'incomplete_profile']);
+            account = { account_id: result.insertId, email, status: 'incomplete_profile', google_id: googleId, created_at: new Date() }; // Return newly created account
           }
 
           return done(null, account); // Successful authentication

@@ -60,7 +60,6 @@
       await navigateTo({ path: localePath('auth-verify-email') });
     } catch (e) {
       if (e.response && e.response.data.code) {
-        console.log('checker', e.response.data);
         errorGlobal.value = t(`Error.${e.response.data.code}`);
       } else {
         errorGlobal.value = t('Error.GENERAL_ERROR');
@@ -68,6 +67,10 @@
     } finally {
       loading.value = false;
     }
+  };
+
+  const redirectToLogin = async () => {
+    await navigateTo({ path: localePath('auth-login') });
   };
 </script>
 

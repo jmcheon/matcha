@@ -1,4 +1,18 @@
 {
+  "_Global": {
+    "email": "Email",
+    "firstName": "First name",
+    "genre": "Genre",
+    "greaterThan": "Greater than",
+    "lastName": "Last name",
+    "password": "Password",
+    "retypePassword": "Retype password",
+    "update": "Update",
+    "username": "Username",
+    "year": "Year",
+    "login": "Login",
+    "forgotPassword": "Forgot password"
+  },
   "Navbar": {
     "LoginSelector": {
       "login": "Login",
@@ -13,5 +27,33 @@
   },
   "Footer": {
     "copyright": "All Rights Reserved."
+  },
+  "Error": {
+    "404": "Page not found",
+    "backToHome": "Back to home",
+    "EMAIL_ALREADY_EXISTS": "Email already exists.",
+    "GENERAL_ERROR": "Unexpected error",
+    "INVALID_EMAIL": "Invalid email address",
+    "INVALID_LOGIN": "Invalid username or password",
+    "INVALID_PASSWORD": "Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a digit, and a special character.",
+    "INVALID_USER_CREDENTIALS": "Invalid user credentials.",
+    "MAX_LENGTH": "{value} must be less than {length}",
+    "MIN_LENGTH": "{value} must be at least {length} characters long.",
+    "PASSWORDS_DO_NOT_MATCH": "Password does not match.",
+    "REQUIRED": " {value} is required",
+    "USERNAME_ALREADY_EXISTS": "Username already exists."
+  },
+  "AuthRegister": {
+    "description": "Create an account to enjoy unlimited movies",
+    "or": "OR",
+    "register": "Register",
+    "Stepper": {
+      "step1": "Register",
+      "step2": "Verify email",
+      "step3": "Done"
+    },
+    "title": "Register Matcha",
+    "alreadyAccount": "Already have an account?",
+    "forgotPassword": "Forgot password?"
   }
 }

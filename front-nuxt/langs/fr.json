@@ -7,5 +7,16 @@
   },
   "Footer": {
     "copyright": "Tous droits réservés."
+  },
+  "AuthRegister": {
+    "description": "Create an account to enjoy unlimited movies",
+    "or": "OR",
+    "register": "Register",
+    "Stepper": {
+      "step1": "Register",
+      "step2": "Verify email",
+      "step3": "Done"
+    },
+    "title": "Register Hypertube"
   }
 }

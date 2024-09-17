@@ -3,6 +3,7 @@
     <v-btn
       icon="mdi-theme-light-dark"
       aria-label="Toggle Dark Mode"
+      class="dark:bg-gray-500"
       @click="toggleDarkMode"
     />
   </div>

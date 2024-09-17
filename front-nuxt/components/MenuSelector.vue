@@ -1,3 +1,24 @@
+<template>
+  <div ref="target" class="relative">
+    <v-btn icon="mdi-cog" aria-label="User Menu" @click.stop="toggleDropdown" />
+    <ul
+      v-if="showDropdown"
+      :class="$style.dropdown"
+      class="flex flex-col absolute top-[calc(100%+10px)] right-0 min-w-[80px] gap-1 p-1 rounded-lg bg-white text-balck"
+    >
+      <li
+        v-for="option in options"
+        :key="option.value"
+        @click="handleAction(option.value)"
+      >
+        <div class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200">
+          {{ option.name }}
+        </div>
+      </li>
+    </ul>
+  </div>
+</template>
+
 <script setup>
   import { onClickOutside } from '@vueuse/core';
   import { ref } from 'vue';
@@ -42,27 +63,6 @@
     }
   };
 </script>
-
-<template>
-  <div ref="target" class="relative">
-    <v-btn icon="mdi-cog" aria-label="User Menu" @click.stop="toggleDropdown" />
-    <ul
-      v-if="showDropdown"
-      :class="$style.dropdown"
-      class="absolute min-w-[80px] top-[calc(100%+10px)] right-0 gap-1 rounded-lg bg-white text-balck p-1 flex flex-col"
-    >
-      <li
-        v-for="option in options"
-        :key="option.value"
-        @click="handleAction(option.value)"
-      >
-        <div class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200">
-          {{ option.name }}
-        </div>
-      </li>
-    </ul>
-  </div>
-</template>
 
 <style module>
   .dropdown::before {

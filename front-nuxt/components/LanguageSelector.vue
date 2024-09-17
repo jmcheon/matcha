@@ -1,3 +1,28 @@
+<template>
+  <div ref="target" class="relative">
+    <!-- Match the circular style with the LoginSelector -->
+    <v-btn icon class="dark:bg-gray-500" @click.stop="toggleDropdown">
+      <component :is="currentLangFlag" class="h-6 w-6" />
+    </v-btn>
+
+    <ul
+      v-if="showDropdown"
+      :class="$style.dropdown"
+      class="flex flex-col absolute top-[calc(100%+10px)] left-0 min-w-[100px] rounded-lg p-1 bg-white dark:bg-gray-300"
+    >
+      <li v-for="option in options" :key="option.value">
+        <NuxtLink
+          :to="switchLocalePath(option.value)"
+          class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200"
+          @click.stop="() => (showDropdown = false)"
+        >
+          {{ option.name }}
+        </NuxtLink>
+      </li>
+    </ul>
+  </div>
+</template>
+
 <script setup>
   import { onClickOutside } from '@vueuse/core';
   import EnFlag from '~/assets/icons/en.svg';
@@ -23,31 +48,6 @@
     showDropdown.value = false;
   });
 </script>
-
-<template>
-  <div ref="target" class="relative">
-    <!-- Match the circular style with the LoginSelector -->
-    <v-btn icon class="dark:bg-gray-500" @click.stop="toggleDropdown">
-      <component :is="currentLangFlag" class="h-6 w-6" />
-    </v-btn>
-
-    <ul
-      v-if="showDropdown"
-      :class="$style.dropdown"
-      class="absolute flex flex-col top-full min-w-[100px] left-0 rounded-lg p-1 gap-1 dark:bg-gray-500"
-    >
-      <li v-for="option in options" :key="option.value">
-        <NuxtLink
-          :to="switchLocalePath(option.value)"
-          class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200 dark:hover:bg-surface-700 dark:text-white dark:bg-gray-5"
-          @click.stop="() => (showDropdown = false)"
-        >
-          {{ option.name }}
-        </NuxtLink>
-      </li>
-    </ul>
-  </div>
-</template>
 
 <style module>
   .dropdown::before {

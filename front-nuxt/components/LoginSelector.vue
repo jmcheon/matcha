@@ -3,13 +3,14 @@
     <v-btn
       v-if="!isLoggedIn"
       icon="mdi-login"
+      class="dark:bg-gray-500"
       aria-label="User Login"
       @click.stop="toggleDropdown"
     />
     <ul
       v-if="showDropdown"
       :class="$style.dropdown"
-      class="absolute min-w-[80px] top-[calc(100%+10px)] right-0 gap-1 rounded-lg bg-white text-balck p-1 flex flex-col"
+      class="flex flex-col absolute top-[calc(100%+10px)] right-0 min-w-[80px] p-1 rounded-lg bg-white dark:bg-gray-500"
     >
       <li v-for="option in options" :key="option.value">
         <div

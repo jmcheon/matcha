@@ -23,8 +23,8 @@
 
       <!-- Right side icons and selectors with uniform larger spacing -->
       <div class="ml-auto flex items-center space-x-10 px-3">
-        <LanguageSelector class="mr-4" />
         <DarkModeSelector class="mr-4" />
+        <LanguageSelector class="mr-4" />
         <MenuSelector v-if="isLoggedIn" />
         <LoginSelector v-else />
       </div>

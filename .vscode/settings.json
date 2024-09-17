@@ -41,6 +41,10 @@
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "vscode.typescript-language-features"
   },
+  "[vue]": {
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80
+  },
   "i18n-ally.localesPaths": ["front-nuxt/langs"],
   "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.keystyle": "nested"

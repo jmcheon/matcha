@@ -60,12 +60,8 @@
     },
     "title": "Register Matcha",
     "alreadyAccount": "Already have an account?",
-<<<<<<< HEAD
     "forgotPassword": "Forgot password?",
     "socialLoginMessage": "Sign up with social login. You can log in with both social login and id/password."
-=======
-    "forgotPassword": "Forgot password?"
->>>>>>> 6b07da5 (wip: dirty/globalError applied)
   },
   "AuthLogin": {
     "description": "Create an account to enjoy unlimited movies",

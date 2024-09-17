@@ -36,17 +36,11 @@
     "firstName": "Prénom",
     "lastName": "Nom",
     "forgotPassword": "Mot de passe oublié",
-<<<<<<< HEAD
-    "retypePassword": "retaper le mot de passe",
     "register": "Registre",
     "newPassword": "Nouveau mot de passe",
     "email": "E-mail",
-    "confirmPassword": "Confirmez le mot de passe"
-
-=======
-    "email": "E-mail",
+    "confirmPassword": "Confirmez le mot de passe",
     "retypePassword": "retaper le mot de passe"
->>>>>>> 6d04fc3 (chore: registration social login message)
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",

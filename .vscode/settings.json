@@ -40,5 +40,8 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "vscode.typescript-language-features"
-  }
+  },
+  "i18n-ally.localesPaths": ["front-nuxt/langs"],
+  "i18n-ally.enabledFrameworks": ["vue"],
+  "i18n-ally.keystyle": "nested"
 }

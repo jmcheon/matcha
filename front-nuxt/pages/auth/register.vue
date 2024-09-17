@@ -1,160 +1,173 @@
-<template>
-  <main
-    class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-green-500"
-  >
-    <div class="bg-blue-500 dark:bg-gray-100 p-6 rounded-lg shadow-lg w-80">
-      <h2 class="text-center text-xl font-bold mb-4">Register</h2>
-      <form @submit.prevent="handleRegister">
-        <!-- Username Input Field -->
-        <div class="mb-4">
-          <label for="username" class="block text-sm font-medium text-gray-700"
-            >Username</label
-          >
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your username"
-            required
-          />
-        </div>
-
-        <!-- Email Input Field -->
-        <div class="mb-4">
-          <label for="email" class="block text-sm font-medium text-gray-700"
-            >Email</label
-          >
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your email"
-            required
-            :readonly="isSocialLogin"
-          />
-        </div>
-
-        <!-- Password Input Field -->
-        <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-700"
-            >Password</label
-          >
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your password"
-            required
-          />
-        </div>
-
-        <!-- Retype Password Input Field -->
-        <div class="mb-4">
-          <label
-            for="retypePassword"
-            class="block text-sm font-medium text-gray-700"
-            >Retype Password</label
-          >
-          <input
-            id="retypePassword"
-            v-model="retypePassword"
-            type="password"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Retype your password"
-            required
-          />
-        </div>
-
-        <button
-          type="submit"
-          class="w-full px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow-md"
-        >
-          Register
-        </button>
-      </form>
-
-      <p class="mt-4 text-center text-sm text-gray-600">
-        Already have an account?
-        <button
-          href="/login"
-          class="text-blue-500 hover:underline"
-          @click="redirectToLogin"
-        >
-          Login
-        </button>
-      </p>
-    </div>
-  </main>
-</template>
-
 <script setup>
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { useAxios, useLocalePath, useI18n, navigateTo } from '#imports';
 
+  const axios = useAxios();
+  const username = ref('');
   const email = ref('');
   const password = ref('');
   const retypePassword = ref('');
-  const username = ref(''); // New username field
-  const isSocialLogin = ref(false); // To track if the login was through social
-
-  const axios = useAxios();
+  const isSocialLogin = ref(false);
   const localePath = useLocalePath();
+  const { t } = useI18n();
+  const loading = ref(false);
+  const dirty = ref(false);
+  const errorGlobal = ref('');
+
+  // Validators (assuming you have your custom useValidator)
+  const { usernameValidator, emailValidator, passwordValidator } =
+    useValidator();
+  const { error: errorUsername } = usernameValidator(dirty, username, t);
+  const { error: errorEmail } = emailValidator(dirty, email, t);
+  const { error: errorPassword } = passwordValidator(dirty, password, t);
+
   const { doRegister } = useAuth();
   const { locale } = useI18n();
-  const route = useRoute(); // To access query parameters
+  const route = useRoute();
 
-  // On component mount, check if email is pre-filled from query parameters
   onMounted(() => {
     const queryEmail = route.query.email;
     const socialLogin = route.query.socialLogin === 'true';
-
     if (queryEmail) {
       email.value = queryEmail;
-      isSocialLogin.value = socialLogin; // Set flag for social login
+      isSocialLogin.value = socialLogin;
     }
   });
 
-  // Handle registration form submission
   const handleRegister = async () => {
+    dirty.value = true;
+
+    if (errorUsername.value || errorEmail.value || errorPassword.value) {
+      return;
+    }
+
     if (password.value !== retypePassword.value) {
-      // eslint-disable-next-line no-alert
-      alert('Passwords do not match');
+      errorGlobal.value = t('Error.PASSWORDS_DO_NOT_MATCH');
       return;
     }
 
     const userInfo = {
-      username: username.value, // Add username to registration data
+      username: username.value,
       email: email.value,
       password: password.value,
     };
 
     try {
+      loading.value = true;
+      errorGlobal.value = '';
       await doRegister(axios, userInfo, locale.value, isSocialLogin.value);
-      // eslint-disable-next-line no-alert
-      alert('Registration successful!');
       await navigateTo({ path: localePath('auth-verify-email') });
-    } catch (error) {
-      console.error('Error during registration:', error);
-      // eslint-disable-next-line no-alert
-      alert('Error during registration');
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        console.log('checker', e.response.data);
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
     }
-  };
-
-  // Redirect to login page
-  const redirectToLogin = async () => {
-    await navigateTo({ path: localePath('auth-login') });
   };
 </script>
 
-<style scoped>
-  main {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-</style>
+<template>
+  <v-container
+    fluid
+    class="d-flex justify-center align-center fill-height dark:bg-black"
+  >
+    <v-card class="pa-6" elevation="2" width="450">
+      <v-card-title class="text-center">
+        <span class="text-h5 font-weight-bold">{{
+          $t('AuthRegister.title')
+        }}</span>
+      </v-card-title>
+
+      <v-form @submit.prevent="handleRegister">
+        <!-- Username Input Field -->
+        <v-text-field
+          v-model="username"
+          :label="$t('_Global.username')"
+          :error-messages="errorUsername ? [errorUsername] : []"
+          :rules="[
+            (v) =>
+              !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
+          ]"
+          required
+        />
+
+        <!-- Email Input Field -->
+        <v-text-field
+          v-model="email"
+          :label="$t('_Global.email')"
+          type="email"
+          :error-messages="errorEmail ? [errorEmail] : []"
+          :rules="[
+            (v) => !!v || $t('Error.REQUIRED', { value: $t('_Global.email') }),
+          ]"
+          required
+        />
+
+        <!-- Password Input Field -->
+        <v-text-field
+          v-model="password"
+          :label="$t('_Global.password')"
+          type="password"
+          :error-messages="errorPassword ? [errorPassword] : []"
+          :rules="[
+            (v) =>
+              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
+          ]"
+          required
+        />
+
+        <!-- Retype Password Input Field -->
+        <v-text-field
+          v-model="retypePassword"
+          :label="$t('_Global.retypePassword')"
+          type="password"
+          :rules="[
+            (v) =>
+              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
+          ]"
+          required
+        />
+
+        <!-- Error Message -->
+        <v-alert v-if="dirty && errorGlobal" type="error" class="mt-4">
+          {{ errorGlobal }}
+        </v-alert>
+
+        <!-- Submit Button -->
+        <v-btn
+          type="submit"
+          color="primary"
+          class="mt-4"
+          :loading="loading"
+          block
+        >
+          {{ $t('AuthRegister.register') }}
+        </v-btn>
+      </v-form>
+
+      <v-card-actions class="justify-center">
+        <p class="text-center text-sm">
+          {{ $t('AuthRegister.alreadyAccount') }}
+          <v-btn text @click="navigateTo({ path: localePath('auth-login') })">{{
+            $t('_Global.login')
+          }}</v-btn>
+        </p>
+      </v-card-actions>
+      <v-card-actions class="justify-center">
+        <p class="text-center text-sm">
+          {{ $t('AuthRegister.forgotPassword') }}
+          <v-btn
+            text
+            @click="navigateTo({ path: localePath('auth-forgot-password') })"
+            >{{ $t('_Global.forgotPassword') }}</v-btn
+          >
+        </p>
+      </v-card-actions>
+    </v-card>
+  </v-container>
+</template>

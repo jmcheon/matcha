@@ -7,5 +7,35 @@
   },
   "Footer": {
     "copyright": "Tous droits réservés."
+  },
+  "AuthRegister": {
+    "description": "Create an account to enjoy unlimited movies",
+    "or": "OR",
+    "register": "Register",
+    "Stepper": {
+      "step1": "Register",
+      "step2": "Verify email",
+      "step3": "Done"
+    },
+    "title": "Register Matcha"
+  },
+  "Error": {
+    "REQUIRED": "{value} est requis",
+    "GENERAL_ERROR": "Erreur inattendue",
+    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide"
+  },
+  "_Global": {
+    "password": "Mot de passe",
+    "username": "Nom d'utilisateur",
+    "login": "Se connecter",
+    "firstName": "Prénom",
+    "lastName": "Nom"
+  },
+  "AuthLogin": {
+    "accountDont": "Vous n'avez pas de compte ?",
+    "forgotPassword": "Mot de passe oublié ?"
+  },
+  "AuthGenerateProfile": {
+    "title": "Générer un profil"
   }
 }

@@ -1,74 +1,3 @@
-<template>
-  <main
-    class="min-h-screen flex flex-col items-center justify-center bg-blue-300 space-y-6"
-  >
-    <!-- Login Form -->
-    <div class="bg-blue-400 p-6 rounded-lg shadow-lg w-80">
-      <h2 class="text-center text-xl font-bold mb-4">Login</h2>
-      <form @submit.prevent="handleLogin">
-        <div class="mb-4">
-          <label for="username" class="block text-sm font-medium text-gray-700"
-            >Username</label
-          >
-          <input
-            id="username"
-            v-model="username"
-            type="username"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your username"
-            required
-          />
-        </div>
-        <div class="mb-4">
-          <label for="password" class="block text-sm font-medium text-gray-700"
-            >Password</label
-          >
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your password"
-            required
-          />
-        </div>
-        <button
-          type="submit"
-          class="w-full px-4 py-2 bg-blue-500 text-white font-semibold rounded-md shadow-md"
-        >
-          Login
-        </button>
-      </form>
-      <!-- Register link -->
-      <p class="mt-4 text-center text-sm text-gray-600">
-        Don't have an account?
-        <button
-          class="text-blue-500 hover:underline"
-          @click="redirectToRegister"
-        >
-          Register
-        </button>
-      </p>
-    </div>
-
-    <!-- Social Login Buttons -->
-    <div class="flex space-x-4">
-      <button
-        class="px-6 py-3 bg-blue-500 text-white font-semibold rounded-md shadow-md"
-        @click="onGoogleLogin"
-      >
-        Sign in with Google
-      </button>
-      <button
-        class="px-6 py-3 bg-green-500 text-white font-semibold rounded-md shadow-md"
-        @click="redirectTo42Intra"
-      >
-        Sign in with 42Intra
-      </button>
-    </div>
-  </main>
-</template>
-
 <script setup>
   import { ref } from 'vue';
 
@@ -76,18 +5,27 @@
     // layout: 'auth',
     middleware: ['non-auth'],
   });
-  const localePath = useLocalePath();
+
   const axios = useAxios();
+  const localePath = useLocalePath();
   const username = ref('');
   const password = ref('');
   const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
   const { isEmailVerified, isProfileGenerated } = storeToRefs(useUserStore());
+  const { t } = useI18n();
+  const loading = ref(false);
+  const dirty = ref(false);
+  const errorGlobal = ref('');
 
   // Handle traditional login form submission
   const handleLogin = async () => {
-    console.log('Login attempted with', username.value, password.value);
+    dirty.value = true;
+
+    if (!username.value || !password.value) return;
     // Add your login logic here
     try {
+      loading.value = true;
+      errorGlobal.value = '';
       await doLogin(axios, {
         username: username.value,
         password: password.value,
@@ -104,12 +42,14 @@
         // User is not verified
         await navigateTo({ path: localePath('auth-verify-email') });
       }
-    } catch (error) {
-      console.error('Error during registration:', error);
-      // eslint-disable-next-line no-alert
-      alert('Error during registration');
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
     } finally {
-      console.log('hi');
+      loading.value = false;
     }
   };
 
@@ -126,23 +66,96 @@
   };
 </script>
 
-<style>
-  /* Styling to center everything horizontally and vertically */
-  html,
-  body {
-    margin: 0;
-    height: 100%;
-  }
+<template>
+  <v-container
+    fluid
+    class="d-flex justify-center align-center fill-height dark:bg-black"
+  >
+    <v-card class="pa-6" elevation="2" width="450">
+      <v-card-title class="text-center">
+        <span class="text-h5 font-weight-bold">Login</span>
+      </v-card-title>
 
-  main {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
+      <v-form @submit.prevent="handleLogin">
+        <!-- Username Input Field -->
+        <v-text-field
+          v-model="username"
+          :label="$t('_Global.username')"
+          :error-messages="errorUsername ? [errorUsername] : []"
+          :rules="[
+            (v) =>
+              !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
+          ]"
+          required
+        />
 
-  button {
-    cursor: pointer;
-  }
-</style>
+        <!-- Password Input Field -->
+        <v-text-field
+          v-model="password"
+          :label="$t('_Global.password')"
+          type="password"
+          :error-messages="errorPassword ? [errorPassword] : []"
+          :rules="[
+            (v) =>
+              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
+          ]"
+          required
+        />
+
+        <!-- Error Message -->
+        <v-alert v-if="dirty && errorGlobal" type="error" class="mt-4">
+          {{ errorGlobal }}
+        </v-alert>
+
+        <!-- Submit Button -->
+        <v-btn
+          type="submit"
+          color="primary"
+          class="mt-4"
+          :loading="loading"
+          block
+        >
+          {{ $t(`_Global.login`) }}
+        </v-btn>
+      </v-form>
+
+      <!-- Register link -->
+      <v-card-actions class="justify-center">
+        <p class="text-center text-sm">
+          {{ $t('AuthLogin.accountDont') }}
+          <v-btn text class="text-blue-500" @click="redirectToRegister">
+            Register
+          </v-btn>
+        </p>
+      </v-card-actions>
+
+      <!-- Forgot Password link -->
+      <v-card-actions class="justify-center">
+        <p class="text-center text-sm">
+          {{ $t('AuthLogin.forgotPassword') }}
+          <v-btn
+            text
+            @click="navigateTo({ path: localePath('auth-forgot-password') })"
+            >Forgot Password</v-btn
+          >
+        </p>
+      </v-card-actions>
+
+      <!-- Responsive Social Login Buttons with Tailwind CSS -->
+      <div class="d-flex flex-column align-center">
+        <div>Social login</div>
+        <v-card-actions class="d-flex justify-center">
+          <v-btn class="text-black mx-2" @click="onGoogleLogin">
+            <v-icon left>mdi-google</v-icon>
+          </v-btn>
+          <v-btn class="text-black mx-2" @click="redirectTo42Intra">
+            <v-icon left>mdi-github</v-icon>
+          </v-btn>
+          <v-btn class="text-black mx-2" @click="redirectTo42Intra">
+            <v-icon left>mdi-account</v-icon>
+          </v-btn>
+        </v-card-actions>
+      </div>
+    </v-card>
+  </v-container>
+</template>

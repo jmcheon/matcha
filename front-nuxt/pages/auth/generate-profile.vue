@@ -1,175 +1,13 @@
-<template>
-  <main class="min-h-screen flex items-center justify-center bg-gray-100">
-    <div class="bg-blue-500 p-6 rounded-lg shadow-lg w-80">
-      <h2 class="text-center text-xl font-bold mb-4">Generate Profile</h2>
-      <form @submit.prevent="handleGenerateProfile">
-        <!-- First Name -->
-        <div class="mb-4">
-          <label for="firstName" class="block text-sm font-medium text-gray-700"
-            >First Name</label
-          >
-          <input
-            id="firstName"
-            v-model="firstName"
-            type="text"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your first name"
-            required
-          />
-        </div>
-
-        <!-- Last Name -->
-        <div class="mb-4">
-          <label for="lastName" class="block text-sm font-medium text-gray-700"
-            >Last Name</label
-          >
-          <input
-            id="lastName"
-            v-model="lastName"
-            type="text"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your last name"
-            required
-          />
-        </div>
-
-        <!-- Location -->
-        <div class="mb-4">
-          <label for="location" class="block text-sm font-medium text-gray-700"
-            >Location</label
-          >
-          <input
-            id="location"
-            v-model="location"
-            type="text"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your location"
-            required
-          />
-        </div>
-
-        <!-- Gender -->
-        <div class="mb-4">
-          <label for="gender" class="block text-sm font-medium text-gray-700"
-            >Gender</label
-          >
-          <select
-            id="gender"
-            v-model="gender"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            required
-          >
-            <option value="" disabled>Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <!-- Age -->
-        <div class="mb-4">
-          <label for="age" class="block text-sm font-medium text-gray-700"
-            >Age</label
-          >
-          <input
-            id="age"
-            v-model="age"
-            type="number"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your age"
-            min="18"
-            max="99"
-            required
-          />
-        </div>
-
-        <!-- Height -->
-        <div class="mb-4">
-          <label for="height" class="block text-sm font-medium text-gray-700"
-            >Height (cm)</label
-          >
-          <input
-            id="height"
-            v-model="height"
-            type="number"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter your height"
-            min="130"
-            max="230"
-            required
-          />
-        </div>
-
-        <!-- I Like -->
-        <div class="mb-4">
-          <label for="iLike" class="block text-sm font-medium text-gray-700"
-            >I Like</label
-          >
-          <select
-            id="iLike"
-            v-model="iLike"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            required
-          >
-            <option value="" disabled>Select Preference</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="both">Both</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
-        <!-- Bio -->
-        <div class="mb-4">
-          <label for="bio" class="block text-sm font-medium text-gray-700"
-            >Bio</label
-          >
-          <textarea
-            id="bio"
-            v-model="bio"
-            maxlength="140"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Write something about yourself (140 characters max)"
-            required
-          ></textarea>
-        </div>
-
-        <!-- Interests (Hashtags) -->
-        <div class="mb-4">
-          <label for="interests" class="block text-sm font-medium text-gray-700"
-            >Interests (Hashtags)</label
-          >
-          <input
-            id="interests"
-            v-model="interests"
-            type="text"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Enter interests separated by commas"
-            required
-          />
-          <div class="mt-2 text-sm text-gray-500">
-            Example: #music, #travel, #food
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          class="w-full px-4 py-2 bg-green-500 text-white font-semibold rounded-md shadow-md"
-        >
-          Generate Profile
-        </button>
-      </form>
-    </div>
-  </main>
-</template>
-
 <script setup>
   import { ref } from 'vue';
 
   definePageMeta({
-    // layout: 'auth',
+    layout: 'auth',
     middleware: ['strict-auth'],
   });
+  const dirty = ref(false);
+  const loading = ref(false);
+  const errorGlobal = ref('');
   const localePath = useLocalePath();
   const firstName = ref('');
   const lastName = ref('');
@@ -180,24 +18,27 @@
   const iLike = ref('');
   const bio = ref('');
   const interests = ref('');
+  const { t } = useI18n();
   const axios = useAxios();
   const { generateProfile } = useProfile();
 
+  const { firstNameValidator, lastNameValidator } = useValidator();
+  const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
+  const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
+
   const handleGenerateProfile = async () => {
+    dirty.value = true;
     // Validate the form before submission
     if (
-      !firstName.value ||
-      !lastName.value ||
+      errorFirstName.value ||
+      errorLastName.value ||
       !location.value ||
       !gender.value ||
       !iLike.value ||
       !bio.value ||
       !interests.value
-    ) {
-      // eslint-disable-next-line no-alert
-      alert('Please fill in all fields.');
+    )
       return;
-    }
 
     const profileData = {
       firstName: firstName.value,
@@ -212,27 +53,103 @@
     };
 
     try {
-      // Make API call to save profile data
+      loading.value = true;
+      errorGlobal.value = '';
       console.log('Profile Data:', profileData);
-      // await saveProfile(profileData);
       await generateProfile(axios, profileData);
-      // eslint-disable-next-line no-alert
-      alert('Profile generated successfully!');
       // Redirect or handle success
       await navigateTo({ path: localePath('index') });
-    } catch (error) {
-      console.error('Error generating profile:', error);
-      // eslint-disable-next-line no-alert
-      alert('Error generating profile.');
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
     }
   };
 </script>
 
-<style>
-  main {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-</style>
+<template>
+  <v-container class="fill-height" fluid>
+    <v-row justify="center">
+      <!-- Adjust column sizes for responsiveness and use Vuetify's margin classes -->
+      <v-col cols="12" sm="10" md="8" lg="4" class="ma-auto ma-sm-0 ma-sm-5">
+        <v-card class="pa-4" elevation="8">
+          <v-card-title class="text-h5 text-center">
+            {{ $t('AuthGenerateProfile.title') }}
+          </v-card-title>
+          <v-form @submit.prevent="handleGenerateProfile">
+            <!-- Adjust field sizes for responsiveness -->
+            <v-text-field
+              v-model="firstName"
+              :label="$t('_Global.firstName')"
+              :error-messages="errorFirstName ? [errorFirstName] : []"
+              :rules="[
+                (v) =>
+                  !!v ||
+                  $t('Error.REQUIRED', { value: $t('_Global.firstName') }),
+              ]"
+              required
+            />
+            <v-text-field
+              v-model="lastName"
+              :label="$t('_Global.lastName')"
+              :error-messages="errorLastName ? [errorLastName] : []"
+              :rules="[
+                (v) =>
+                  !!v ||
+                  $t('Error.REQUIRED', { value: $t('_Global.lastName') }),
+              ]"
+              required
+            />
+            <v-text-field v-model="location" label="Location" required />
+            <v-select
+              v-model="gender"
+              :items="['Male', 'Female', 'Other']"
+              :rules="gender.value === '' ? ['Please select a gender'] : []"
+              label="Gender"
+              required
+            />
+            <v-text-field
+              v-model="age"
+              label="Age"
+              type="number"
+              :min="18"
+              :max="99"
+              required
+            />
+            <v-text-field
+              v-model="height"
+              label="Height (cm)"
+              type="number"
+              :min="130"
+              :max="230"
+              required
+            />
+            <v-select
+              v-model="iLike"
+              :items="['Male', 'Female', 'Both', 'Other']"
+              label="I Like"
+              required
+            />
+            <v-textarea v-model="bio" label="Bio" maxlength="140" required />
+            <v-text-field
+              v-model="interests"
+              label="Interests (Hashtags)"
+              hint="Example: #music, #travel, #food"
+              persistent-hint
+              required
+            />
+
+            <!-- Use full-width button on small screens -->
+            <v-btn color="green" :loading="loading" block large type="submit">
+              Generate Profile
+            </v-btn>
+          </v-form>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>

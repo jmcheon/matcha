@@ -48,7 +48,7 @@ export default class AuthenticationController {
     const { lang } = req.query;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ error: 'All fields are required' });
+      return res.status(400).json({ code: 'All fields are required' });
     }
 
     try {
@@ -56,14 +56,14 @@ export default class AuthenticationController {
 
       const usernameExists = await checkIfUsernameExists(username);
       if (usernameExists) {
-        return res.status(409).json({ error: 'Username is already in use' });
+        return res.status(409).json({ code: 'USERNAME_ALREADY_EXISTS' });
       }
 
 
       // Check if email is already in use
       const emailExists = await checkIfEmailExists(email);
       if (emailExists) {
-        return res.status(409).json({ error: 'Email is already in use' });
+        return res.status(409).json({ code: 'EMAIL_ALREADY_EXISTS' });
       }
 
       // Hash the password
@@ -92,7 +92,7 @@ export default class AuthenticationController {
       });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Server error' });
+      res.status(500).json({ code: 'GENERAL_ERROR' });
     }
   }
 
@@ -101,7 +101,7 @@ export default class AuthenticationController {
     const { lang } = req.query;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ error: 'Email is required' });
+      return res.status(400).json({ code: 'Email is required' });
     }
 
     try {
@@ -109,7 +109,7 @@ export default class AuthenticationController {
 
       const usernameExists = await checkIfUsernameExists(username);
       if (usernameExists) {
-        return res.status(409).json({ error: 'Username is already in use' });
+        return res.status(409).json({ code: 'USERNAME_ALREADY_EXISTS' });
       }
 
       const existingUser = await getAccountByEmail(email);
@@ -152,7 +152,7 @@ export default class AuthenticationController {
     passport.authenticate('local', async (err: any, account: Account | false, info: { message: string }) => {
       if (err) return next(err);
       if (!account) {
-        return res.status(400).json({ error: info.message });
+        return res.status(400).json({ code: "INVALID_LOGIN" });
       }
 
       // Use the helper function to generate tokens and set cookies

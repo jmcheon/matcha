@@ -29,7 +29,8 @@
     "username": "Nom d'utilisateur",
     "login": "Se connecter",
     "firstName": "Prénom",
-    "lastName": "Nom"
+    "lastName": "Nom",
+    "register": "Registre"
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",
@@ -37,5 +38,9 @@
   },
   "AuthGenerateProfile": {
     "title": "Générer un profil"
+  },
+  "AuthForgotPassword": {
+    "accountDont": "Vous n'avez pas de compte ?",
+    "emailSentTo": "Vérifiez votre boîte de réception à"
   }
 }

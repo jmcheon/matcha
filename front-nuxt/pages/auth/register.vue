@@ -60,6 +60,7 @@
       await navigateTo({ path: localePath('auth-verify-email') });
     } catch (e) {
       if (e.response && e.response.data.code) {
+        console.log('checker', e.response.data);
         errorGlobal.value = t(`Error.${e.response.data.code}`);
       } else {
         errorGlobal.value = t('Error.GENERAL_ERROR');
@@ -67,10 +68,6 @@
     } finally {
       loading.value = false;
     }
-  };
-
-  const redirectToLogin = async () => {
-    await navigateTo({ path: localePath('auth-login') });
   };
 </script>
 
@@ -92,7 +89,10 @@
           v-model="username"
           :label="$t('_Global.username')"
           :error-messages="errorUsername ? [errorUsername] : []"
-          :rules="[(v) => !!v || $t('_Global.required')]"
+          :rules="[
+            (v) =>
+              !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
+          ]"
           required
         />
 
@@ -102,7 +102,9 @@
           :label="$t('_Global.email')"
           type="email"
           :error-messages="errorEmail ? [errorEmail] : []"
-          :rules="[(v) => !!v || $t('_Global.required')]"
+          :rules="[
+            (v) => !!v || $t('Error.REQUIRED', { value: $t('_Global.email') }),
+          ]"
           required
         />
 
@@ -151,15 +153,19 @@
       <v-card-actions class="justify-center">
         <p class="text-center text-sm">
           {{ $t('AuthRegister.alreadyAccount') }}
-          <v-btn text @click="redirectToLogin">{{ $t('_Global.login') }}</v-btn>
+          <v-btn text @click="navigateTo({ path: localePath('auth-login') })">{{
+            $t('_Global.login')
+          }}</v-btn>
         </p>
       </v-card-actions>
       <v-card-actions class="justify-center">
         <p class="text-center text-sm">
           {{ $t('AuthRegister.forgotPassword') }}
-          <v-btn text @click="redirectToLogin">{{
-            $t('_Global.forgotPassword')
-          }}</v-btn>
+          <v-btn
+            text
+            @click="navigateTo({ path: localePath('auth-forgot-password') })"
+            >{{ $t('_Global.forgotPassword') }}</v-btn
+          >
         </p>
       </v-card-actions>
     </v-card>

@@ -55,7 +55,6 @@
     "title": "Register Matcha",
     "alreadyAccount": "Already have an account?",
     "forgotPassword": "Forgot password?"
-<<<<<<< HEAD
   },
   "AuthLogin": {
     "description": "Create an account to enjoy unlimited movies",
@@ -73,7 +72,5 @@
   "AuthGenerateProfile": {
     "title": "Generate Profile",
     "description": "Create an account to enjoy unlimited movies"
-=======
->>>>>>> 3cb1463 (wip: register done / using vuetify)
   }
 }

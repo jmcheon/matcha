@@ -12,7 +12,8 @@
     "year": "Year",
     "login": "Login",
     "forgotPassword": "Forgot password",
-    "register": "Register"
+    "register": "Register",
+    "newPassword": "New password"
   },
   "Navbar": {
     "LoginSelector": {

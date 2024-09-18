@@ -30,7 +30,8 @@
     "login": "Se connecter",
     "firstName": "Prénom",
     "lastName": "Nom",
-    "register": "Registre"
+    "register": "Registre",
+    "newPassword": "Nouveau mot de passe"
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",

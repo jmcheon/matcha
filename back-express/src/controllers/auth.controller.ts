@@ -20,7 +20,6 @@ import {
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { JwtPayloadModel } from '../models/payload.model';
-import { access } from 'fs';
 
 export default class AuthenticationController {
   // Helper function to generate tokens, set cookies, and save refresh token

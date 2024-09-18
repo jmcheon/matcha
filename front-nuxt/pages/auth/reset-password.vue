@@ -112,6 +112,11 @@
       </v-form>
 
       <!-- Back to Login Button -->
+      <v-card-actions class="justify-center mt-4">
+        <v-btn text @click="navigateTo({ path: localePath('auth-login') })">
+          {{ $t('_Global.login') }}
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-container>
 </template>

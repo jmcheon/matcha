@@ -14,7 +14,8 @@
     "forgotPassword": "Forgot password",
     "home": "home",
     "register": "Register",
-    "newPassword": "New password"
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password"
   },
   "Navbar": {
     "LoginSelector": {

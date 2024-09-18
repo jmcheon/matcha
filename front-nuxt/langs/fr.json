@@ -31,7 +31,8 @@
     "firstName": "Prénom",
     "lastName": "Nom",
     "register": "Registre",
-    "newPassword": "Nouveau mot de passe"
+    "newPassword": "Nouveau mot de passe",
+    "email": "E-mail"
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",
@@ -42,6 +43,10 @@
   },
   "AuthForgotPassword": {
     "accountDont": "Vous n'avez pas de compte ?",
-    "emailSentTo": "Vérifiez votre boîte de réception à"
+    "emailSentTo": "Vérifiez votre boîte de réception à",
+    "passwordResetSent": "E-mail de réinitialisation du mot de passe envoyé !",
+    "title": "Mot de passe oublié ?",
+    "submit": "Soumettre",
+    "rememberAccount": "Vous vous souvenez de votre compte ?"
   }
 }

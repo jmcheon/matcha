@@ -39,7 +39,8 @@
     "register": "Registre",
     "newPassword": "Nouveau mot de passe",
     "email": "E-mail",
-    "retypePassword": "retaper le mot de passe"
+    "retypePassword": "retaper le mot de passe",
+    "confirmPassword": "Confirmez le mot de passe"
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",

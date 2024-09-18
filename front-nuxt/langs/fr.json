@@ -22,7 +22,8 @@
   "Error": {
     "REQUIRED": "{value} est requis",
     "GENERAL_ERROR": "Erreur inattendue",
-    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide"
+    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide",
+    "INVALID_PASSWORD": "Le mot de passe doit contenir au moins 8 caractères, inclure une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial."
   },
   "_Global": {
     "password": "Mot de passe",
@@ -32,7 +33,8 @@
     "lastName": "Nom",
     "register": "Registre",
     "newPassword": "Nouveau mot de passe",
-    "email": "E-mail"
+    "email": "E-mail",
+    "confirmPassword": "Confirmez le mot de passe"
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",
@@ -48,5 +50,9 @@
     "title": "Mot de passe oublié ?",
     "submit": "Soumettre",
     "rememberAccount": "Vous vous souvenez de votre compte ?"
+  },
+  "AuthResetPassword": {
+    "resetPassword": "Réinitialiser le mot de passe",
+    "reset": "Réinitialiser le mot de passe"
   }
 }

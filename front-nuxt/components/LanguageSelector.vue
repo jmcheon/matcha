@@ -5,21 +5,40 @@
       <component :is="currentLangFlag" class="h-6 w-6" />
     </v-btn>
 
-    <ul
-      v-if="showDropdown"
-      :class="$style.dropdown"
-      class="flex flex-col absolute top-[calc(100%+10px)] left-0 min-w-[100px] rounded-lg p-1 bg-white dark:bg-gray-300"
-    >
-      <li v-for="option in options" :key="option.value">
-        <NuxtLink
-          :to="switchLocalePath(option.value)"
-          class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200"
-          @click.stop="() => (showDropdown = false)"
-        >
-          {{ option.name }}
-        </NuxtLink>
-      </li>
-    </ul>
+    <div v-if="colorMode.preference == 'dark'">
+      <ul
+        v-if="showDropdown"
+        :class="$style['dark-dropdown']"
+        class="flex flex-col absolute top-[calc(100%+10px)] left-0 min-w-[100px] rounded-lg p-1 dark:bg-gray-500"
+      >
+        <li v-for="option in options" :key="option.value">
+          <NuxtLink
+            :to="switchLocalePath(option.value)"
+            class="flex w-full rounded-lg px-2 py-1 dark:hover:bg-surface-800 dark:text-white"
+            @click.stop="() => (showDropdown = false)"
+          >
+            {{ option.name }}
+          </NuxtLink>
+        </li>
+      </ul>
+    </div>
+    <div v-else>
+      <ul
+        v-if="showDropdown"
+        :class="$style.dropdown"
+        class="flex flex-col absolute top-[calc(100%+10px)] left-0 min-w-[100px] rounded-lg p-1 bg-white"
+      >
+        <li v-for="option in options" :key="option.value">
+          <NuxtLink
+            :to="switchLocalePath(option.value)"
+            class="flex w-full rounded-lg px-2 py-1 hover:bg-surface-200"
+            @click.stop="() => (showDropdown = false)"
+          >
+            {{ option.name }}
+          </NuxtLink>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -35,6 +54,7 @@
     { name: 'Français', value: 'fr' },
   ];
 
+  const colorMode = useColorMode();
   const showDropdown = ref(false);
   const toggleDropdown = () => {
     showDropdown.value = !showDropdown.value;
@@ -59,6 +79,19 @@
     height: 0;
     border-left: 10px solid transparent;
     border-bottom: 10px solid white;
+    border-right: 10px solid transparent;
+    content: '';
+  }
+
+  .dark-dropdown::before {
+    position: absolute;
+    bottom: 100%;
+    left: 15px;
+    display: block;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-bottom: 10px solid gray;
     border-right: 10px solid transparent;
     content: '';
   }

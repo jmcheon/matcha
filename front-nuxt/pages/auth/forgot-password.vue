@@ -66,10 +66,8 @@
           v-model="email"
           :label="$t('_Global.email')"
           type="email"
-          :error-messages="errorEmail ? [errorEmail] : []"
-          :rules="[
-            (v) => !!v || $t('Error.REQUIRED', { value: $t('_Global.email') }),
-          ]"
+          :error="!!errorEmail"
+          :messages="[errorEmail]"
           required
         />
 

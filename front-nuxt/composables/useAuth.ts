@@ -11,7 +11,7 @@ export const useAuth = () => {
   );
 
   const doRefreshTokenServer = async () => {
-    if (userData.value.username) return;
+    if (userData.value.accountId) return;
 
     const cookie = useRequestHeaders(['cookie']);
     try {

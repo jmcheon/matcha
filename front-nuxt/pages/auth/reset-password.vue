@@ -1,7 +1,11 @@
 <script setup>
   import { ref } from 'vue';
 
-  const route = useRoute();
+  // definePageMeta({
+  //   // layout: 'auth',
+  //   middleware: ['strict-auth'],
+  // });
+
   const axios = useAxios();
   const localePath = useLocalePath();
   const { t } = useI18n();
@@ -12,11 +16,22 @@
   const errorGlobal = ref('');
   const dirty = ref(false);
 
-  // Retrieve token from query params (usually passed in password reset link)
-  const token = ref(route.query.token || '');
+  const { userData } = storeToRefs(useUserStore());
+  const { updateProfile } = useProfile();
+
+  const { passwordValidator } = useValidator();
+  const { error: errorPassword } = passwordValidator(dirty, newPassword, t);
+  const { error: errorConfirmPassword } = passwordValidator(
+    dirty,
+    confirmPassword,
+    t,
+  );
 
   const handleResetPassword = async () => {
     dirty.value = true;
+    if (errorPassword.value || errorConfirmPassword.value) return;
+
+    if (!newPassword.value || !confirmPassword.value) return;
 
     if (newPassword.value !== confirmPassword.value) {
       errorGlobal.value = t('Error.PASSWORDS_DO_NOT_MATCH');
@@ -25,15 +40,15 @@
 
     try {
       loading.value = true;
-      errorGlobal.value = '';
+      console.log(userData.value);
       // Simulate API call for resetting password
-      await axios.post('/api/auth/reset-password', {
-        token: token.value,
-        newPassword: newPassword.value,
+      await updateProfile(axios, userData.value.account_id, {
+        password: newPassword.value,
       });
 
       // Redirect to login page after successful reset
       await navigateTo({ path: localePath('auth-login') });
+      errorGlobal.value = '';
     } catch (e) {
       if (e.response && e.response.data.code) {
         errorGlobal.value = t(`Error.${e.response.data.code}`);
@@ -43,10 +58,6 @@
     } finally {
       loading.value = false;
     }
-  };
-
-  const navigateToLogin = () => {
-    navigateTo({ path: localePath('auth-login') });
   };
 </script>
 
@@ -68,10 +79,8 @@
           v-model="newPassword"
           :label="$t('_Global.newPassword')"
           type="password"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.newPassword') }),
-          ]"
+          :error="!!errorPassword"
+          :messages="[errorPassword]"
           required
         />
 
@@ -80,11 +89,8 @@
           v-model="confirmPassword"
           :label="$t('_Global.confirmPassword')"
           type="password"
-          :rules="[
-            (v) =>
-              !!v ||
-              $t('Error.REQUIRED', { value: $t('_Global.confirmPassword') }),
-          ]"
+          :error="!!errorConfirmPassword"
+          :messages="[errorConfirmPassword]"
           required
         />
 
@@ -107,8 +113,8 @@
 
       <!-- Back to Login Button -->
       <v-card-actions class="justify-center mt-4">
-        <v-btn text @click="navigateToLogin">
-          {{ $t('_Global.backToLogin') }}
+        <v-btn text @click="navigateTo({ path: localePath('auth-login') })">
+          {{ $t('_Global.login') }}
         </v-btn>
       </v-card-actions>
     </v-card>

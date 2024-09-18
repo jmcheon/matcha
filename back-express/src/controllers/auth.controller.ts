@@ -20,7 +20,6 @@ import {
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { JwtPayloadModel } from '../models/payload.model';
-import { access } from 'fs';
 
 export default class AuthenticationController {
   // Helper function to generate tokens, set cookies, and save refresh token
@@ -255,10 +254,11 @@ export default class AuthenticationController {
       res.cookie('refreshToken', '', cookieOptions);
 
       // Generate new tokens and set cookies
-      const accessToken = await this.generateTokensAndSetCookies(res, userId);
+      const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, userId);
 
       // Retrieve user data to return
       const userData = await getAccountById(userId);
+      console.log(userData)
 
       // Return user data along with the access token
       return res.json({ ...userData, accessToken });

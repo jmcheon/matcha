@@ -13,7 +13,8 @@
     "login": "Login",
     "forgotPassword": "Forgot password",
     "register": "Register",
-    "newPassword": "New password"
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password"
   },
   "Navbar": {
     "LoginSelector": {
@@ -83,5 +84,9 @@
     "accountDont": "Don't have an account?",
     "passwordResetSent": "Password reset email sent!",
     "emailSentTo": "Check your inbox at"
+  },
+  "AuthResetPassword": {
+    "resetPassword": "Reset password",
+    "reset": "Reset Password"
   }
 }

@@ -6,31 +6,31 @@
       <v-btn
         icon="mdi-bell"
         aria-label="Notifications"
-        color="white"
+        class="dark:bg-gray-500"
         @click="navigateTo({ path: localePath('notifications') })"
       />
       <v-btn
         icon="mdi-magnify"
         aria-label="Find"
-        color="white"
+        class="dark:bg-gray-500"
         @click="navigateTo({ path: localePath('find') })"
       />
       <v-btn
         icon="mdi-heart"
         aria-label="Swipe"
-        color="white"
+        class="dark:bg-gray-500"
         @click="navigateTo({ path: localePath('swipe') })"
       />
       <v-btn
         icon="mdi-chat"
         aria-label="Chat"
-        color="white"
+        class="dark:bg-gray-500"
         @click="navigateTo({ path: localePath('chat') })"
       />
       <v-btn
         icon="mdi-account"
         aria-label="My Profile"
-        color="white"
+        class="dark:bg-gray-500"
         @click="navigateTo({ path: localePath('profile') })"
       />
     </div>

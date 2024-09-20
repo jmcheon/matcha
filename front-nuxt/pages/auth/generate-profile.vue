@@ -1,10 +1,10 @@
 <script setup>
   import { ref } from 'vue';
 
-  definePageMeta({
-    layout: 'auth',
-    middleware: ['strict-auth'],
-  });
+  // definePageMeta({
+  //   layout: 'auth',
+  //   middleware: ['strict-auth'],
+  // });
   const dirty = ref(false);
   const loading = ref(false);
   const errorGlobal = ref('');

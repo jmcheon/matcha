@@ -12,7 +12,7 @@
     "year": "Year",
     "login": "Login",
     "forgotPassword": "Forgot password",
-    "home": "home"
+    "home": "home",
     "register": "Register",
     "newPassword": "New password",
     "confirmPassword": "Confirm password"
@@ -33,8 +33,8 @@
     "copyright": "All Rights Reserved."
   },
   "Error": {
-    "404": "Page not found",
     "error": "Error",
+    "404": "Page not found",
     "backToHome": "Back to home",
     "EMAIL_ALREADY_EXISTS": "Email already exists.",
     "GENERAL_ERROR": "Unexpected error",

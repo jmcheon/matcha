@@ -14,19 +14,26 @@ export default function google() {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
-          console.log("testing", profile)
           const googleId = profile.id;
           const email = profile.emails?.[0]?.value;
 
-          if (!email) {
-            return done(null, false, { message: 'No email found in Google account.' });
-          }
 
           const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE email = ?', [email]);
           let account = rows[0] as Account | undefined;
 
+          // If an account with the same email exists but the Google ID does not
+          if (account?.email === email && (!account?.google_id || account.google_id === "")) {
+            // Redirect to an account linking page
+            return done(null, false, { code: 'GOOGLE_NOT_LINKED' });
+          }
+
+          // If account exists with Google ID, return success
+          if (account && account.google_id === googleId) {
+            return done(null, account);
+          }
+
+          // If account does not exist, create a new account
           if (!account) {
-            // If account does not exist, create a new account
             const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (email, google_id, status) VALUES (?, ?, ?)', [email, googleId, 'incomplete_profile']);
             account = { account_id: result.insertId, email, status: 'incomplete_profile', google_id: googleId, created_at: new Date() }; // Return newly created account
           }

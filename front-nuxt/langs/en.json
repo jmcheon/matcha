@@ -11,7 +11,8 @@
     "username": "Username",
     "year": "Year",
     "login": "Login",
-    "forgotPassword": "Forgot password"
+    "forgotPassword": "Forgot password",
+    "home": "home"
   },
   "Navbar": {
     "LoginSelector": {
@@ -29,6 +30,7 @@
     "copyright": "All Rights Reserved."
   },
   "Error": {
+    "error": "Error",
     "404": "Page not found",
     "backToHome": "Back to home",
     "EMAIL_ALREADY_EXISTS": "Email already exists.",
@@ -41,7 +43,8 @@
     "MIN_LENGTH": "{value} must be at least {length} characters long.",
     "PASSWORDS_DO_NOT_MATCH": "Password does not match.",
     "REQUIRED": " {value} is required",
-    "USERNAME_ALREADY_EXISTS": "Username already exists."
+    "USERNAME_ALREADY_EXISTS": "Username already exists.",
+    "GOOGLE_NOT_LINKED": "Account exists but Google Social Login is not linked"
   },
   "AuthRegister": {
     "description": "Create an account to enjoy unlimited movies",

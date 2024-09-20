@@ -22,7 +22,8 @@
   "Error": {
     "REQUIRED": "{value} est requis",
     "GENERAL_ERROR": "Erreur inattendue",
-    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide"
+    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide",
+    "error": "Erreur"
   },
   "_Global": {
     "password": "Mot de passe",

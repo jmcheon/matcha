@@ -8,7 +8,7 @@ export const generateProfile = async (req: Request, res: Response): Promise<Resp
   const access_token = req.cookies['accessToken'];
   if (!access_token) {
     console.log('Access token not found');
-    return res.status(401).json({ error: 'Access token not provided' });
+    return res.status(401).json({ code: 'GENERAL_ERROR' });
   }
 
   try {
@@ -34,13 +34,13 @@ export const generateProfile = async (req: Request, res: Response): Promise<Resp
     // Check if account exists
     const account = await getAccountById(account_id);
     if (!account) {
-      return res.status(404).json({ error: 'Account not found' });
+      return res.status(404).json({ code: 'INVALID_USER_CREDENTIALS' });
     }
 
     // Check if a profile already exists for this account
     const existingProfile = await getProfileByAccountId(account_id);
     if (existingProfile) {
-      return res.status(400).json({ error: 'Profile already exists for this account' });
+      return res.status(400).json({ code: 'EMAIL_ALREADY_EXISTS' });
     }
 
     // Create new profile data

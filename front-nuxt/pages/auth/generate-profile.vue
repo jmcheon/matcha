@@ -58,7 +58,7 @@
       console.log('Profile Data:', profileData);
       await generateProfile(axios, profileData);
       // Redirect or handle success
-      await navigateTo({ path: localePath('index') });
+      await navigateTo({ path: localePath('auth-upload-profile-image') });
     } catch (e) {
       if (e.response && e.response.data.code) {
         errorGlobal.value = t(`Error.${e.response.data.code}`);

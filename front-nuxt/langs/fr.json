@@ -17,7 +17,10 @@
       "step2": "Verify email",
       "step3": "Done"
     },
-    "title": "Register Matcha"
+    "title": "Register Matcha",
+    "socialLoginMessage": "Inscrivez-vous avec la connexion sociale. \nVous pouvez vous connecter à la fois avec votre identifiant social et votre identifiant/mot de passe.",
+    "forgotPassword": "Mot de passe oublié ?",
+    "alreadyAccount": "Vous avez déjà un compte ?"
   },
   "Error": {
     "REQUIRED": "{value} est requis",
@@ -30,7 +33,10 @@
     "username": "Nom d'utilisateur",
     "login": "Se connecter",
     "firstName": "Prénom",
-    "lastName": "Nom"
+    "lastName": "Nom",
+    "forgotPassword": "Mot de passe oublié",
+    "email": "E-mail",
+    "retypePassword": "retaper le mot de passe"
   },
   "AuthLogin": {
     "accountDont": "Vous n'avez pas de compte ?",

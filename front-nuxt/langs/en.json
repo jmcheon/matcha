@@ -1,6 +1,6 @@
 {
   "_Global": {
-    "email": "Email",
+    "email": "E-mail",
     "firstName": "First Name",
     "genre": "Genre",
     "greaterThan": "Greater than",
@@ -30,8 +30,8 @@
     "copyright": "All Rights Reserved."
   },
   "Error": {
-    "error": "Error",
     "404": "Page not found",
+    "error": "Error",
     "backToHome": "Back to home",
     "EMAIL_ALREADY_EXISTS": "Email already exists.",
     "GENERAL_ERROR": "Unexpected error",
@@ -57,7 +57,8 @@
     },
     "title": "Register Matcha",
     "alreadyAccount": "Already have an account?",
-    "forgotPassword": "Forgot password?"
+    "forgotPassword": "Forgot password?",
+    "socialLoginMessage": "Sign up with social login. You can log in with both social login and id/password."
   },
   "AuthLogin": {
     "description": "Create an account to enjoy unlimited movies",

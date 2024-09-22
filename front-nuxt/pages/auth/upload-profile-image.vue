@@ -9,79 +9,76 @@
       <!-- Main Image Upload Display -->
       <v-card-text>
         <div class="mb-6">
-          <div
-            v-if="uploadedImages.length && currentImageIndex !== -1"
-            class="relative"
-          >
-            <v-img
-              :src="uploadedImages[currentImageIndex].url"
-              max-height="400"
-              contain
-              class="mb-4 rounded"
-            />
-            <!-- Remove Button -->
-            <v-btn
-              icon
-              small
-              class="red darken-2 white--text"
-              absolute
-              top
-              right
-              @click="removeImage(currentImageIndex)"
-            >
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
+          <div class="relative w-full h-96 flex items-center justify-center">
+            <template v-if="uploadedImages[currentImageIndex]">
+              <v-hover v-slot="{ isHovering, props }">
+                <div
+                  class="relative w-full h-full flex items-center justify-center"
+                  v-bind="props"
+                >
+                  <img
+                    :src="uploadedImages[currentImageIndex].url"
+                    class="max-w-full max-h-full object-contain"
+                    @click="$refs.imageInput.click()"
+                  />
+                  <div
+                    v-if="isHovering"
+                    class="absolute inset-0 flex items-center justify-center bg-gray-500/50"
+                  >
+                    <v-btn @click="removeImage(currentImageIndex)">
+                      Remove image
+                    </v-btn>
+                  </div>
+                </div>
+              </v-hover>
+            </template>
+            <template v-else>
+              <!-- Show upload button if no image is in the current slot -->
+              <div
+                class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
+                @click="$refs.imageInput.click()"
+              >
+                <button
+                  class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2"
+                >
+                  <span>{{ $t('AuthUploadProfileImage.upload') }}</span>
+                </button>
+              </div>
+            </template>
           </div>
-
-          <!-- Show upload button if no images are uploaded -->
-          <v-sheet
-            v-else
-            class="d-flex align-center justify-center"
-            height="400"
-            color="grey lighten-4"
-            tile
-            outlined
-          >
-            <v-btn color="primary" large @click="$refs.imageInput.click()">
-              <v-icon>mdi-plus</v-icon>
-              {{ $t('AuthUploadProfileImage.upload') }}
-            </v-btn>
-          </v-sheet>
 
           <!-- Hidden File Input -->
           <input
             ref="imageInput"
             type="file"
             accept="image/*"
-            multiple
             class="d-none"
             @change="handleImageUpload"
           />
         </div>
 
         <!-- Thumbnails (5 slots) -->
-        <v-row justify="center">
-          <v-col v-for="index in maxImages" :key="index" cols="2">
-            <v-avatar
-              v-if="uploadedImages[index - 1]"
-              :src="uploadedImages[index - 1].url"
-              :class="{
-                'selected-avatar': currentImageIndex === index - 1,
-                'default-avatar': currentImageIndex !== index - 1,
-              }"
-              size="56"
-              @click="handleThumbnailClick(index - 1)"
-            />
-            <v-avatar
-              v-else
-              class="default-avatar"
-              size="56"
-              @click="handleThumbnailClick(index - 1)"
-            >
+        <div class="flex space-x-4 mb-8">
+          <div
+            v-for="(image, index) in uploadedImages"
+            :key="index"
+            class="flex items-center justify-center aspect-square ml-3"
+            :class="{
+              'border-2 border-red-500': currentImageIndex === index,
+              'border-2 border-dotted border-gray-300':
+                currentImageIndex !== index,
+              'w-14 md:w-20 lg:w-24': true, // responsive width
+            }"
+            @click="handleThumbnailClick(index)"
+          >
+            <template v-if="image">
+              <v-img :src="image.url" width="100%" height="100%" contain />
+            </template>
+            <template v-else>
               <v-icon>mdi-plus</v-icon>
-            </v-avatar>
-          </v-col>
-        </v-row>
+            </template>
+          </div>
+        </div>
 
         <!-- Submit Button -->
         <v-btn
@@ -108,54 +105,50 @@
   import { useI18n } from 'vue-i18n';
   import axios from 'axios';
 
-  const uploadedImages = ref([]);
-  const currentImageIndex = ref(-1);
+  const currentImageIndex = ref(0);
   const loading = ref(false);
   const errorGlobal = ref('');
   const { t } = useI18n();
   const maxImages = 5;
+  const uploadedImages = ref(Array(maxImages).fill(null));
 
   const handleImageUpload = async (event) => {
-    const files = event.target.files;
-    if (uploadedImages.value.length + files.length > maxImages) {
-      errorGlobal.value = t('Error.MAX_IMAGES_EXCEEDED', { max: maxImages });
-      return;
-    }
+    const file = event.target.files[0]; // Only handle one file at a time
+    if (!file) return;
 
-    Array.from(files).forEach((file) => {
-      const url = URL.createObjectURL(file);
-      uploadedImages.value.push({ file, url });
-    });
+    const url = URL.createObjectURL(file);
 
-    if (currentImageIndex.value === -1 && uploadedImages.value.length > 0) {
-      currentImageIndex.value = 0;
-    }
+    // Replace or assign the image to the current slot
+    uploadedImages.value[currentImageIndex.value] = { file, url };
 
+    // Clear the file input
     event.target.value = '';
   };
 
   const handleThumbnailClick = (index) => {
     console.log('Selected index:', index); // Debugging line
-    if (uploadedImages.value[index]) {
-      currentImageIndex.value = index;
-    }
+    currentImageIndex.value = index;
   };
 
   const removeImage = (index) => {
-    URL.revokeObjectURL(uploadedImages.value[index].url);
-    uploadedImages.value.splice(index, 1);
+    if (uploadedImages.value[index]) {
+      URL.revokeObjectURL(uploadedImages.value[index].url);
+      uploadedImages.value[index] = null;
+    }
 
-    if (uploadedImages.value.length === 0) {
-      currentImageIndex.value = -1;
-    } else if (currentImageIndex.value === index) {
-      currentImageIndex.value = 0;
-    } else if (currentImageIndex.value > index) {
-      currentImageIndex.value -= 1;
+    // Optionally reset currentImageIndex if needed
+    if (currentImageIndex.value === index) {
+      currentImageIndex.value = uploadedImages.value.findIndex(
+        (img) => img !== null,
+      );
+      if (currentImageIndex.value === -1) currentImageIndex.value = 0; // Default to first slot
     }
   };
 
   const submitImages = async () => {
-    if (uploadedImages.value.length === 0) {
+    const imagesToUpload = uploadedImages.value.filter((img) => img !== null);
+
+    if (imagesToUpload.length === 0) {
       errorGlobal.value = t('Error.NO_IMAGES_UPLOADED');
       return;
     }
@@ -165,7 +158,7 @@
       errorGlobal.value = '';
       const formData = new FormData();
 
-      uploadedImages.value.forEach((image, index) => {
+      imagesToUpload.forEach((image, index) => {
         formData.append(`images[${index}]`, image.file);
       });
 
@@ -190,19 +183,3 @@
     });
   });
 </script>
-
-<style scoped>
-  .default-avatar {
-    border: 2px dotted #ccc;
-    border-radius: 0;
-    width: 56px;
-    height: 56px;
-  }
-
-  .selected-avatar {
-    border: 2px solid red;
-    border-radius: 0;
-    width: 56px;
-    height: 56px;
-  }
-</style>

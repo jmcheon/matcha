@@ -60,5 +60,9 @@
   "AuthResetPassword": {
     "resetPassword": "Réinitialiser le mot de passe",
     "reset": "Réinitialiser le mot de passe"
+  },
+  "AuthUploadProfileImage": {
+    "title": "Télécharger l'image du profil",
+    "upload": "Télécharger une image"
   }
 }

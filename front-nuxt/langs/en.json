@@ -92,5 +92,9 @@
   "AuthResetPassword": {
     "resetPassword": "Reset password",
     "reset": "Reset Password"
+  },
+  "AuthUploadProfileImage": {
+    "title": "Upload Profile Image",
+    "upload": "Upload image"
   }
 }

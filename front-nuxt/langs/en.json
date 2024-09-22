@@ -47,7 +47,8 @@
     "PASSWORDS_DO_NOT_MATCH": "Password does not match.",
     "REQUIRED": " {value} is required",
     "USERNAME_ALREADY_EXISTS": "Username already exists.",
-    "GOOGLE_NOT_LINKED": "Account exists but Google Social Login is not linked"
+    "GOOGLE_NOT_LINKED": "Account exists but Google Social Login is not linked",
+    "NO_IMAGES_UPLOADED": "No images to upload"
   },
   "AuthRegister": {
     "description": "Create an account to enjoy unlimited movies",
@@ -95,6 +96,7 @@
   },
   "AuthUploadProfileImage": {
     "title": "Upload Profile Image",
-    "upload": "Upload image"
+    "upload": "Upload image",
+    "submit": "submit"
   }
 }

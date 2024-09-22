@@ -146,6 +146,7 @@
   };
 
   const submitImages = async () => {
+    // automatically remove empty indexes
     const imagesToUpload = uploadedImages.value.filter((img) => img !== null);
 
     if (imagesToUpload.length === 0) {
@@ -162,11 +163,19 @@
         formData.append(`images[${index}]`, image.file);
       });
 
-      const response = await axios.post('/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      const response = await axios.post(
+        'http://localhost:3005/api/profile/upload_image',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         },
-      });
+      );
 
       console.log('Upload successful:', response.data);
     } catch (error) {

@@ -6,7 +6,8 @@ import AccountController from '../controllers/account.controller';
 const router = express.Router();
 
 // Define the route to get account by ID
-router.get('/account/:id', AccountController.getAccountById);
-router.patch('/account/:id', AccountController.updateUser);
+router.post('/profile', ProfileController.generateProfile);
+router.patch('/:id', AccountController.updateUser);
+router.post('/upload_image', ProfileController.uploadPicture);
 
 export default router;

@@ -3,11 +3,14 @@ import express, { Express } from 'express';
 import dotenv from 'dotenv';
 import accountRoutes from './routes/account.routes';
 import authRoutes from './routes/auth.routes';
+import profileRoutes from './routes/profile.routes';
 import cookieParser from 'cookie-parser';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import passport from 'passport'
 import cors from 'cors';
+
+import fileUpload from 'express-fileupload';
 
 import passportConfig from './passport'
 
@@ -33,6 +36,7 @@ app.use(session({
 
 app.use(cookieParser());
 app.use(express.json())
+app.use(fileUpload())
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -43,6 +47,7 @@ app.get('/', (req, res) => {
 });
 app.use('/', authRoutes);
 app.use('/api', accountRoutes);
+app.use('/api/profile', profileRoutes);
 
 // Allow requests from your frontend (localhost:8080 or wherever your frontend is running)
 app.use(cors({

@@ -1,3 +1,98 @@
+<script setup>
+  import { ref, onBeforeUnmount } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import axios from 'axios';
+
+  const currentImageIndex = ref(0);
+  const loading = ref(false);
+  const errorGlobal = ref('');
+  const { t } = useI18n();
+  const localePath = useLocalePath();
+  const maxImages = 5;
+  const uploadedImages = ref(Array(maxImages).fill(null));
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0]; // Only handle one file at a time
+    if (!file) return;
+
+    const url = URL.createObjectURL(file);
+
+    // Replace or assign the image to the current slot
+    uploadedImages.value[currentImageIndex.value] = { file, url };
+
+    // Clear the file input
+    event.target.value = '';
+  };
+
+  const handleThumbnailClick = (index) => {
+    console.log('Selected index:', index); // Debugging line
+    currentImageIndex.value = index;
+  };
+
+  const removeImage = (index) => {
+    if (uploadedImages.value[index]) {
+      URL.revokeObjectURL(uploadedImages.value[index].url);
+      uploadedImages.value[index] = null;
+    }
+
+    // Optionally reset currentImageIndex if needed
+    if (currentImageIndex.value === index) {
+      currentImageIndex.value = uploadedImages.value.findIndex(
+        (img) => img !== null,
+      );
+      if (currentImageIndex.value === -1) currentImageIndex.value = 0; // Default to first slot
+    }
+  };
+
+  const submitImages = async () => {
+    // automatically remove empty indexes
+    const imagesToUpload = uploadedImages.value.filter((img) => img !== null);
+
+    if (imagesToUpload.length === 0) {
+      errorGlobal.value = t('Error.NO_IMAGES_UPLOADED');
+      return;
+    }
+
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+      const formData = new FormData();
+
+      imagesToUpload.forEach((image, index) => {
+        formData.append(`images[${index}]`, image.file);
+      });
+
+      for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
+      const response = await axios.post(
+        'http://localhost:3005/api/profile/upload_image',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          withCredentials: true, // Add this line to send cookies
+        },
+      );
+
+      console.log('Upload successful:', response.data);
+      await navigateTo({ path: localePath('index') });
+    } catch (error) {
+      console.error('Upload error:', error);
+      errorGlobal.value = t('Error.GENERAL_ERROR');
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // onBeforeUnmount(() => {
+  //   uploadedImages.value.forEach((image) => {
+  //     URL.revokeObjectURL(image.url);
+  //   });
+  // });
+</script>
 <template>
   <v-container class="min-h-screen d-flex align-center justify-center">
     <v-card class="mx-auto" max-width="600">
@@ -99,96 +194,3 @@
     </v-card>
   </v-container>
 </template>
-
-<script setup>
-  import { ref, onBeforeUnmount } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import axios from 'axios';
-
-  const currentImageIndex = ref(0);
-  const loading = ref(false);
-  const errorGlobal = ref('');
-  const { t } = useI18n();
-  const maxImages = 5;
-  const uploadedImages = ref(Array(maxImages).fill(null));
-
-  const handleImageUpload = async (event) => {
-    const file = event.target.files[0]; // Only handle one file at a time
-    if (!file) return;
-
-    const url = URL.createObjectURL(file);
-
-    // Replace or assign the image to the current slot
-    uploadedImages.value[currentImageIndex.value] = { file, url };
-
-    // Clear the file input
-    event.target.value = '';
-  };
-
-  const handleThumbnailClick = (index) => {
-    console.log('Selected index:', index); // Debugging line
-    currentImageIndex.value = index;
-  };
-
-  const removeImage = (index) => {
-    if (uploadedImages.value[index]) {
-      URL.revokeObjectURL(uploadedImages.value[index].url);
-      uploadedImages.value[index] = null;
-    }
-
-    // Optionally reset currentImageIndex if needed
-    if (currentImageIndex.value === index) {
-      currentImageIndex.value = uploadedImages.value.findIndex(
-        (img) => img !== null,
-      );
-      if (currentImageIndex.value === -1) currentImageIndex.value = 0; // Default to first slot
-    }
-  };
-
-  const submitImages = async () => {
-    // automatically remove empty indexes
-    const imagesToUpload = uploadedImages.value.filter((img) => img !== null);
-
-    if (imagesToUpload.length === 0) {
-      errorGlobal.value = t('Error.NO_IMAGES_UPLOADED');
-      return;
-    }
-
-    try {
-      loading.value = true;
-      errorGlobal.value = '';
-      const formData = new FormData();
-
-      imagesToUpload.forEach((image, index) => {
-        formData.append(`images[${index}]`, image.file);
-      });
-
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
-      const response = await axios.post(
-        'http://localhost:3005/api/profile/upload_image',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        },
-      );
-
-      console.log('Upload successful:', response.data);
-    } catch (error) {
-      console.error('Upload error:', error);
-      errorGlobal.value = t('Error.GENERAL_ERROR');
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  onBeforeUnmount(() => {
-    uploadedImages.value.forEach((image) => {
-      URL.revokeObjectURL(image.url);
-    });
-  });
-</script>

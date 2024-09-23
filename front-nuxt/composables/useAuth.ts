@@ -90,7 +90,9 @@ export const useAuth = () => {
       }
 
       // Make API request to the appropriate endpoint
-      const { data } = await api.post(`${endpoint}?lang=${lang}`, { ...info });
+      const { data } = await api.post(`${BACK_HOST}${endpoint}?lang=${lang}`, {
+        ...info,
+      });
 
       // Set user data and trigger the refresh auth process
       userData.value = data;

@@ -90,16 +90,24 @@ export default class ProfileController {
   }
 
   static async uploadPicture(req: Request, res: Response) {
-    console.log("hihi", req.files)
+    //TODO: remove
+    const access_token = req.cookies['accessToken'];
+    if (!access_token) {
+      console.log('Access token not found');
+      return res.status(401).json({ code: 'GENERAL_ERROR' });
+    }
 
     try {
+      const user: any = await jwt.verify(access_token, process.env.JWT_SECRET as string);
+      const account_id = user.accountId; // Assuming req.user is populated via authentication middleware
+
       if (!req.files || Object.keys(req.files).length === 0) {
         return res.status(400).json({ error: 'No files were uploaded.' });
       }
       // Access the file
 
       const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      const uploadDir = path.join(__dirname, '../../images/1/');
+      const uploadDir = path.join(__dirname, `../../images/${account_id}/`);
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir);
       }
@@ -118,7 +126,7 @@ export default class ProfileController {
         const uploadPath = path.join(uploadDir, fileName);
 
         await file.mv(uploadPath);
-        await addProfileImage("11", fileName)
+        await addProfileImage(account_id, fileName)
 
       }
       return res.status(200).json({ code: 'wip' });

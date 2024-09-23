@@ -1,10 +1,10 @@
 <script setup>
   import { ref } from 'vue';
 
-  // definePageMeta({
-  //   layout: 'auth',
-  //   middleware: ['strict-auth'],
-  // });
+  definePageMeta({
+    layout: 'auth',
+    middleware: ['strict-auth'],
+  });
   const dirty = ref(false);
   const loading = ref(false);
   const errorGlobal = ref('');
@@ -58,6 +58,7 @@
       console.log('Profile Data:', profileData);
       await generateProfile(axios, profileData);
       // Redirect or handle success
+      console.log('success');
       await navigateTo({ path: localePath('auth-upload-profile-image') });
     } catch (e) {
       if (e.response && e.response.data.code) {

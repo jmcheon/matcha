@@ -20,6 +20,7 @@ import {
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { JwtPayloadModel } from '../models/payload.model';
+import { getProfileByAccountId } from '../models/profile.model';
 
 export default class AuthenticationController {
   // Helper function to generate tokens, set cookies, and save refresh token
@@ -228,6 +229,13 @@ export default class AuthenticationController {
       if (account.status === 'pending_verification') {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
       } else {
+        const profileData: any = await getProfileByAccountId(String(account.account_id));
+        if (!profileData) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+        }
+        else if (!profileData.image_paths) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+        }
         return res.redirect(`${process.env.NGINX_HOST}/${language}`);
       }
     })(req, res, next);

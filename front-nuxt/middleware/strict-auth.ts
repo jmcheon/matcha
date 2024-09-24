@@ -1,12 +1,17 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   const localePath = useLocalePath();
-  const { isEmailVerified, isProfileGenerated, isLoggedIn } =
-    storeToRefs(useUserStore());
+  const {
+    isEmailVerified,
+    isProfileGenerated,
+    isProfileImageUploaded,
+    isLoggedIn,
+  } = storeToRefs(useUserStore());
 
   if (
     isLoggedIn.value &&
     isEmailVerified.value &&
     isProfileGenerated.value &&
+    isProfileImageUploaded.value &&
     to.path !== localePath('index')
   ) {
     return navigateTo({ path: localePath('index') });

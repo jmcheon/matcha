@@ -18,6 +18,33 @@ const randomizeFileNameBase64 = (originalName: string): string => {
   return `${randomString}${fileExtension}`;
 };
 export default class ProfileController {
+  static async getProfile(req: Request, res: Response): Promise<Response> {
+    // Extract the access token from cookies
+    const access_token = req.cookies['accessToken'];
+    if (!access_token) {
+      console.log('Access token not found');
+      return res.status(401).json({ code: 'GENERAL_ERROR' });
+    }
+
+    try {
+      // Verify the access token
+      const user: any = jwt.verify(access_token, process.env.JWT_SECRET as string);
+      const account_id = user.accountId;
+
+      // Retrieve the profile associated with the account_id
+      const profileData = await getProfileByAccountId(account_id);
+      if (!profileData) {
+        return res.status(404).json({ code: 'PROFILE_NOT_FOUND', message: 'Profile not found' });
+      }
+
+
+      return res.status(200).json(profileData);
+    } catch (error) {
+      console.error('Error retrieving profile:', error);
+      return res.status(500).json({ code: 'INTERNAL_SERVER_ERROR', message: 'An error occurred while retrieving the profile' });
+    }
+  }
+
   static async generateProfile(req: Request, res: Response): Promise<Response> {
     //TODO: remove
     const access_token = req.cookies['accessToken'];

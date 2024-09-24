@@ -55,10 +55,7 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      console.log('Profile Data:', profileData);
       await generateProfile(axios, profileData);
-      // Redirect or handle success
-      console.log('success');
       await navigateTo({ path: localePath('auth-upload-profile-image') });
     } catch (e) {
       if (e.response && e.response.data.code) {

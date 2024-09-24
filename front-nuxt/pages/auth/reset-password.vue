@@ -16,7 +16,7 @@
   const errorGlobal = ref('');
   const dirty = ref(false);
 
-  const { userData } = storeToRefs(useUserStore());
+  const { accountData } = storeToRefs(useUserStore());
   const { updateProfile } = useProfile();
 
   const { passwordValidator } = useValidator();
@@ -40,9 +40,9 @@
 
     try {
       loading.value = true;
-      console.log(userData.value);
+      console.log(accountData.value);
       // Simulate API call for resetting password
-      await updateProfile(axios, userData.value.account_id, {
+      await updateProfile(axios, accountData.value.account_id, {
         password: newPassword.value,
       });
 

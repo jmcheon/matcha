@@ -1,28 +1,32 @@
-import type { AccountData } from '~/types';
+import type { AccountData, ProfileData } from '~/types';
 
 export const useUserStore = defineStore('user', () => {
-  const userData = ref<AccountData>({} as AccountData);
+  const accountData = ref<AccountData>({} as AccountData);
+  const profileData = ref<ProfileData | null>(null);
   const refreshTokenIntervalId = ref();
 
-  const isLoggedIn = computed(() => !!userData.value.accessToken);
+  const isLoggedIn = computed(() => !!accountData.value.accessToken);
   const isEmailVerified = computed(() => {
-    if (userData.value.status === 'pending_verification') return false;
+    if (accountData.value.status === 'pending_verification') return false;
     else return true;
   });
   const isProfileGenerated = computed(() => {
-    if (
-      userData.value.status === 'online' ||
-      userData.value.status === 'offline'
-    )
+    if (profileData.value) {
       return true;
-    else return false;
+    } else return false;
   });
-
+  const isProfileImageUploaded = computed(() => {
+    if (profileData.value && profileData.value.image_paths) {
+      return true;
+    } else return false;
+  });
   return {
     isLoggedIn,
     isEmailVerified,
     isProfileGenerated,
-    userData,
+    isProfileImageUploaded,
+    accountData,
+    profileData,
     refreshTokenIntervalId,
   };
 });

@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
     `image_paths` JSON NULL,
     `location` VARCHAR(50) NULL,
     `gender` ENUM('male', 'female', 'other') NULL,
-    `like_gender` ENUM('male', 'female', 'other') NULL,
+    `like_gender` ENUM('male', 'female', 'other', 'both') NULL,
     `height` INT NULL,
     `user_language` VARCHAR(50) NULL,
     `interests` TEXT NULL,

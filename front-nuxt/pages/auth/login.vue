@@ -11,7 +11,8 @@
   const username = ref('');
   const password = ref('');
   const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
-  const { isEmailVerified, isProfileGenerated } = storeToRefs(useUserStore());
+  const { isEmailVerified, isProfileGenerated, isProfileImageUploaded } =
+    storeToRefs(useUserStore());
   const { t } = useI18n();
   const loading = ref(false);
   const dirty = ref(false);
@@ -33,7 +34,10 @@
       if (isEmailVerified.value) {
         if (isProfileGenerated.value) {
           // User is verified and has a generated profile
-          await navigateTo({ path: localePath('index') });
+          if (isProfileImageUploaded.value)
+            await navigateTo({ path: localePath('index') });
+          else
+            await navigateTo({ path: localePath('auth-upload-profile-image') });
         } else {
           // User is verified but does not have a generated profile
           await navigateTo({ path: localePath('auth-generate-profile') });

@@ -1,21 +1,21 @@
 export default defineNuxtPlugin(async (nuxtApp) => {
   const { ssrContext } = nuxtApp;
   const auth = useAuth();
-  const { userData, isLoggedIn } = storeToRefs(useUserStore());
+  const { accountData, isLoggedIn } = storeToRefs(useUserStore());
 
   // Server-side specific logic
   if (ssrContext) {
-    userData.value.accessToken = useCookie('accessToken').value as string;
-    if (userData.value.accessToken && !userData.value.email) {
+    accountData.value.accessToken = useCookie('accessToken').value as string;
+    if (accountData.value.accessToken && !accountData.value.email) {
       await auth.doRefreshTokenServer();
     }
   }
 
   // Client-side specific logic
   if (!ssrContext) {
-    userData.value.accessToken = useCookie('accessToken').value as string;
+    accountData.value.accessToken = useCookie('accessToken').value as string;
 
-    if (userData.value.accessToken) {
+    if (accountData.value.accessToken) {
       auth.startRefreshAuth();
 
       window.onfocus = () => {

@@ -2,7 +2,7 @@
   import { ref } from 'vue';
 
   definePageMeta({
-    layout: 'auth',
+    // layout: 'auth',
     middleware: ['strict-auth'],
   });
   const dirty = ref(false);
@@ -21,6 +21,7 @@
   const { t } = useI18n();
   const axios = useAxios();
   const { generateProfile } = useProfile();
+  const { profileData } = storeToRefs(useUserStore());
 
   const { firstNameValidator, lastNameValidator } = useValidator();
   const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
@@ -40,7 +41,7 @@
     )
       return;
 
-    const profileData = {
+    const generatedProfile = {
       firstName: firstName.value,
       lastName: lastName.value,
       location: location.value,
@@ -55,7 +56,8 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      await generateProfile(axios, profileData);
+      const generatedResult = await generateProfile(axios, generatedProfile);
+      profileData.value = generatedResult;
       await navigateTo({ path: localePath('auth-upload-profile-image') });
     } catch (e) {
       if (e.response && e.response.data.code) {

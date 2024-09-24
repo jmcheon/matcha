@@ -11,6 +11,8 @@
   const maxImages = 5;
   const uploadedImages = ref(Array(maxImages).fill(null));
 
+  const { profileData } = storeToRefs(useUserStore());
+
   const handleImageUpload = async (event) => {
     const file = event.target.files[0]; // Only handle one file at a time
     if (!file) return;
@@ -76,9 +78,9 @@
           withCredentials: true, // Add this line to send cookies
         },
       );
-
-      console.log('Upload successful:', response.data);
-      await navigateTo({ path: localePath('index') });
+      console.log('checker 222', response.data);
+      profileData.value.image_paths = response.data;
+      await navigateTo({ path: localePath('home') });
     } catch (error) {
       console.error('Upload error:', error);
       errorGlobal.value = t('Error.GENERAL_ERROR');

@@ -12,6 +12,7 @@ export const useUserStore = defineStore('user', () => {
   });
   const isProfileGenerated = computed(() => {
     if (profileData.value) {
+      console.log('checker', profileData.value.image_paths);
       return true;
     } else return false;
   });

@@ -35,7 +35,7 @@
         if (isProfileGenerated.value) {
           // User is verified and has a generated profile
           if (isProfileImageUploaded.value)
-            await navigateTo({ path: localePath('index') });
+            await navigateTo({ path: localePath('home') });
           else
             await navigateTo({ path: localePath('auth-upload-profile-image') });
         } else {

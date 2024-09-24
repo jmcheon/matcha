@@ -229,14 +229,14 @@ export default class AuthenticationController {
       if (account.status === 'pending_verification') {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
       } else {
-        const profileData: any = await getProfileByAccountId(String(account.account_id));
-        if (!profileData) {
-          return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-        }
-        else if (!profileData.image_paths) {
-          return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
-        }
-        return res.redirect(`${process.env.NGINX_HOST}/${language}`);
+        // const profileData: any = await getProfileByAccountId(String(account.account_id));
+        // if (!profileData) {
+        //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+        // }
+        // else if (!profileData.image_paths) {
+        //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+        // }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
       }
     })(req, res, next);
   }

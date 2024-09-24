@@ -9,7 +9,7 @@ export interface ProfileData {
   profile_id?: number;
   first_name?: string;
   last_name?: string;
-  image_paths?: string;
+  image_paths?: string[];
   location?: string;
   gender?: string;
   like_gender?: string;

@@ -1,5 +1,5 @@
 <script setup>
-  import { useUserStore } from '@/stores/account.store';
+  import { useUserStore } from '@/stores/user.store';
 
   const { isLoggedIn } = storeToRefs(useUserStore());
   const localePath = useLocalePath();

@@ -5,7 +5,6 @@ import type { AccountData, ProfileData } from '~/types';
 const MAX_IMAGE_SIZE = 5242880; // 5MB
 
 const imageAlertActive = ref(false);
-
 export const useProfile = () => {
   const axios = useAxios();
   const router = useRouter();
@@ -48,7 +47,8 @@ export const useProfile = () => {
   };
 
   const generateProfile = async (api: AxiosInstance, userInfo: ProfileData) => {
-    await api.post('/api/profile', userInfo);
+    const result = await api.post('/api/profile', userInfo);
+    return result.data;
   };
 
   return {

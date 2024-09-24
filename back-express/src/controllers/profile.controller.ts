@@ -155,8 +155,10 @@ export default class ProfileController {
         await file.mv(uploadPath);
         await addProfileImage(account_id, fileName)
 
+
       }
-      return res.status(200).json({ code: 'wip' });
+      const uploadedResults = await getProfileByAccountId(account_id)
+      return res.status(200).json(uploadedResults.image_paths);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ code: 'Failed to upload picture.' });

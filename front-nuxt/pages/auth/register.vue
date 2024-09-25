@@ -87,7 +87,8 @@
         <v-text-field
           v-model="username"
           :label="$t('_Global.username')"
-          :error-messages="errorUsername ? [errorUsername] : []"
+          :error="!!errorUsername"
+          :messages="[errorUsername]"
           :rules="[
             (v) =>
               !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
@@ -100,7 +101,8 @@
           v-model="email"
           :label="$t('_Global.email')"
           type="email"
-          :error-messages="errorEmail ? [errorEmail] : []"
+          :error="!!errorEmail"
+          :messages="[errorEmail]"
           :rules="[
             (v) => !!v || $t('Error.REQUIRED', { value: $t('_Global.email') }),
           ]"
@@ -112,7 +114,8 @@
           v-model="password"
           :label="$t('_Global.password')"
           type="password"
-          :error-messages="errorPassword ? [errorPassword] : []"
+          :error="!!errorPassword"
+          :messages="[errorPassword]"
           :rules="[
             (v) =>
               !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
@@ -131,6 +134,13 @@
           ]"
           required
         />
+
+        <v-card-text>
+          <!-- Conditional rendering based on errorCode -->
+          <span v-if="isSocialLogin">{{
+            t(`AuthRegister.socialLoginMessage`)
+          }}</span>
+        </v-card-text>
 
         <!-- Error Message -->
         <v-alert v-if="dirty && errorGlobal" type="error" class="mt-4">

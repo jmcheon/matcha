@@ -206,15 +206,18 @@ export default class AuthenticationController {
 
     const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
 
-    passport.authenticate('google', async (err: any, account: Account | false, info: { message: string }) => {
+    passport.authenticate('google', async (err: any, account: Account | false, info: { code: string }) => {
       if (err) return next(err);
       if (!account) {
-        return res.status(400).json({ error: info?.message || 'Google login failed' });
+        if (info?.code) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
+        }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
       }
 
       if (account.status === 'incomplete_profile') {
         return res.redirect(
-          `http://localhost:8080/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`
+          `${process.env.NGINX_HOST}/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`
         );
       }
 
@@ -222,9 +225,9 @@ export default class AuthenticationController {
       await AuthenticationController.generateTokensAndSetCookies(res, account.account_id);
 
       if (account.status === 'pending_verification') {
-        return res.redirect(`http://localhost:8080/${language}/auth/verify-email`);
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
       } else {
-        return res.redirect(`http://localhost:8080/${language}`);
+        return res.redirect(`${process.env.NGINX_HOST}/${language}`);
       }
     })(req, res, next);
   }

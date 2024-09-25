@@ -39,22 +39,22 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (
     isLoggedIn.value &&
     isEmailVerified.value &&
-    !isProfileGenerated.value &&
+    isProfileGenerated.value &&
     !isProfileImageUploaded.value
   ) {
-    if (to.path !== generateProfilePath) {
-      return navigateTo({ path: generateProfilePath });
+    if (to.path !== uploadProfileImagePath) {
+      return navigateTo({ path: uploadProfileImagePath });
     }
   }
 
   if (
     isLoggedIn.value &&
     isEmailVerified.value &&
-    isProfileGenerated.value &&
-    !isProfileImageUploaded.value
+    !isProfileGenerated.value &&
+    isProfileImageUploaded.value
   ) {
-    if (to.path !== uploadProfileImagePath) {
-      return navigateTo({ path: uploadProfileImagePath });
+    if (to.path !== generateProfilePath) {
+      return navigateTo({ path: generateProfilePath });
     }
   }
 

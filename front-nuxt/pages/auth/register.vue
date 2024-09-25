@@ -1,75 +1,3 @@
-<script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRoute } from 'vue-router';
-
-  const axios = useAxios();
-  const username = ref('');
-  const email = ref('');
-  const password = ref('');
-  const retypePassword = ref('');
-  const isSocialLogin = ref(false);
-  const localePath = useLocalePath();
-  const { t } = useI18n();
-  const loading = ref(false);
-  const dirty = ref(false);
-  const errorGlobal = ref('');
-
-  // Validators (assuming you have your custom useValidator)
-  const { usernameValidator, emailValidator, passwordValidator } =
-    useValidator();
-  const { error: errorUsername } = usernameValidator(dirty, username, t);
-  const { error: errorEmail } = emailValidator(dirty, email, t);
-  const { error: errorPassword } = passwordValidator(dirty, password, t);
-
-  const { doRegister } = useAuth();
-  const { locale } = useI18n();
-  const route = useRoute();
-
-  onMounted(() => {
-    const queryEmail = route.query.email;
-    const socialLogin = route.query.socialLogin === 'true';
-    if (queryEmail) {
-      email.value = queryEmail;
-      isSocialLogin.value = socialLogin;
-    }
-  });
-
-  const handleRegister = async () => {
-    dirty.value = true;
-
-    if (errorUsername.value || errorEmail.value || errorPassword.value) {
-      return;
-    }
-
-    if (password.value !== retypePassword.value) {
-      errorGlobal.value = t('Error.PASSWORDS_DO_NOT_MATCH');
-      return;
-    }
-
-    const userInfo = {
-      username: username.value,
-      email: email.value,
-      password: password.value,
-    };
-
-    try {
-      loading.value = true;
-      errorGlobal.value = '';
-      await doRegister(axios, userInfo, locale.value, isSocialLogin.value);
-      await navigateTo({ path: localePath('auth-verify-email') });
-    } catch (e) {
-      if (e.response && e.response.data.code) {
-        console.log('checker', e.response.data);
-        errorGlobal.value = t(`Error.${e.response.data.code}`);
-      } else {
-        errorGlobal.value = t('Error.GENERAL_ERROR');
-      }
-    } finally {
-      loading.value = false;
-    }
-  };
-</script>
-
 <template>
   <v-container
     fluid
@@ -180,3 +108,75 @@
     </v-card>
   </v-container>
 </template>
+
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import { useRoute } from 'vue-router';
+
+  const axios = useAxios();
+  const username = ref('');
+  const email = ref('');
+  const password = ref('');
+  const retypePassword = ref('');
+  const isSocialLogin = ref(false);
+  const localePath = useLocalePath();
+  const { t } = useI18n();
+  const loading = ref(false);
+  const dirty = ref(false);
+  const errorGlobal = ref('');
+
+  // Validators (assuming you have your custom useValidator)
+  const { usernameValidator, emailValidator, passwordValidator } =
+    useValidator();
+  const { error: errorUsername } = usernameValidator(dirty, username, t);
+  const { error: errorEmail } = emailValidator(dirty, email, t);
+  const { error: errorPassword } = passwordValidator(dirty, password, t);
+
+  const { doRegister } = useAuth();
+  const { locale } = useI18n();
+  const route = useRoute();
+
+  onMounted(() => {
+    const queryEmail = route.query.email;
+    const socialLogin = route.query.socialLogin === 'true';
+    if (queryEmail) {
+      email.value = queryEmail;
+      isSocialLogin.value = socialLogin;
+    }
+  });
+
+  const handleRegister = async () => {
+    dirty.value = true;
+
+    if (errorUsername.value || errorEmail.value || errorPassword.value) {
+      return;
+    }
+
+    if (password.value !== retypePassword.value) {
+      errorGlobal.value = t('Error.PASSWORDS_DO_NOT_MATCH');
+      return;
+    }
+
+    const userInfo = {
+      username: username.value,
+      email: email.value,
+      password: password.value,
+    };
+
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+      await doRegister(axios, userInfo, locale.value, isSocialLogin.value);
+      await navigateTo({ path: localePath('auth-verify-email') });
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        console.log('checker', e.response.data);
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+</script>

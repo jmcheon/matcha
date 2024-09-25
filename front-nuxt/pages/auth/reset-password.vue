@@ -1,3 +1,58 @@
+<template>
+  <v-container
+    fluid
+    class="d-flex justify-center align-center fill-height dark:bg-black"
+  >
+    <v-card class="pa-6" elevation="2" width="450">
+      <v-card-title class="text-center">
+        <span class="text-h5 font-weight-bold">
+          {{ $t('AuthResetPassword.resetPassword') }}
+        </span>
+      </v-card-title>
+
+      <v-form @submit.prevent="handleResetPassword">
+        <!-- New Password Field -->
+        <v-text-field
+          v-model="newPassword"
+          :label="$t('_Global.newPassword')"
+          type="password"
+          :error="!!errorPassword"
+          :messages="[errorPassword]"
+          required
+        />
+
+        <!-- Confirm Password Field -->
+        <v-text-field
+          v-model="confirmPassword"
+          :label="$t('_Global.confirmPassword')"
+          type="password"
+          :error="!!errorConfirmPassword"
+          :messages="[errorConfirmPassword]"
+          required
+        />
+
+        <!-- Error Message -->
+        <v-alert v-if="dirty && errorGlobal" type="error" class="mt-4">
+          {{ errorGlobal }}
+        </v-alert>
+
+        <!-- Submit Button -->
+        <v-btn
+          color="primary"
+          block
+          class="mt-4"
+          :loading="loading"
+          type="submit"
+        >
+          {{ $t('AuthResetPassword.reset') }}
+        </v-btn>
+      </v-form>
+
+      <!-- Back to Login Button -->
+    </v-card>
+  </v-container>
+</template>
+
 <script setup>
   import { ref } from 'vue';
 
@@ -60,58 +115,3 @@
     }
   };
 </script>
-
-<template>
-  <v-container
-    fluid
-    class="d-flex justify-center align-center fill-height dark:bg-black"
-  >
-    <v-card class="pa-6" elevation="2" width="450">
-      <v-card-title class="text-center">
-        <span class="text-h5 font-weight-bold">
-          {{ $t('AuthResetPassword.resetPassword') }}
-        </span>
-      </v-card-title>
-
-      <v-form @submit.prevent="handleResetPassword">
-        <!-- New Password Field -->
-        <v-text-field
-          v-model="newPassword"
-          :label="$t('_Global.newPassword')"
-          type="password"
-          :error="!!errorPassword"
-          :messages="[errorPassword]"
-          required
-        />
-
-        <!-- Confirm Password Field -->
-        <v-text-field
-          v-model="confirmPassword"
-          :label="$t('_Global.confirmPassword')"
-          type="password"
-          :error="!!errorConfirmPassword"
-          :messages="[errorConfirmPassword]"
-          required
-        />
-
-        <!-- Error Message -->
-        <v-alert v-if="dirty && errorGlobal" type="error" class="mt-4">
-          {{ errorGlobal }}
-        </v-alert>
-
-        <!-- Submit Button -->
-        <v-btn
-          color="primary"
-          block
-          class="mt-4"
-          :loading="loading"
-          type="submit"
-        >
-          {{ $t('AuthResetPassword.reset') }}
-        </v-btn>
-      </v-form>
-
-      <!-- Back to Login Button -->
-    </v-card>
-  </v-container>
-</template>

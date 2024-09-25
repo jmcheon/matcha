@@ -1,76 +1,3 @@
-<script setup>
-  import { ref } from 'vue';
-
-  definePageMeta({
-    // layout: 'auth',
-    middleware: ['strict-auth'],
-  });
-  const dirty = ref(false);
-  const loading = ref(false);
-  const errorGlobal = ref('');
-  const localePath = useLocalePath();
-  const firstName = ref('');
-  const lastName = ref('');
-  const location = ref('');
-  const gender = ref('');
-  const age = ref(18);
-  const height = ref(130);
-  const iLike = ref('');
-  const bio = ref('');
-  const interests = ref('');
-  const { t } = useI18n();
-  const axios = useAxios();
-  const { generateProfile } = useProfile();
-  const { profileData } = storeToRefs(useUserStore());
-
-  const { firstNameValidator, lastNameValidator } = useValidator();
-  const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
-  const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
-
-  const handleGenerateProfile = async () => {
-    dirty.value = true;
-    // Validate the form before submission
-    if (
-      errorFirstName.value ||
-      errorLastName.value ||
-      !location.value ||
-      !gender.value ||
-      !iLike.value ||
-      !bio.value ||
-      !interests.value
-    )
-      return;
-
-    const generatedProfile = {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      location: location.value,
-      gender: gender.value,
-      age: age.value,
-      height: height.value,
-      iLike: iLike.value,
-      bio: bio.value,
-      interests: interests.value.split(',').map((tag) => tag.trim()),
-    };
-
-    try {
-      loading.value = true;
-      errorGlobal.value = '';
-      const generatedResult = await generateProfile(axios, generatedProfile);
-      profileData.value = generatedResult;
-      await navigateTo({ path: localePath('auth-upload-profile-image') });
-    } catch (e) {
-      if (e.response && e.response.data.code) {
-        errorGlobal.value = t(`Error.${e.response.data.code}`);
-      } else {
-        errorGlobal.value = t('Error.GENERAL_ERROR');
-      }
-    } finally {
-      loading.value = false;
-    }
-  };
-</script>
-
 <template>
   <v-container class="fill-height" fluid>
     <v-row justify="center">
@@ -153,3 +80,76 @@
     </v-row>
   </v-container>
 </template>
+
+<script setup>
+  import { ref } from 'vue';
+
+  definePageMeta({
+    // layout: 'auth',
+    middleware: ['strict-auth'],
+  });
+  const dirty = ref(false);
+  const loading = ref(false);
+  const errorGlobal = ref('');
+  const localePath = useLocalePath();
+  const firstName = ref('');
+  const lastName = ref('');
+  const location = ref('');
+  const gender = ref('');
+  const age = ref(18);
+  const height = ref(130);
+  const iLike = ref('');
+  const bio = ref('');
+  const interests = ref('');
+  const { t } = useI18n();
+  const axios = useAxios();
+  const { generateProfile } = useProfile();
+  const { profileData } = storeToRefs(useUserStore());
+
+  const { firstNameValidator, lastNameValidator } = useValidator();
+  const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
+  const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
+
+  const handleGenerateProfile = async () => {
+    dirty.value = true;
+    // Validate the form before submission
+    if (
+      errorFirstName.value ||
+      errorLastName.value ||
+      !location.value ||
+      !gender.value ||
+      !iLike.value ||
+      !bio.value ||
+      !interests.value
+    )
+      return;
+
+    const generatedProfile = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      location: location.value,
+      gender: gender.value,
+      age: age.value,
+      height: height.value,
+      iLike: iLike.value,
+      bio: bio.value,
+      interests: interests.value.split(',').map((tag) => tag.trim()),
+    };
+
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+      const generatedResult = await generateProfile(axios, generatedProfile);
+      profileData.value = generatedResult;
+      await navigateTo({ path: localePath('auth-upload-profile-image') });
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+</script>

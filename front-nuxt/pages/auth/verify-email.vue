@@ -1,10 +1,3 @@
-<script setup>
-  definePageMeta({
-    layout: 'auth',
-    middleware: ['loose-auth'],
-  });
-</script>
-
 <template>
   <div class="flex items-center justify-center h-full dark:bg-black">
     <h1
@@ -17,3 +10,10 @@
     </h1>
   </div>
 </template>
+
+<script setup>
+  definePageMeta({
+    layout: 'auth',
+    middleware: ['loose-auth'],
+  });
+</script>

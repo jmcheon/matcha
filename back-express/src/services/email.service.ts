@@ -4,22 +4,19 @@ import { Request, Response, NextFunction } from 'express';
 import { getAccountById, updateAccountStatus } from '../models/account.model';
 import { JwtPayloadModel } from '../models/payload.model';
 class EmailService {
-  public transporter;
 
-  constructor() {
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.GMAIL_ID,
-        pass: process.env.GMAIL_PASSWORD,
-      },
-    });
-  }
+  public static transporter = nodemailer.createTransport({
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.GMAIL_ID,
+      pass: process.env.GMAIL_PASSWORD,
+    },
+  });
 
-  async sendVerifyEmail(
+  static async sendVerifyEmail(
     data: { accountId: number; username: string; email: string },
     lang: 'en' | 'fr'
   ) {
@@ -83,6 +80,41 @@ class EmailService {
     } catch (err) {
       // Handle token verification errors
       return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+  }
+
+  static async sendPasswordResetEmail(
+    data: { accountId: number; email: string },
+    lang: 'en' | 'fr'
+  ) {
+    try {
+      const token = jwt.sign(
+        data,
+        process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
+        { expiresIn: '24h' }
+      );
+      const template = {
+        en: {
+          subject: 'Password reset for Matcha',
+          html: `<a href="${process.env.BACK_HOST}/reset-password?token=${token}&lang=${lang}">Password reset for Matcha</a>`,
+        },
+        fr: {
+          subject: 'Réinitialisation du mot de passe pour Matcha',
+          html: `<a href="${process.env.BACK_HOST}/reset-password?token=${token}&lang=${lang}">Réinitialisation du mot de passe pour Matcha</a>`,
+        },
+      };
+      const mailOptions = {
+        from: {
+          name: 'Matcha Reloaded',
+          address: process.env.GMAIL_ID || 'matcha.reloaded@gmail.com',
+        },
+        to: data.email,
+        subject: template[lang].subject,
+        html: template[lang].html,
+      };
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      throw new Error("Can't send email");
     }
   }
 }

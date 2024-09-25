@@ -1,5 +1,5 @@
 export interface AccountData {
-  id?: number;
+  accountId?: number;
   email?: String;
   status?: String;
   accessToken?: String;

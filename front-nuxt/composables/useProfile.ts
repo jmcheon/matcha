@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
 
-import type { ProfileData } from '~/types';
+import type { AccountData, ProfileData } from '~/types';
 
 const MAX_IMAGE_SIZE = 5242880; // 5MB
 
@@ -39,13 +39,13 @@ export const useProfile = () => {
     }
   }
 
-  // const updateProfile = async (
-  //   api: AxiosInstance,
-  //   userId: string,
-  //   userInfo: UserData,
-  // ) => {
-  //   await api.patch('/users/' + userId, userInfo);
-  // };
+  const updateProfile = async (
+    api: AxiosInstance,
+    userId: string,
+    userInfo: AccountData,
+  ) => {
+    await api.patch('/api/account/' + userId, userInfo);
+  };
 
   const generateProfile = async (api: AxiosInstance, userInfo: ProfileData) => {
     await api.post('/api/profile', userInfo);
@@ -55,6 +55,6 @@ export const useProfile = () => {
     imageAlertActive,
     generateProfile,
     updateAvatar,
-    // updateProfile,
+    updateProfile,
   };
 };

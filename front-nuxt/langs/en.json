@@ -1,6 +1,6 @@
 {
   "_Global": {
-    "email": "Email",
+    "email": "E-mail",
     "firstName": "First Name",
     "genre": "Genre",
     "greaterThan": "Greater than",
@@ -11,7 +11,10 @@
     "username": "Username",
     "year": "Year",
     "login": "Login",
-    "forgotPassword": "Forgot password"
+    "forgotPassword": "Forgot password",
+    "register": "Register",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password"
   },
   "Navbar": {
     "LoginSelector": {
@@ -72,5 +75,18 @@
   "AuthGenerateProfile": {
     "title": "Generate Profile",
     "description": "Create an account to enjoy unlimited movies"
+  },
+  "AuthForgotPassword": {
+    "title": "Forgot Password?",
+    "description": "Create an account to enjoy unlimited movies",
+    "submit": "Submit",
+    "rememberAccount": "Remember your account?",
+    "accountDont": "Don't have an account?",
+    "passwordResetSent": "Password reset email sent!",
+    "emailSentTo": "Check your inbox at"
+  },
+  "AuthResetPassword": {
+    "resetPassword": "Reset password",
+    "reset": "Reset Password"
   }
 }

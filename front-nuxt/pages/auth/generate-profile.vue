@@ -102,7 +102,6 @@
   const bio = ref('');
   const interests = ref('');
   const { t } = useI18n();
-  const axios = useAxios();
   const { generateProfile } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
 
@@ -139,7 +138,7 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      const generatedResult = await generateProfile(axios, generatedProfile);
+      const generatedResult = await generateProfile(generatedProfile);
       profileData.value = generatedResult;
       await navigateTo({ path: localePath('auth-upload-profile-image') });
     } catch (e) {

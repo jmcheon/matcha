@@ -61,7 +61,6 @@
   //   middleware: ['strict-auth'],
   // });
 
-  const axios = useAxios();
   const localePath = useLocalePath();
   const { t } = useI18n();
 
@@ -97,7 +96,7 @@
       loading.value = true;
       console.log(accountData.value);
       // Simulate API call for resetting password
-      await updateProfile(axios, accountData.value.account_id, {
+      await updateProfile(accountData.value.account_id, {
         password: newPassword.value,
       });
 

@@ -112,6 +112,7 @@
   const localePath = useLocalePath();
   const maxImages = 5;
   const uploadedImages = ref(Array(maxImages).fill(null));
+  const { updateProfileImage } = useProfile();
 
   const { profileData } = storeToRefs(useUserStore());
 
@@ -160,27 +161,9 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      const formData = new FormData();
-
-      imagesToUpload.forEach((image, index) => {
-        formData.append(`images[${index}]`, image.file);
-      });
-
-      for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-      }
-
-      const response = await axios.post(
-        'http://localhost:3005/api/profile/upload_image',
-        formData,
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-          withCredentials: true, // Add this line to send cookies
-        },
-      );
-      console.log('checker 222', response.data);
+      
+      const response = await updateProfileImage(imagesToUpload)
+      
       profileData.value.image_paths = response.data;
       await navigateTo({ path: localePath('home') });
     } catch (error) {
@@ -190,10 +173,4 @@
       loading.value = false;
     }
   };
-
-  // onBeforeUnmount(() => {
-  //   uploadedImages.value.forEach((image) => {
-  //     URL.revokeObjectURL(image.url);
-  //   });
-  // });
 </script>

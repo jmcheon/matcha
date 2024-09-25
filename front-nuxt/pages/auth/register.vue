@@ -1,7 +1,6 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
-  import { useAxios, useLocalePath, useI18n, navigateTo } from '#imports';
 
   const axios = useAxios();
   const username = ref('');

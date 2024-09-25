@@ -36,7 +36,6 @@ export default class AuthenticationController {
 
       await saveRefreshToken(userId, refreshToken);
 
-
       return accessToken;
     } catch (error) {
       throw error;
@@ -82,8 +81,7 @@ export default class AuthenticationController {
       const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, accountId);
 
       // Send verification email
-      const emailService = new EmailService();
-      await emailService.sendVerifyEmail(createdUser, selectedLang);
+      await EmailService.sendVerifyEmail(createdUser, selectedLang);
 
       // Respond with success
       return res.status(201).json({
@@ -135,8 +133,7 @@ export default class AuthenticationController {
       const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, accountId);
 
       // Send verification email
-      const emailService = new EmailService();
-      await emailService.sendVerifyEmail(createdUser, selectedLang);
+      await EmailService.sendVerifyEmail(createdUser, selectedLang);
 
       return res.status(201).json({
         ...createdUser,
@@ -260,10 +257,11 @@ export default class AuthenticationController {
       res.cookie('refreshToken', '', cookieOptions);
 
       // Generate new tokens and set cookies
-      const accessToken = await this.generateTokensAndSetCookies(res, userId);
+      const accessToken = await AuthenticationController.generateTokensAndSetCookies(res, userId);
 
       // Retrieve user data to return
       const userData = await getAccountById(userId);
+      console.log(userData)
 
       // Return user data along with the access token
       return res.json({ ...userData, accessToken });
@@ -272,4 +270,36 @@ export default class AuthenticationController {
     }
   }
 
+  static async forgotPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    const lang = req.query.lang as 'en' | 'fr';
+
+    try {
+      const foundAccount = await getAccountByEmail(email);
+      if (!foundAccount) {
+        return res.status(409).json({ code: 'INVALID_EMAIL' });
+      }
+
+      await EmailService.sendPasswordResetEmail(
+        { accountId: foundAccount.account_id as number, email: foundAccount.email as string },
+        lang,
+      );
+      return res.status(200).json({ code: 'backToHome' });
+    } catch (error) {
+      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+    }
+  }
+
+  static async resetPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    const lang = req.query.lang as 'en' | 'fr';
+    const token = req.query.token;
+
+    const payload = jwt.verify(token as string, process.env.JWT_SECRET as string) as JwtPayloadModel;
+    console.log(payload)
+    await AuthenticationController.generateTokensAndSetCookies(res, payload.accountId);
+    return res.redirect(
+      `http://localhost:8080/${lang}/auth/reset-password/`
+    );
+  }
 }

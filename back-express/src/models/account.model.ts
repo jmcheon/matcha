@@ -125,3 +125,47 @@ export const updateAccountStatus = async (accountId: number, status: string): Pr
   }
 };
 
+export async function updateAccount(
+  account_id: number,
+  email: string | null,
+  password: string | null,
+  google_id: string | null,
+  intra_username: string | null
+): Promise<void> {
+  // Create an array to hold the fields to update
+  const fields: string[] = [];
+  const values: (string | number | null)[] = [];
+
+  // Check each field and add to the query if it's not null
+  if (email !== null) {
+    fields.push('email = ?');
+    values.push(email);
+  }
+  if (password !== null) {
+    fields.push('password = ?');
+    values.push(password);
+  }
+  if (google_id !== null) {
+    fields.push('google_id = ?');
+    values.push(google_id);
+  }
+  if (intra_username !== null) {
+    fields.push('intra_username = ?');
+    values.push(intra_username);
+  }
+
+  // Always add the account_id to the values array for the WHERE clause
+  values.push(account_id);
+
+  // If no fields are being updated, exit early
+  if (fields.length === 0) {
+    throw new Error('No fields to update');
+  }
+
+  // Construct the SQL query dynamically based on the fields provided
+  const query = `UPDATE account SET ${fields.join(', ')} WHERE account_id = ?`;
+
+  // Execute the query
+  await pool.query<ResultSetHeader>(query, values);
+}
+

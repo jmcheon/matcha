@@ -13,6 +13,9 @@
     "login": "Login",
     "forgotPassword": "Forgot password",
     "home": "home"
+    "register": "Register",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password"
   },
   "Navbar": {
     "LoginSelector": {
@@ -76,5 +79,18 @@
   "AuthGenerateProfile": {
     "title": "Generate Profile",
     "description": "Create an account to enjoy unlimited movies"
+  },
+  "AuthForgotPassword": {
+    "title": "Forgot Password?",
+    "description": "Create an account to enjoy unlimited movies",
+    "submit": "Submit",
+    "rememberAccount": "Remember your account?",
+    "accountDont": "Don't have an account?",
+    "passwordResetSent": "Password reset email sent!",
+    "emailSentTo": "Check your inbox at"
+  },
+  "AuthResetPassword": {
+    "resetPassword": "Reset password",
+    "reset": "Reset Password"
   }
 }

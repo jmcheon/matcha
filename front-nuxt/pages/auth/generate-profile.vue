@@ -137,7 +137,6 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      console.log(length(generateProfile.bio.value))
       const generatedResult = await generateProfile(generatedProfile);
       profileData.value = generatedResult;
       await navigateTo({ path: localePath('auth-upload-profile-image') });

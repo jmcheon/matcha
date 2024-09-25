@@ -13,11 +13,8 @@
         <v-text-field
           v-model="username"
           :label="$t('_Global.username')"
-          :error-messages="errorUsername ? [errorUsername] : []"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
-          ]"
+          :error="!!errorUsername"
+          :messages="[errorUsername]"
           required
         />
 
@@ -26,11 +23,8 @@
           v-model="password"
           :label="$t('_Global.password')"
           type="password"
-          :error-messages="errorPassword ? [errorPassword] : []"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
-          ]"
+          :error="!!errorPassword"
+          :messages="[errorPassword]"
           required
         />
 

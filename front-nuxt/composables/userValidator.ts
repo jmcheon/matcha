@@ -35,6 +35,7 @@ export const useValidator = () => {
   };
 
   const minLengthRule = (errorMessage: string, minLength?: number) => {
+    console.log('min len ', minLength)
     return (value: string) =>
       value.length < (minLength ?? DEFAULT_MIN) ? errorMessage : undefined;
   };
@@ -55,12 +56,14 @@ export const useValidator = () => {
           value: t('_Global.username'),
           length: DEFAULT_MIN,
         }),
+        DEFAULT_MIN
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.username'),
           length: DEFAULT_MAX,
         }),
+        DEFAULT_MAX
       ),
     ]);
   };
@@ -77,12 +80,14 @@ export const useValidator = () => {
           value: t('_Global.firstName'),
           length: DEFAULT_MIN,
         }),
+        DEFAULT_MIN
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.firstName'),
           length: DEFAULT_MAX,
         }),
+        DEFAULT_MAX
       ),
     ]);
   };
@@ -99,12 +104,38 @@ export const useValidator = () => {
           value: t('_Global.lastName'),
           length: DEFAULT_MIN,
         }),
+        DEFAULT_MIN
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.lastName'),
           length: DEFAULT_MAX,
         }),
+        DEFAULT_MAX
+      ),
+    ]);
+  };
+
+  const bioValidator = (
+    dirty: ComputedRef<boolean>,
+    bio: ComputedRef<string>,
+    t: any, // I18n
+  ) => {
+    return validator(dirty, bio, [
+      requiredRule(t('Error.REQUIRED', { value: t('_Global.bio') })),
+      minLengthRule(
+        t('Error.MIN_LENGTH', {
+          value: t('_Global.bio'),
+          length: 12,
+        }),
+        12
+      ),
+      maxLengthRule(
+        t('Error.MAX_LENGTH', {
+          value: t('_Global.bio'),
+          length: 140,
+        }),
+        140
       ),
     ]);
   };
@@ -137,6 +168,7 @@ export const useValidator = () => {
     firstNameValidator,
     lastNameValidator,
     emailValidator,
+    bioValidator,
     passwordValidator,
     passwordRule,
     emailRule,

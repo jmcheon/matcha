@@ -12,23 +12,15 @@
             <v-text-field
               v-model="firstName"
               :label="$t('_Global.firstName')"
-              :error-messages="errorFirstName ? [errorFirstName] : []"
-              :rules="[
-                (v) =>
-                  !!v ||
-                  $t('Error.REQUIRED', { value: $t('_Global.firstName') }),
-              ]"
+              :error="!!errorFirstName"
+              :messages="[errorFirstName]"
               required
             />
             <v-text-field
               v-model="lastName"
               :label="$t('_Global.lastName')"
-              :error-messages="errorLastName ? [errorLastName] : []"
-              :rules="[
-                (v) =>
-                  !!v ||
-                  $t('Error.REQUIRED', { value: $t('_Global.lastName') }),
-              ]"
+              :error="!!errorLastName"
+              :messages="[errorLastName]"
               required
             />
             <v-text-field v-model="location" label="Location" required />
@@ -61,7 +53,13 @@
               label="I Like"
               required
             />
-            <v-textarea v-model="bio" label="Bio" maxlength="140" required />
+            <v-textarea 
+              v-model="bio" 
+              :label="$t('_Global.bio')"
+              :error="!!errorBio"
+              :messages="[errorBio]"
+              required 
+              />
             <v-text-field
               v-model="interests"
               label="Interests (Hashtags)"
@@ -105,9 +103,10 @@
   const { generateProfile } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
 
-  const { firstNameValidator, lastNameValidator } = useValidator();
+  const { firstNameValidator, lastNameValidator, bioValidator } = useValidator();
   const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
   const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
+  const { error: errorBio } = bioValidator(dirty, bio, t);
 
   const handleGenerateProfile = async () => {
     dirty.value = true;
@@ -118,7 +117,7 @@
       !location.value ||
       !gender.value ||
       !iLike.value ||
-      !bio.value ||
+      errorBio.value ||
       !interests.value
     )
       return;
@@ -138,6 +137,7 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
+      console.log(length(generateProfile.bio.value))
       const generatedResult = await generateProfile(generatedProfile);
       profileData.value = generatedResult;
       await navigateTo({ path: localePath('auth-upload-profile-image') });

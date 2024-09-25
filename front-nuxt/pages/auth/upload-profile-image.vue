@@ -101,9 +101,8 @@
 </template>
 
 <script setup>
-  import { ref, onBeforeUnmount } from 'vue';
+  import { ref } from 'vue';
   import { useI18n } from 'vue-i18n';
-  import axios from 'axios';
 
   const currentImageIndex = ref(0);
   const loading = ref(false);

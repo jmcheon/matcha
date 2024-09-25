@@ -17,10 +17,6 @@
           :label="$t('_Global.username')"
           :error="!!errorUsername"
           :messages="[errorUsername]"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
-          ]"
           required
         />
 
@@ -31,9 +27,6 @@
           type="email"
           :error="!!errorEmail"
           :messages="[errorEmail]"
-          :rules="[
-            (v) => !!v || $t('Error.REQUIRED', { value: $t('_Global.email') }),
-          ]"
           required
         />
 
@@ -44,10 +37,6 @@
           type="password"
           :error="!!errorPassword"
           :messages="[errorPassword]"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
-          ]"
           required
         />
 
@@ -56,10 +45,8 @@
           v-model="retypePassword"
           :label="$t('_Global.retypePassword')"
           type="password"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
-          ]"
+          :error="!!errorRetypePassword"
+          :messages="[errorRetypePassword]"
           required
         />
 
@@ -131,6 +118,7 @@
   const { error: errorUsername } = usernameValidator(dirty, username, t);
   const { error: errorEmail } = emailValidator(dirty, email, t);
   const { error: errorPassword } = passwordValidator(dirty, password, t);
+  const { error: errorRetypePassword } = passwordValidator(dirty, retypePassword, t);
 
   const { doRegister } = useAuth();
   const { locale } = useI18n();
@@ -148,7 +136,7 @@
   const handleRegister = async () => {
     dirty.value = true;
 
-    if (errorUsername.value || errorEmail.value || errorPassword.value) {
+    if (errorUsername.value || errorEmail.value || errorPassword.value || errorRetypePassword.value) {
       return;
     }
 

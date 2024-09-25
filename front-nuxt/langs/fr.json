@@ -15,7 +15,8 @@
     "home": "Accueil",
     "register": "S'inscrire",
     "newPassword": "Nouveau mot de passe",
-    "confirmPassword": "Confirmer le mot de passe"
+    "confirmPassword": "Confirmer le mot de passe",
+    "bio": "biographie"
   },
   "Navbar": {
     "LoginSelector": {

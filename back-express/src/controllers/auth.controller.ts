@@ -217,7 +217,7 @@ export default class AuthenticationController {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
       }
 
-      if (account.status === 'incomplete_profile') {
+      if (account.status === 'incomplete_social') {
         return res.redirect(
           `${process.env.NGINX_HOST}/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`
         );
@@ -228,23 +228,28 @@ export default class AuthenticationController {
 
       if (account.status === 'pending_verification') {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
-      } else {
-        // const profileData: any = await getProfileByAccountId(String(account.account_id));
-        // if (!profileData) {
-        //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-        // }
-        // else if (!profileData.image_paths) {
-        //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
-        // }
-        return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
       }
+
+      if (account.status === 'incomplete_profile') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      }
+      // const profileData: any = await getProfileByAccountId(String(account.account_id));
+      // if (!profileData) {
+      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      // }
+      // else if (!profileData.image_paths) {
+      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      // }
+      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
+
     })(req, res, next);
   }
 
   static async refresh(req: Request, res: Response) {
     const oldRefreshToken = req.cookies['refreshToken'];
     if (!oldRefreshToken) {
-      return res.status(400).json({ error: 'Refresh token not provided' });
+      console.error("invalid refresh token")
+      return res.status(400).json({ code: 'INVALID_USER_CREDENTIALS' });
     }
     try {
       const payload = jwt.verify(oldRefreshToken, process.env.JWT_SECRET as string) as JwtPayloadModel;
@@ -275,7 +280,7 @@ export default class AuthenticationController {
       // Return user data along with the access token
       return res.json({ ...userData, accessToken });
     } catch (error) {
-      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+      return res.status(401).json({ code: 'INVALID_USER_CREDENTIALS' });
     }
   }
 
@@ -295,7 +300,7 @@ export default class AuthenticationController {
       );
       return res.status(200).json({ code: 'backToHome' });
     } catch (error) {
-      return res.status(401).json({ error: 'Invalid or expired refresh token' });
+      return res.status(401).json({ code: 'GENERAL_ERROR' });
     }
   }
 

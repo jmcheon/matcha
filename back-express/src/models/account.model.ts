@@ -8,7 +8,7 @@ export interface Account {
   password?: string;
   google_id?: string;
   intra_username?: string;
-  status: 'incomplete_profile' | 'pending_verification' | 'online' | 'offline';
+  status: 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline';
   created_at: Date;
   last_modified_at?: Date;
   deleted_at?: Date;
@@ -21,7 +21,7 @@ function mapRowToAccount(row: RowDataPacket): Account {
     account_id: row.account_id as number,
     email: row.email as string,
     password: row.password as string,
-    status: row.status as 'incomplete_profile' | 'pending_verification' | 'online' | 'offline',
+    status: row.status as 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline',
     refresh_token: row.refresh_token as string,
     google_id: row.google_id as string,
     created_at: row.created_at as Date,

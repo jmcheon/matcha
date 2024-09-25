@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `account` (
     `google_id` VARCHAR(50) NULL,
     `intra_username` VARCHAR(50) NULL,
     `refresh_token` VARCHAR(600) NULL,
-    `status` ENUM('pending_verification', 'incomplete_profile', 'online', 'offline') NULL,
+    `status` ENUM('pending_verification', 'incomplete_profile', 'incomplete_social', 'online', 'offline') NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `last_modified_at` DATETIME NULL,
     `deleted_at` DATETIME NULL,

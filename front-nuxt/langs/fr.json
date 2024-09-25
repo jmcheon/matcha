@@ -1,61 +1,98 @@
 {
+  "_Global": {
+    "email": "E-mail",
+    "firstName": "Prénom",
+    "genre": "Genre",
+    "greaterThan": "Plus grand que",
+    "lastName": "Nom de famille",
+    "password": "Mot de passe",
+    "retypePassword": "Retaper le mot de passe",
+    "update": "Mettre à jour",
+    "username": "Nom d'utilisateur",
+    "year": "Année",
+    "login": "Connexion",
+    "forgotPassword": "Mot de passe oublié",
+    "home": "Accueil",
+    "register": "S'inscrire",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe"
+  },
   "Navbar": {
     "LoginSelector": {
-      "login": "Se connecter",
+      "login": "Connexion",
       "register": "S'inscrire"
+    },
+    "MenuSelector": {
+      "chat": "Discussion",
+      "noti": "Notification",
+      "profile": "Profil",
+      "logout": "Déconnexion"
     }
   },
   "Footer": {
     "copyright": "Tous droits réservés."
   },
-  "AuthRegister": {
-    "description": "Create an account to enjoy unlimited movies",
-    "or": "OR",
-    "register": "Register",
-    "Stepper": {
-      "step1": "Register",
-      "step2": "Verify email",
-      "step3": "Done"
-    },
-    "title": "Register Matcha",
-    "socialLoginMessage": "Inscrivez-vous avec la connexion sociale. \nVous pouvez vous connecter à la fois avec votre identifiant social et votre identifiant/mot de passe.",
-    "forgotPassword": "Mot de passe oublié ?",
-    "alreadyAccount": "Vous avez déjà un compte ?"
+  "AuthVerifyEmail": {
+    "description": "Veuillez vérifier votre boîte mail",
+    "title": "En attente de la confirmation de votre e-mail"
   },
   "Error": {
-    "REQUIRED": "{value} est requis",
-    "GENERAL_ERROR": "Erreur inattendue",
-    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide",
+    "404": "Page non trouvée",
     "error": "Erreur",
-    "INVALID_PASSWORD": "Le mot de passe doit contenir au moins 8 caractères, inclure une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial."
+    "backToHome": "Retour à l'accueil",
+    "EMAIL_ALREADY_EXISTS": "L'e-mail existe déjà.",
+    "GENERAL_ERROR": "Erreur inattendue",
+    "INVALID_EMAIL": "Adresse e-mail invalide",
+    "INVALID_LOGIN": "Nom d'utilisateur ou mot de passe invalide",
+    "INVALID_PASSWORD": "Le mot de passe doit comporter au moins 8 caractères et inclure une majuscule, une minuscule, un chiffre et un caractère spécial.",
+    "INVALID_USER_CREDENTIALS": "Identifiants utilisateur invalides.",
+    "MAX_LENGTH": "{value} doit être inférieur à {length}",
+    "MIN_LENGTH": "{value} doit comporter au moins {length} caractères.",
+    "PASSWORDS_DO_NOT_MATCH": "Le mot de passe ne correspond pas.",
+    "REQUIRED": "{value} est requis",
+    "USERNAME_ALREADY_EXISTS": "Le nom d'utilisateur existe déjà.",
+    "GOOGLE_NOT_LINKED": "Le compte existe mais la connexion Google n'est pas liée",
+    "NO_IMAGES_UPLOADED": "Aucune image à télécharger"
   },
-  "_Global": {
-    "password": "Mot de passe",
-    "username": "Nom d'utilisateur",
-    "login": "Se connecter",
-    "firstName": "Prénom",
-    "lastName": "Nom",
-    "forgotPassword": "Mot de passe oublié",
-    "register": "Registre",
-    "newPassword": "Nouveau mot de passe",
-    "email": "E-mail",
-    "retypePassword": "retaper le mot de passe",
-    "confirmPassword": "Confirmez le mot de passe"
+  "AuthRegister": {
+    "description": "Créez un compte pour profiter de films illimités",
+    "or": "OU",
+    "register": "S'inscrire",
+    "Stepper": {
+      "step1": "Inscription",
+      "step2": "Vérifier l'e-mail",
+      "step3": "Terminé"
+    },
+    "title": "Inscription Matcha",
+    "alreadyAccount": "Vous avez déjà un compte ?",
+    "forgotPassword": "Mot de passe oublié ?",
+    "socialLoginMessage": "Inscrivez-vous avec un réseau social. Vous pouvez vous connecter avec un réseau social ou un identifiant/mot de passe."
   },
   "AuthLogin": {
+    "description": "Créez un compte pour profiter de films illimités",
+    "or": "OU",
+    "register": "S'inscrire",
+    "Stepper": {
+      "step1": "Inscription",
+      "step2": "Vérifier l'e-mail",
+      "step3": "Terminé"
+    },
+    "title": "Connexion Matcha",
     "accountDont": "Vous n'avez pas de compte ?",
     "forgotPassword": "Mot de passe oublié ?"
   },
   "AuthGenerateProfile": {
-    "title": "Générer un profil"
+    "title": "Générer le profil",
+    "description": "Créez un compte pour profiter de films illimités"
   },
   "AuthForgotPassword": {
-    "accountDont": "Vous n'avez pas de compte ?",
-    "emailSentTo": "Vérifiez votre boîte de réception à",
-    "passwordResetSent": "E-mail de réinitialisation du mot de passe envoyé !",
     "title": "Mot de passe oublié ?",
-    "submit": "Soumettre",
-    "rememberAccount": "Vous vous souvenez de votre compte ?"
+    "description": "Créez un compte pour profiter de films illimités",
+    "submit": "Envoyer",
+    "rememberAccount": "Vous vous souvenez de votre compte ?",
+    "accountDont": "Vous n'avez pas de compte ?",
+    "passwordResetSent": "E-mail de réinitialisation du mot de passe envoyé !",
+    "emailSentTo": "Vérifiez votre boîte de réception à"
   },
   "AuthResetPassword": {
     "resetPassword": "Réinitialiser le mot de passe",
@@ -63,6 +100,7 @@
   },
   "AuthUploadProfileImage": {
     "title": "Télécharger l'image du profil",
-    "upload": "Télécharger une image"
+    "upload": "Télécharger l'image",
+    "submit": "Envoyer"
   }
 }

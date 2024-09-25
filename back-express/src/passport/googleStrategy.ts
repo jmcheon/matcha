@@ -18,7 +18,7 @@ export default function google() {
           const email = profile.emails?.[0]?.value;
 
 
-          const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE email = ?', [email]);
+          const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE google_id = ?', [googleId]);
           let account = rows[0] as Account | undefined;
 
           // If an account with the same email exists but the Google ID does not
@@ -34,8 +34,8 @@ export default function google() {
 
           // If account does not exist, create a new account
           if (!account) {
-            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (email, google_id, status) VALUES (?, ?, ?)', [email, googleId, 'incomplete_profile']);
-            account = { account_id: result.insertId, email, status: 'incomplete_profile', google_id: googleId, created_at: new Date() }; // Return newly created account
+            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (email, google_id, status) VALUES (?, ?, ?)', [email, googleId, 'incomplete_social']);
+            account = { account_id: result.insertId, email, status: 'incomplete_social', google_id: googleId, created_at: new Date() }; // Return newly created account
           }
 
           return done(null, account); // Successful authentication

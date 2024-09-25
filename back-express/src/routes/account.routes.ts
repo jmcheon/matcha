@@ -1,6 +1,5 @@
 // routes/accountRoutes.ts
 import express from 'express';
-import ProfileController from '../controllers/profile.controller';
 import AccountController from '../controllers/account.controller';
 
 const router = express.Router();

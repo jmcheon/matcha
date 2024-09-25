@@ -1,60 +1,48 @@
-import type { AxiosInstance } from 'axios';
-
 import type { AccountData, ProfileData } from '~/types';
 
 const MAX_IMAGE_SIZE = 5242880; // 5MB
 
-const imageAlertActive = ref(false);
-
 export const useProfile = () => {
   const axios = useAxios();
-  const router = useRouter();
+  
+  const updateProfileImage = async (imagesToUpload: any) => {
+    const formData = new FormData();
+    imagesToUpload.forEach((image, index) => {
+      formData.append(`images[${index}]`, image.file);
+    });
 
-  function updateAvatar(event: any) {
-    const target = event.target;
-    const file = target.files[0];
-    if (file) {
-      if (file.size > MAX_IMAGE_SIZE) {
-        imageAlertActive.value = true;
-        target.value = '';
-        return setTimeout(() => {
-          imageAlertActive.value = false;
-        }, 5000);
-      }
-
-      const reader = new FileReader();
-
-      reader.onload = async () => {
-        const formData = new FormData();
-        formData.append('image', file);
-
-        try {
-          await axios.patch(`/users/avatar`, formData);
-          router.go();
-        } catch (error) {
-          console.error(error);
-        }
-      };
-      reader.readAsDataURL(file);
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
     }
+
+    const response = await axios.post(
+      '/api/profile/upload_image',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        withCredentials: true, // Add this line to send cookies
+      },
+    );
+    return response;
   }
 
   const updateProfile = async (
-    api: AxiosInstance,
     userId: string,
     userInfo: AccountData,
   ) => {
-    await api.patch('/api/account/' + userId, userInfo);
+    await axios.patch('/api/account/' + userId, userInfo);
   };
 
-  const generateProfile = async (api: AxiosInstance, userInfo: ProfileData) => {
-    await api.post('/api/profile', userInfo);
+  const generateProfile = async (userInfo: ProfileData) => {
+    const result = await axios.post('/api/profile', userInfo);
+    return result.data;
   };
 
   return {
-    imageAlertActive,
     generateProfile,
-    updateAvatar,
+    updateProfileImage,
     updateProfile,
   };
 };

@@ -1,53 +1,3 @@
-<script setup>
-  import { ref } from 'vue';
-  import { useAxios, useLocalePath, useI18n, navigateTo } from '#imports';
-
-  const axios = useAxios();
-  const email = ref('');
-  const loading = ref(false);
-  const errorGlobal = ref('');
-  const dirty = ref(false);
-
-  const { locale } = useI18n();
-  const { t } = useI18n();
-  const localePath = useLocalePath();
-
-  // Validator for email
-  const { emailValidator } = useValidator();
-  const { error: errorEmail } = emailValidator(dirty, email, t);
-
-  const { doCheckUserCredentials } = useAuth();
-
-  const handleForgotPassword = async () => {
-    dirty.value = true;
-
-    if (errorEmail.value) {
-      return;
-    }
-
-    try {
-      loading.value = true;
-      errorGlobal.value = '';
-      // Simulating API request to send reset password email
-      await doCheckUserCredentials(axios, { email: email.value }, locale.value);
-
-      // Redirect to a confirmation page or display success message
-      await navigateTo({
-        path: localePath('auth-reset-email-sent'),
-        query: { email: email.value },
-      });
-    } catch (e) {
-      if (e.response && e.response.data.code) {
-        errorGlobal.value = t(`Error.${e.response.data.code}`);
-      } else {
-        errorGlobal.value = t('Error.GENERAL_ERROR');
-      }
-    } finally {
-      loading.value = false;
-    }
-  };
-</script>
-
 <template>
   <v-container
     fluid
@@ -108,3 +58,53 @@
     </v-card>
   </v-container>
 </template>
+
+<script setup>
+  import { ref } from 'vue';
+  import { useAxios, useLocalePath, useI18n, navigateTo } from '#imports';
+
+  const axios = useAxios();
+  const email = ref('');
+  const loading = ref(false);
+  const errorGlobal = ref('');
+  const dirty = ref(false);
+
+  const { locale } = useI18n();
+  const { t } = useI18n();
+  const localePath = useLocalePath();
+
+  // Validator for email
+  const { emailValidator } = useValidator();
+  const { error: errorEmail } = emailValidator(dirty, email, t);
+
+  const { doCheckUserCredentials } = useAuth();
+
+  const handleForgotPassword = async () => {
+    dirty.value = true;
+
+    if (errorEmail.value) {
+      return;
+    }
+
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+      // Simulating API request to send reset password email
+      await doCheckUserCredentials(axios, { email: email.value }, locale.value);
+
+      // Redirect to a confirmation page or display success message
+      await navigateTo({
+        path: localePath('auth-reset-email-sent'),
+        query: { email: email.value },
+      });
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+</script>

@@ -1,40 +1,71 @@
 export default defineNuxtRouteMiddleware((to, from) => {
   const localePath = useLocalePath();
-  const { isEmailVerified, isProfileGenerated, isLoggedIn } =
-    storeToRefs(useUserStore());
+  const {
+    isLoggedIn,
+    isEmailVerified,
+    isProfileGenerated,
+    isProfileImageUploaded,
+  } = storeToRefs(useUserStore());
+
+  const loginPath = localePath('auth-login');
+  const verifyEmailPath = localePath('auth-verify-email');
+  const generateProfilePath = localePath('auth-generate-profile');
+  const uploadProfileImagePath = localePath('auth-upload-profile-image');
+  const homePath = localePath('home');
 
   if (
-    isLoggedIn.value &&
-    isEmailVerified.value &&
-    isProfileGenerated.value &&
-    to.path !== localePath('index')
+    !isLoggedIn.value &&
+    !isEmailVerified.value &&
+    !isProfileGenerated.value &&
+    !isProfileImageUploaded.value
   ) {
-    return navigateTo({ path: localePath('index') });
-  }
-
-  // If the user is not logged in, redirect to the login page
-  if (!isLoggedIn.value && to.path !== localePath('auth-login')) {
-    return navigateTo({ path: localePath('auth-login') });
+    if (to.path !== loginPath) {
+      return navigateTo({ path: loginPath });
+    }
   }
 
   // If logged in but email is not verified, redirect to the verify email page
   if (
     isLoggedIn.value &&
     !isEmailVerified.value &&
-    to.path !== localePath('auth-verify-email')
+    !isProfileGenerated.value &&
+    !isProfileImageUploaded.value
   ) {
-    return navigateTo({ path: localePath('auth-verify-email') });
+    if (to.path !== verifyEmailPath) {
+      return navigateTo({ path: verifyEmailPath });
+    }
   }
 
-  // If email is verified but profile is not generated, redirect to generate profile page
   if (
     isLoggedIn.value &&
     isEmailVerified.value &&
     !isProfileGenerated.value &&
-    to.path !== localePath('auth-generate-profile')
+    !isProfileImageUploaded.value
   ) {
-    return navigateTo({ path: localePath('auth-generate-profile') });
+    if (to.path !== generateProfilePath) {
+      return navigateTo({ path: generateProfilePath });
+    }
   }
 
-  // If the user is logged in, email verified, and profile generated, allow access to the index page
+  if (
+    isLoggedIn.value &&
+    isEmailVerified.value &&
+    isProfileGenerated.value &&
+    !isProfileImageUploaded.value
+  ) {
+    if (to.path !== uploadProfileImagePath) {
+      return navigateTo({ path: uploadProfileImagePath });
+    }
+  }
+
+  if (
+    isLoggedIn.value &&
+    isEmailVerified.value &&
+    isProfileGenerated.value &&
+    isProfileImageUploaded.value
+  ) {
+    if (to.path !== homePath) {
+      return navigateTo({ path: homePath });
+    }
+  }
 });

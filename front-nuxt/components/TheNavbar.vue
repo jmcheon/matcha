@@ -1,10 +1,3 @@
-<script setup>
-  import { useUserStore } from '@/stores/account.store';
-
-  const { isLoggedIn } = storeToRefs(useUserStore());
-  const localePath = useLocalePath();
-</script>
-
 <template>
   <nav
     class="fixed top-0 z-[999] h-[112px] w-full bg-gradient-to-b from-pink-500 to-transparent"
@@ -31,3 +24,10 @@
     </div>
   </nav>
 </template>
+
+<script setup>
+  import { useUserStore } from '@/stores/user.store';
+
+  const { isLoggedIn } = storeToRefs(useUserStore());
+  const localePath = useLocalePath();
+</script>

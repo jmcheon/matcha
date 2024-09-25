@@ -1,17 +1,17 @@
 import type { AxiosInstance } from 'axios';
 
-import type { AccountData } from '~/types';
+import type { AccountData, ProfileData } from '~/types';
 
 export const useAuth = () => {
   const BACK_HOST = useRuntimeConfig().public.BACK_HOST;
-  const { userData } = storeToRefs(useUserStore());
+  const { accountData, profileData } = storeToRefs(useUserStore());
   const refreshTokenIntervalId = ref();
   const tokenDurationMins = Number(
     useRuntimeConfig().public.JWT_ACCESS_DURATION,
   );
 
   const doRefreshTokenServer = async () => {
-    if (userData.value.accountId) return;
+    if (accountData.value.accountId) return;
 
     const cookie = useRequestHeaders(['cookie']);
     try {
@@ -19,10 +19,10 @@ export const useAuth = () => {
         method: 'POST',
         headers: {
           ...cookie,
-          Authorization: `Bearer ${userData.value.accessToken}`,
+          Authorization: `Bearer ${accountData.value.accessToken}`,
         },
       });
-      userData.value = data || {};
+      accountData.value = data || {};
     } catch (error: any) {
       console.error(error.message);
     }
@@ -32,7 +32,7 @@ export const useAuth = () => {
     const axios = useAxios();
     try {
       const { data } = await axios.post(`/refresh`);
-      userData.value = data || {};
+      accountData.value = data || {};
     } catch (error: any) {
       console.error(error.message);
     }
@@ -57,13 +57,33 @@ export const useAuth = () => {
       username: info.username,
       password: info.password,
     });
-    userData.value = data;
+    try {
+      const profileResponse = await api.get('/api/profile/', {
+        headers: { Authorization: `Bearer ${data.accessToken}` },
+      });
+
+      console.log(profileResponse);
+      // Store profile data in the state
+      profileData.value = profileResponse.data;
+    } catch (error) {
+      // Handle the error by setting profileData to null
+      profileData.value = null;
+
+      // // Optionally, you can handle specific error statuses
+      // if (axios.isAxiosError(error) && error.response) {
+      //   const statusCode = error.response.status;
+      //   if (statusCode === 400) {
+      //     // Handle 400 Bad Request error specifically if needed
+      //   }
+      //   // Handle other status codes as necessary
+    }
+    accountData.value = data;
     startRefreshAuth();
   };
 
   const doLogout = async (api: AxiosInstance) => {
     await api.delete('/logout');
-    userData.value = {} as AccountData;
+    accountData.value = {} as AccountData;
     stopRefreshAuth();
   };
 
@@ -90,10 +110,12 @@ export const useAuth = () => {
       }
 
       // Make API request to the appropriate endpoint
-      const { data } = await api.post(`${endpoint}?lang=${lang}`, { ...info });
+      const { data } = await api.post(`${BACK_HOST}${endpoint}?lang=${lang}`, {
+        ...info,
+      });
 
       // Set user data and trigger the refresh auth process
-      userData.value = data;
+      accountData.value = data;
       startRefreshAuth();
 
       return data; // Return data if needed for further handling

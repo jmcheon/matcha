@@ -1,71 +1,3 @@
-<script setup>
-  import { ref } from 'vue';
-
-  definePageMeta({
-    // layout: 'auth',
-    middleware: ['non-auth'],
-  });
-
-  const axios = useAxios();
-  const localePath = useLocalePath();
-  const username = ref('');
-  const password = ref('');
-  const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
-  const { isEmailVerified, isProfileGenerated } = storeToRefs(useUserStore());
-  const { t } = useI18n();
-  const loading = ref(false);
-  const dirty = ref(false);
-  const errorGlobal = ref('');
-
-  // Handle traditional login form submission
-  const handleLogin = async () => {
-    dirty.value = true;
-
-    if (!username.value || !password.value) return;
-    // Add your login logic here
-    try {
-      loading.value = true;
-      errorGlobal.value = '';
-      await doLogin(axios, {
-        username: username.value,
-        password: password.value,
-      });
-      if (isEmailVerified.value) {
-        if (isProfileGenerated.value) {
-          // User is verified and has a generated profile
-          await navigateTo({ path: localePath('index') });
-        } else {
-          // User is verified but does not have a generated profile
-          await navigateTo({ path: localePath('auth-generate-profile') });
-        }
-      } else {
-        // User is not verified
-        await navigateTo({ path: localePath('auth-verify-email') });
-      }
-    } catch (e) {
-      if (e.response && e.response.data.code) {
-        errorGlobal.value = t(`Error.${e.response.data.code}`);
-      } else {
-        errorGlobal.value = t('Error.GENERAL_ERROR');
-      }
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  // Redirect to backend which handles Google OAuth2
-
-  const redirectToRegister = () => {
-    navigateTo({ path: localePath('auth-register') });
-  };
-
-  // Redirect to backend which handles 42Intra OAuth2
-  const redirectTo42Intra = () => {
-    const intraOAuthUrl = `http://localhost:3005/social/42intra`;
-    window.location.href = intraOAuthUrl;
-  };
-</script>
-
 <template>
   <v-container
     fluid
@@ -81,11 +13,8 @@
         <v-text-field
           v-model="username"
           :label="$t('_Global.username')"
-          :error-messages="errorUsername ? [errorUsername] : []"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.username') }),
-          ]"
+          :error="!!errorUsername"
+          :messages="[errorUsername]"
           required
         />
 
@@ -94,11 +23,8 @@
           v-model="password"
           :label="$t('_Global.password')"
           type="password"
-          :error-messages="errorPassword ? [errorPassword] : []"
-          :rules="[
-            (v) =>
-              !!v || $t('Error.REQUIRED', { value: $t('_Global.password') }),
-          ]"
+          :error="!!errorPassword"
+          :messages="[errorPassword]"
           required
         />
 
@@ -159,3 +85,75 @@
     </v-card>
   </v-container>
 </template>
+
+<script setup>
+  import { ref } from 'vue';
+
+  definePageMeta({
+    // layout: 'auth',
+    middleware: ['non-auth'],
+  });
+
+  const axios = useAxios();
+  const localePath = useLocalePath();
+  const username = ref('');
+  const password = ref('');
+  const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
+  const { isEmailVerified, isProfileGenerated, isProfileImageUploaded } =
+    storeToRefs(useUserStore());
+  const { t } = useI18n();
+  const loading = ref(false);
+  const dirty = ref(false);
+  const errorGlobal = ref('');
+
+  // Handle traditional login form submission
+  const handleLogin = async () => {
+    dirty.value = true;
+
+    if (!username.value || !password.value) return;
+    // Add your login logic here
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+      await doLogin(axios, {
+        username: username.value,
+        password: password.value,
+      });
+      if (isEmailVerified.value) {
+        if (isProfileGenerated.value) {
+          // User is verified and has a generated profile
+          if (isProfileImageUploaded.value)
+            await navigateTo({ path: localePath('home') });
+          else
+            await navigateTo({ path: localePath('auth-upload-profile-image') });
+        } else {
+          // User is verified but does not have a generated profile
+          await navigateTo({ path: localePath('auth-generate-profile') });
+        }
+      } else {
+        // User is not verified
+        await navigateTo({ path: localePath('auth-verify-email') });
+      }
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  // Redirect to backend which handles Google OAuth2
+
+  const redirectToRegister = () => {
+    navigateTo({ path: localePath('auth-register') });
+  };
+
+  // Redirect to backend which handles 42Intra OAuth2
+  const redirectTo42Intra = () => {
+    const intraOAuthUrl = `http://localhost:3005/social/42intra`;
+    window.location.href = intraOAuthUrl;
+  };
+</script>

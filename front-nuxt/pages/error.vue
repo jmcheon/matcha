@@ -1,19 +1,3 @@
-<script setup>
-  import { ref, onMounted } from 'vue';
-  import { useI18n } from 'vue-i18n';
-  import { useRoute } from 'vue-router';
-
-  const route = useRoute();
-  const { t } = useI18n();
-
-  // Extract the message from query parameters
-  const errorCode = ref('');
-
-  onMounted(() => {
-    errorCode.value = route.query.message ?? null;
-  });
-</script>
-
 <template>
   <v-container
     fluid
@@ -52,3 +36,19 @@
     </v-card>
   </v-container>
 </template>
+
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { useRoute } from 'vue-router';
+
+  const route = useRoute();
+  const { t } = useI18n();
+
+  // Extract the message from query parameters
+  const errorCode = ref('');
+
+  onMounted(() => {
+    errorCode.value = route.query.message ?? null;
+  });
+</script>

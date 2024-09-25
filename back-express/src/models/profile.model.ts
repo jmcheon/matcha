@@ -58,3 +58,24 @@ export async function createProfile(profileData: Profile): Promise<any> {
 
   return insertResult;
 }
+
+
+export async function addProfileImage(account_id: string, image_name: string): Promise<any> {
+  try {
+    console.log(image_name)
+    const query = `
+      UPDATE profile
+      SET image_paths = IF(image_paths IS NULL, JSON_ARRAY(?), JSON_ARRAY_APPEND(image_paths, '$', ?))
+      WHERE account_id = ?;
+    `;
+
+    const [result]: any = await pool.execute(query, [image_name, image_name, account_id]);
+    if (result.affectedRows === 0) {
+      throw new Error(`Profile with account_id ${account_id} not found.`);
+    }
+    return result;
+  } catch (error) {
+    console.error('Error adding profile image:', error);
+    throw error;
+  }
+}

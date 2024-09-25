@@ -12,10 +12,11 @@
     "year": "Year",
     "login": "Login",
     "forgotPassword": "Forgot password",
-    "home": "home"
+    "home": "home",
     "register": "Register",
     "newPassword": "New password",
-    "confirmPassword": "Confirm password"
+    "confirmPassword": "Confirm password",
+    "bio": "bio"
   },
   "Navbar": {
     "LoginSelector": {
@@ -32,6 +33,10 @@
   "Footer": {
     "copyright": "All Rights Reserved."
   },
+  "AuthVerifyEmail": {
+    "description": "Please check your mail box",
+    "title": "Waiting for your email confirmation"
+  },
   "Error": {
     "404": "Page not found",
     "error": "Error",
@@ -47,7 +52,8 @@
     "PASSWORDS_DO_NOT_MATCH": "Password does not match.",
     "REQUIRED": " {value} is required",
     "USERNAME_ALREADY_EXISTS": "Username already exists.",
-    "GOOGLE_NOT_LINKED": "Account exists but Google Social Login is not linked"
+    "GOOGLE_NOT_LINKED": "Account exists but Google Social Login is not linked",
+    "NO_IMAGES_UPLOADED": "No images to upload"
   },
   "AuthRegister": {
     "description": "Create an account to enjoy unlimited movies",
@@ -92,5 +98,10 @@
   "AuthResetPassword": {
     "resetPassword": "Reset password",
     "reset": "Reset Password"
+  },
+  "AuthUploadProfileImage": {
+    "title": "Upload Profile Image",
+    "upload": "Upload image",
+    "submit": "submit"
   }
 }

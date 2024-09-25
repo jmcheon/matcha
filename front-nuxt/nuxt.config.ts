@@ -80,4 +80,7 @@ export default defineNuxtConfig({
       },
     ],
   },
+  vuetify: {
+    treeShake: true,
+  },
 });

@@ -3,6 +3,8 @@
 **/.pnpm-store
 **/pnpm-lock.yaml
 **/package-lock.json
+back-express/images
+!back-express/images/.gitkeep
 
 db-mysql/dev/
 db-mysql/prod/

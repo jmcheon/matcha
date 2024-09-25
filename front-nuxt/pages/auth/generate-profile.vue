@@ -1,76 +1,3 @@
-<script setup>
-  import { ref } from 'vue';
-
-  definePageMeta({
-    layout: 'auth',
-    middleware: ['strict-auth'],
-  });
-  const dirty = ref(false);
-  const loading = ref(false);
-  const errorGlobal = ref('');
-  const localePath = useLocalePath();
-  const firstName = ref('');
-  const lastName = ref('');
-  const location = ref('');
-  const gender = ref('');
-  const age = ref(18);
-  const height = ref(130);
-  const iLike = ref('');
-  const bio = ref('');
-  const interests = ref('');
-  const { t } = useI18n();
-  const axios = useAxios();
-  const { generateProfile } = useProfile();
-
-  const { firstNameValidator, lastNameValidator } = useValidator();
-  const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
-  const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
-
-  const handleGenerateProfile = async () => {
-    dirty.value = true;
-    // Validate the form before submission
-    if (
-      errorFirstName.value ||
-      errorLastName.value ||
-      !location.value ||
-      !gender.value ||
-      !iLike.value ||
-      !bio.value ||
-      !interests.value
-    )
-      return;
-
-    const profileData = {
-      firstName: firstName.value,
-      lastName: lastName.value,
-      location: location.value,
-      gender: gender.value,
-      age: age.value,
-      height: height.value,
-      iLike: iLike.value,
-      bio: bio.value,
-      interests: interests.value.split(',').map((tag) => tag.trim()),
-    };
-
-    try {
-      loading.value = true;
-      errorGlobal.value = '';
-      console.log('Profile Data:', profileData);
-      await generateProfile(axios, profileData);
-      // Redirect or handle success
-      await navigateTo({ path: localePath('index') });
-    } catch (e) {
-      if (e.response && e.response.data.code) {
-        errorGlobal.value = t(`Error.${e.response.data.code}`);
-      } else {
-        errorGlobal.value = t('Error.GENERAL_ERROR');
-      }
-    } finally {
-      loading.value = false;
-    }
-  };
-</script>
-
 <template>
   <v-container class="fill-height" fluid>
     <v-row justify="center">
@@ -85,23 +12,15 @@
             <v-text-field
               v-model="firstName"
               :label="$t('_Global.firstName')"
-              :error-messages="errorFirstName ? [errorFirstName] : []"
-              :rules="[
-                (v) =>
-                  !!v ||
-                  $t('Error.REQUIRED', { value: $t('_Global.firstName') }),
-              ]"
+              :error="!!errorFirstName"
+              :messages="[errorFirstName]"
               required
             />
             <v-text-field
               v-model="lastName"
               :label="$t('_Global.lastName')"
-              :error-messages="errorLastName ? [errorLastName] : []"
-              :rules="[
-                (v) =>
-                  !!v ||
-                  $t('Error.REQUIRED', { value: $t('_Global.lastName') }),
-              ]"
+              :error="!!errorLastName"
+              :messages="[errorLastName]"
               required
             />
             <v-text-field v-model="location" label="Location" required />
@@ -134,7 +53,13 @@
               label="I Like"
               required
             />
-            <v-textarea v-model="bio" label="Bio" maxlength="140" required />
+            <v-textarea 
+              v-model="bio" 
+              :label="$t('_Global.bio')"
+              :error="!!errorBio"
+              :messages="[errorBio]"
+              required 
+              />
             <v-text-field
               v-model="interests"
               label="Interests (Hashtags)"
@@ -153,3 +78,77 @@
     </v-row>
   </v-container>
 </template>
+
+<script setup>
+  import { ref } from 'vue';
+
+  definePageMeta({
+    // layout: 'auth',
+    middleware: ['strict-auth'],
+  });
+  const dirty = ref(false);
+  const loading = ref(false);
+  const errorGlobal = ref('');
+  const localePath = useLocalePath();
+  const firstName = ref('');
+  const lastName = ref('');
+  const location = ref('');
+  const gender = ref('');
+  const age = ref(18);
+  const height = ref(130);
+  const iLike = ref('');
+  const bio = ref('');
+  const interests = ref('');
+  const { t } = useI18n();
+  const { generateProfile } = useProfile();
+  const { profileData } = storeToRefs(useUserStore());
+
+  const { firstNameValidator, lastNameValidator, bioValidator } = useValidator();
+  const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
+  const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
+  const { error: errorBio } = bioValidator(dirty, bio, t);
+
+  const handleGenerateProfile = async () => {
+    dirty.value = true;
+    // Validate the form before submission
+    if (
+      errorFirstName.value ||
+      errorLastName.value ||
+      !location.value ||
+      !gender.value ||
+      !iLike.value ||
+      errorBio.value ||
+      !interests.value
+    )
+      return;
+
+    const generatedProfile = {
+      firstName: firstName.value,
+      lastName: lastName.value,
+      location: location.value,
+      gender: gender.value,
+      age: age.value,
+      height: height.value,
+      iLike: iLike.value,
+      bio: bio.value,
+      interests: interests.value.split(',').map((tag) => tag.trim()),
+    };
+
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+      console.log(length(generateProfile.bio.value))
+      const generatedResult = await generateProfile(generatedProfile);
+      profileData.value = generatedResult;
+      await navigateTo({ path: localePath('auth-upload-profile-image') });
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+</script>

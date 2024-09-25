@@ -1,20 +1,3 @@
-<script setup>
-  import { ref, onMounted } from 'vue';
-  import { useRoute, useLocalePath, navigateTo } from '#imports';
-
-  const route = useRoute();
-  const localePath = useLocalePath();
-  const email = ref('');
-
-  onMounted(() => {
-    email.value = route.query.email || '';
-  });
-
-  const navigateToLogin = () => {
-    navigateTo({ path: localePath('auth-login') });
-  };
-</script>
-
 <template>
   <v-container
     fluid
@@ -37,3 +20,20 @@
     </v-card>
   </v-container>
 </template>
+
+<script setup>
+  import { ref, onMounted } from 'vue';
+  import { useRoute, useLocalePath, navigateTo } from '#imports';
+
+  const route = useRoute();
+  const localePath = useLocalePath();
+  const email = ref('');
+
+  onMounted(() => {
+    email.value = route.query.email || '';
+  });
+
+  const navigateToLogin = () => {
+    navigateTo({ path: localePath('auth-login') });
+  };
+</script>

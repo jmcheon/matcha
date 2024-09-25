@@ -1,66 +1,3 @@
-<script setup>
-  import { ref } from 'vue';
-
-  // definePageMeta({
-  //   // layout: 'auth',
-  //   middleware: ['strict-auth'],
-  // });
-
-  const axios = useAxios();
-  const localePath = useLocalePath();
-  const { t } = useI18n();
-
-  const newPassword = ref('');
-  const confirmPassword = ref('');
-  const loading = ref(false);
-  const errorGlobal = ref('');
-  const dirty = ref(false);
-
-  const { userData } = storeToRefs(useUserStore());
-  const { updateProfile } = useProfile();
-
-  const { passwordValidator } = useValidator();
-  const { error: errorPassword } = passwordValidator(dirty, newPassword, t);
-  const { error: errorConfirmPassword } = passwordValidator(
-    dirty,
-    confirmPassword,
-    t,
-  );
-
-  const handleResetPassword = async () => {
-    dirty.value = true;
-    if (errorPassword.value || errorConfirmPassword.value) return;
-
-    if (!newPassword.value || !confirmPassword.value) return;
-
-    if (newPassword.value !== confirmPassword.value) {
-      errorGlobal.value = t('Error.PASSWORDS_DO_NOT_MATCH');
-      return;
-    }
-
-    try {
-      loading.value = true;
-      console.log(userData.value);
-      // Simulate API call for resetting password
-      await updateProfile(axios, userData.value.account_id, {
-        password: newPassword.value,
-      });
-
-      // Redirect to login page after successful reset
-      await navigateTo({ path: localePath('auth-login') });
-      errorGlobal.value = '';
-    } catch (e) {
-      if (e.response && e.response.data.code) {
-        errorGlobal.value = t(`Error.${e.response.data.code}`);
-      } else {
-        errorGlobal.value = t('Error.GENERAL_ERROR');
-      }
-    } finally {
-      loading.value = false;
-    }
-  };
-</script>
-
 <template>
   <v-container
     fluid
@@ -115,3 +52,65 @@
     </v-card>
   </v-container>
 </template>
+
+<script setup>
+  import { ref } from 'vue';
+
+  // definePageMeta({
+  //   // layout: 'auth',
+  //   middleware: ['strict-auth'],
+  // });
+
+  const localePath = useLocalePath();
+  const { t } = useI18n();
+
+  const newPassword = ref('');
+  const confirmPassword = ref('');
+  const loading = ref(false);
+  const errorGlobal = ref('');
+  const dirty = ref(false);
+
+  const { accountData } = storeToRefs(useUserStore());
+  const { updateProfile } = useProfile();
+
+  const { passwordValidator } = useValidator();
+  const { error: errorPassword } = passwordValidator(dirty, newPassword, t);
+  const { error: errorConfirmPassword } = passwordValidator(
+    dirty,
+    confirmPassword,
+    t,
+  );
+
+  const handleResetPassword = async () => {
+    dirty.value = true;
+    if (errorPassword.value || errorConfirmPassword.value) return;
+
+    if (!newPassword.value || !confirmPassword.value) return;
+
+    if (newPassword.value !== confirmPassword.value) {
+      errorGlobal.value = t('Error.PASSWORDS_DO_NOT_MATCH');
+      return;
+    }
+
+    try {
+      loading.value = true;
+      console.log(accountData.value);
+      // Simulate API call for resetting password
+      await updateProfile(accountData.value.account_id, {
+        password: newPassword.value,
+      });
+
+      // Redirect to login page after successful reset
+      await navigateTo({ path: localePath('auth-login') });
+      errorGlobal.value = '';
+    } catch (e) {
+      if (e.response && e.response.data.code) {
+        errorGlobal.value = t(`Error.${e.response.data.code}`);
+      } else {
+        errorGlobal.value = t('Error.GENERAL_ERROR');
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+</script>

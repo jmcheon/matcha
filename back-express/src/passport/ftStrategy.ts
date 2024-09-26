@@ -60,18 +60,24 @@ export default function ft() {
         const intraLogin = profile.login;
         const email = profile.email
 
+        const socialInfo = {
+          id: intraLogin,
+          email: email,
+          provider: '42'
+        }
+
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE intra_username = ?', [profile.login]);
 
         let account = rows[0] as Account | undefined;
 
         // If an account with the same email exists but the Google ID does not
-        if (account?.email === email && (!account?.intra_username || account.intra_username === "")) {
+        if (account?.email === email && (!account?.intra_username || account.intra_username === "" || account?.intra_username !== intraLogin)) {
           // Redirect to an account linking page
           return done(null, false, { code: '42INTRA_NOT_LINKED' });
         }
 
         // If account exists with Google ID, return success
-        if (account && account.intra_username === intraLogin) {
+        if (account && account.username) {
           return done(null, account);
         }
 
@@ -81,7 +87,7 @@ export default function ft() {
           account = { account_id: result.insertId, status: 'incomplete_social', intra_username: intraLogin, created_at: new Date() }; // Return newly created account
         }
 
-        return done(null, account); // Successful authentication
+        return done(null, socialInfo); // Successful authentication
       } catch (error) {
         return done(error);
       }

@@ -4,6 +4,7 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export interface Account {
   account_id: number;
+  username?: string;
   email?: string;
   password?: string;
   google_id?: string;
@@ -83,6 +84,27 @@ export async function getAccountById(account_id: number): Promise<Account | unde
     return undefined;
   }
 }
+
+export async function getAccountBySocialLogin(provider: string, social_id: string): Promise<Account | undefined> {
+  let query = '';
+
+  // Dynamically choose the query based on the provider
+  if (provider === '42') {
+    query = 'SELECT * FROM account WHERE intra_username = ? LIMIT 1';
+  } else if (provider === 'google') {
+    query = 'SELECT * FROM account WHERE google_id = ? LIMIT 1';
+  } else {
+    throw new Error(`Unsupported provider: ${provider}`);
+  }
+
+  const [rows] = await pool.query<RowDataPacket[]>(query, [social_id]);
+  if (rows.length > 0) {
+    return mapRowToAccount(rows[0]);
+  } else {
+    return undefined;
+  }
+}
+
 
 export async function getAccountStatus(account_id: number): Promise<string | null> {
   const [rows] = await pool.query<RowDataPacket[]>(

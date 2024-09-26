@@ -14,9 +14,11 @@ router.delete('/logout', AuthentificationController.logout);
 router.post('/refresh', AuthentificationController.refresh);
 router.get('/verify-email', EmailService.verifyEmail);
 router.get('/google', AuthentificationController.googleLogin);
+router.get('/ft', AuthentificationController.ftLogin);
 router.post('/forgot-password', AuthentificationController.forgotPassword);
 
 router.get('/auth/google/callback', AuthentificationController.googleCallback);
+router.get('/auth/ft/callback', AuthentificationController.ftCallback);
 router.get('/reset-password', AuthentificationController.resetPassword);
 
 export default router;

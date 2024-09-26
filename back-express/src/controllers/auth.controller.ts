@@ -245,6 +245,52 @@ export default class AuthenticationController {
     })(req, res, next);
   }
 
+  static ftLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('42', { scope: ['public'] })(req, res, next);
+  }
+
+  static ftCallback(req: Request, res: Response, next: NextFunction) {
+    const { lang } = req.query;
+
+    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
+
+    passport.authenticate('42', async (err: any, account: Account | false, info: { code: string }) => {
+      if (err) return next(err);
+      if (!account) {
+        if (info?.code) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
+        }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
+      }
+
+      if (account.status === 'incomplete_social') {
+        return res.redirect(
+          `${process.env.NGINX_HOST}/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`
+        );
+      }
+
+      // Use the helper function to generate tokens and set cookies
+      await AuthenticationController.generateTokensAndSetCookies(res, account.account_id);
+
+      if (account.status === 'pending_verification') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
+      }
+
+      if (account.status === 'incomplete_profile') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      }
+      // const profileData: any = await getProfileByAccountId(String(account.account_id));
+      // if (!profileData) {
+      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      // }
+      // else if (!profileData.image_paths) {
+      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      // }
+      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
+
+    })(req, res, next);
+  }
+
   static async refresh(req: Request, res: Response) {
     const oldRefreshToken = req.cookies['refreshToken'];
     if (!oldRefreshToken) {

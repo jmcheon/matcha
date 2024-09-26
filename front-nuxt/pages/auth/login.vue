@@ -49,7 +49,11 @@
       <v-card-actions class="justify-center">
         <p class="text-center text-sm">
           {{ $t('AuthLogin.accountDont') }}
-          <v-btn text class="text-blue-500" @click="redirectToRegister">
+          <v-btn
+            text
+            class="text-blue-500"
+            @click="navigateTo({ path: localePath('auth-register') })"
+          >
             Register
           </v-btn>
         </p>
@@ -74,10 +78,10 @@
           <v-btn class="text-black mx-2" @click="onGoogleLogin">
             <v-icon left>mdi-google</v-icon>
           </v-btn>
-          <v-btn class="text-black mx-2" @click="redirectTo42Intra">
+          <v-btn class="text-black mx-2" @click="onGithubLogin">
             <v-icon left>mdi-github</v-icon>
           </v-btn>
-          <v-btn class="text-black mx-2" @click="redirectTo42Intra">
+          <v-btn class="text-black mx-2" @click="onFtLogin">
             <v-icon left>mdi-account</v-icon>
           </v-btn>
         </v-card-actions>
@@ -145,15 +149,5 @@
     }
   };
 
-  // Redirect to backend which handles Google OAuth2
-
-  const redirectToRegister = () => {
-    navigateTo({ path: localePath('auth-register') });
-  };
-
   // Redirect to backend which handles 42Intra OAuth2
-  const redirectTo42Intra = () => {
-    const intraOAuthUrl = `http://localhost:3005/social/42intra`;
-    window.location.href = intraOAuthUrl;
-  };
 </script>

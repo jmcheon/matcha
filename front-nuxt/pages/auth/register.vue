@@ -118,7 +118,11 @@
   const { error: errorUsername } = usernameValidator(dirty, username, t);
   const { error: errorEmail } = emailValidator(dirty, email, t);
   const { error: errorPassword } = passwordValidator(dirty, password, t);
-  const { error: errorRetypePassword } = passwordValidator(dirty, retypePassword, t);
+  const { error: errorRetypePassword } = passwordValidator(
+    dirty,
+    retypePassword,
+    t,
+  );
 
   const { doRegister } = useAuth();
   const { locale } = useI18n();
@@ -136,7 +140,12 @@
   const handleRegister = async () => {
     dirty.value = true;
 
-    if (errorUsername.value || errorEmail.value || errorPassword.value || errorRetypePassword.value) {
+    if (
+      errorUsername.value ||
+      errorEmail.value ||
+      errorPassword.value ||
+      errorRetypePassword.value
+    ) {
       return;
     }
 

@@ -8,7 +8,8 @@ export interface Account {
   email?: string;
   password?: string;
   google_id?: string;
-  intra_username?: string;
+  intra42_id?: string;
+  github_id?: string;
   status: 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline';
   created_at: Date;
   last_modified_at?: Date;

@@ -306,6 +306,55 @@ export default class AuthenticationController {
     })(req, res, next);
   }
 
+  static githubLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('github', { scope: ['profile', 'email'] })(req, res, next);
+  }
+
+  static githubCallback(req: Request, res: Response, next: NextFunction) {
+    const { lang } = req.query;
+
+    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
+
+    passport.authenticate('github', async (err: any, payload: Account | false | SocialInfo, info: { code: string }) => {
+      if (err) return next(err);
+      if (!payload) {
+        if (info?.code) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
+        }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
+      }
+
+      if (isSocialInfo(payload)) {
+        const token = jwt.sign(
+          //TODO: account_id
+          payload,
+          process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
+          { expiresIn: '24h' }
+        );
+        return res.redirect(
+          `${process.env.NGINX_HOST}/${language}/auth/register?token=${token}`
+        );
+      }
+
+      // Use the helper function to generate tokens and set cookies
+      await AuthenticationController.generateTokensAndSetCookies(res, payload.account_id);
+
+      if (payload.status === 'pending_verification') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
+      }
+
+      const profileData: any = await getProfileByAccountId(String(payload.account_id));
+      if (!profileData) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      }
+      else if (!profileData.image_paths) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      }
+      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
+
+    })(req, res, next);
+  }
+
   static async refresh(req: Request, res: Response) {
     const oldRefreshToken = req.cookies['refreshToken'];
     if (!oldRefreshToken) {

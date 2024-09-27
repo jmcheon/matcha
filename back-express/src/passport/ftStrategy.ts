@@ -67,12 +67,12 @@ export default function ft() {
           provider: '42'
         }
 
-        const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE intra_username = ?', [profile.login]);
+        const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE intra42_id = ?', [profile.login]);
 
         let account = rows[0] as Account | undefined;
 
         // If an account with the same email exists but the Google ID does not
-        if (account?.email === email && (!account?.intra_username || account.intra_username === "" || account?.intra_username !== intraLogin)) {
+        if (account?.email === email && (!account?.intra42_id || account.intra42_id === "" || account?.intra42_id !== intraLogin)) {
           // Redirect to an account linking page
           return done(null, false, { code: '42INTRA_NOT_LINKED' });
         }
@@ -84,8 +84,8 @@ export default function ft() {
 
         // If account does not exist, create a new account
         if (!account) {
-          const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (intra_username, status) VALUES (?, ?)', [intraLogin, 'incomplete_social']);
-          account = { account_id: result.insertId, status: 'incomplete_social', intra_username: intraLogin, created_at: new Date() }; // Return newly created account
+          const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (intra42_id, status) VALUES (?, ?)', [intraLogin, 'incomplete_social']);
+          account = { account_id: result.insertId, status: 'incomplete_social', intra42_id: intraLogin, created_at: new Date() }; // Return newly created account
         }
 
         return done(null, socialInfo42); // Successful authentication

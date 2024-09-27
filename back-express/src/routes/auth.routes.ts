@@ -15,10 +15,12 @@ router.post('/refresh', AuthentificationController.refresh);
 router.get('/verify-email', EmailService.verifyEmail);
 router.get('/google', AuthentificationController.googleLogin);
 router.get('/ft', AuthentificationController.ftLogin);
+router.get('/github', AuthentificationController.githubLogin);
 router.post('/forgot-password', AuthentificationController.forgotPassword);
 
 router.get('/auth/google/callback', AuthentificationController.googleCallback);
 router.get('/auth/ft/callback', AuthentificationController.ftCallback);
+router.get('/auth/github/callback', AuthentificationController.githubCallback);
 router.get('/reset-password', AuthentificationController.resetPassword);
 
 export default router;

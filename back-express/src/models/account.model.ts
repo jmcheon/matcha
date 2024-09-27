@@ -91,9 +91,11 @@ export async function getAccountBySocialLogin(provider: string, social_id: strin
 
   // Dynamically choose the query based on the provider
   if (provider === '42') {
-    query = 'SELECT * FROM account WHERE intra_username = ? LIMIT 1';
+    query = 'SELECT * FROM account WHERE intra42_id = ? LIMIT 1';
   } else if (provider === 'google') {
     query = 'SELECT * FROM account WHERE google_id = ? LIMIT 1';
+  } else if (provider === 'github') {
+    query = 'SELECT * FROM account WHERE github_id = ? LIMIT 1';
   } else {
     throw new Error(`Unsupported provider: ${provider}`);
   }
@@ -153,7 +155,7 @@ export async function updateAccount(
   email: string | null,
   password: string | null,
   google_id: string | null,
-  intra_username: string | null
+  intra42_id: string | null
 ): Promise<void> {
   // Create an array to hold the fields to update
   const fields: string[] = [];
@@ -172,9 +174,9 @@ export async function updateAccount(
     fields.push('google_id = ?');
     values.push(google_id);
   }
-  if (intra_username !== null) {
-    fields.push('intra_username = ?');
-    values.push(intra_username);
+  if (intra42_id !== null) {
+    fields.push('intra42_id = ?');
+    values.push(intra42_id);
   }
 
   // Always add the account_id to the values array for the WHERE clause

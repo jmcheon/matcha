@@ -132,7 +132,7 @@ export const useAuth = () => {
 
   const onFtLogin = () => (window.location.href = `${BACK_HOST}/ft`);
   const onGithubLogin = () => {
-    window.location.href = `${BACK_HOST}/auth/github/login`;
+    window.location.href = `${BACK_HOST}/github`;
   };
 
   return {

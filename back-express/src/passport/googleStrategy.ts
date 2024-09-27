@@ -1,4 +1,5 @@
 import passport from 'passport';
+
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { pool } from '../utils/db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';

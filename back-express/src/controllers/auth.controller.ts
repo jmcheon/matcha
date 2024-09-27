@@ -22,6 +22,7 @@ import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { JwtPayloadModel } from '../models/payload.model';
 import { getProfileByAccountId } from '../models/profile.model';
+import { isSocialInfo, SocialInfo } from '../passport/SocialInfo';
 
 export default class AuthenticationController {
   // Helper function to generate tokens, set cookies, and save refresh token
@@ -214,54 +215,8 @@ export default class AuthenticationController {
     const { lang } = req.query;
 
     const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
-    passport.authenticate('google', async (err: any, account: Account | false, info: { code: string }) => {
-      if (err) return next(err);
-      if (!account) {
-        if (info?.code) {
-          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
-        }
-        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
-      }
 
-      if (account.status === 'incomplete_social') {
-
-        return res.redirect(
-          `${process.env.NGINX_HOST}/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`
-        );
-      }
-
-      // Use the helper function to generate tokens and set cookies
-      await AuthenticationController.generateTokensAndSetCookies(res, account.account_id);
-
-      if (account.status === 'pending_verification') {
-        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
-      }
-
-      if (account.status === 'incomplete_profile') {
-        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-      }
-      // const profileData: any = await getProfileByAccountId(String(account.account_id));
-      // if (!profileData) {
-      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-      // }
-      // else if (!profileData.image_paths) {
-      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
-      // }
-      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
-
-    })(req, res, next);
-  }
-
-  static ftLogin(req: Request, res: Response, next: NextFunction) {
-    passport.authenticate('42', { scope: ['public'] })(req, res, next);
-  }
-
-  static ftCallback(req: Request, res: Response, next: NextFunction) {
-    const { lang } = req.query;
-
-    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
-
-    passport.authenticate('42', async (err: any, payload: Account | false | any, info: { code: string }) => {
+    passport.authenticate('google', async (err: any, payload: Account | false | SocialInfo, info: { code: string }) => {
       if (err) return next(err);
       if (!payload) {
         if (info?.code) {
@@ -270,7 +225,7 @@ export default class AuthenticationController {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
       }
 
-      if ('provider' in payload) {
+      if (isSocialInfo(payload)) {
         console.log("callback test", payload)
         const token = jwt.sign(
           //TODO: account_id
@@ -290,16 +245,62 @@ export default class AuthenticationController {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
       }
 
-      if (payload.status === 'incomplete_profile') {
+      const profileData: any = await getProfileByAccountId(String(payload.account_id));
+      if (!profileData) {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
       }
-      // const profileData: any = await getProfileByAccountId(String(account.account_id));
-      // if (!profileData) {
-      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-      // }
-      // else if (!profileData.image_paths) {
-      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
-      // }
+      else if (!profileData.image_paths) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      }
+      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
+
+    })(req, res, next);
+  }
+
+  static ftLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('42', { scope: ['public'] })(req, res, next);
+  }
+
+  static ftCallback(req: Request, res: Response, next: NextFunction) {
+    const { lang } = req.query;
+
+    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
+
+    passport.authenticate('42', async (err: any, payload: Account | false | SocialInfo, info: { code: string }) => {
+      if (err) return next(err);
+      if (!payload) {
+        if (info?.code) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
+        }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
+      }
+
+      if (isSocialInfo(payload)) {
+        const token = jwt.sign(
+          //TODO: account_id
+          payload,
+          process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
+          { expiresIn: '24h' }
+        );
+        return res.redirect(
+          `${process.env.NGINX_HOST}/${language}/auth/register?token=${token}`
+        );
+      }
+
+      // Use the helper function to generate tokens and set cookies
+      await AuthenticationController.generateTokensAndSetCookies(res, payload.account_id);
+
+      if (payload.status === 'pending_verification') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
+      }
+
+      const profileData: any = await getProfileByAccountId(String(payload.account_id));
+      if (!profileData) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      }
+      else if (!profileData.image_paths) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      }
       return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
 
     })(req, res, next);

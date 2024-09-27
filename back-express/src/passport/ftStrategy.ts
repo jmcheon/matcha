@@ -4,6 +4,7 @@ import { pool } from '../utils/db';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 import { Account } from '../models/account.model';
 import axios from 'axios';
+import { SocialInfo } from './SocialInfo';
 
 // Extend the OAuth2Strategy
 class FortyTwoStrategy extends OAuth2Strategy {
@@ -60,7 +61,7 @@ export default function ft() {
         const intraLogin = profile.login;
         const email = profile.email
 
-        const socialInfo = {
+        const socialInfo42: SocialInfo = {
           id: intraLogin,
           email: email,
           provider: '42'
@@ -87,7 +88,7 @@ export default function ft() {
           account = { account_id: result.insertId, status: 'incomplete_social', intra_username: intraLogin, created_at: new Date() }; // Return newly created account
         }
 
-        return done(null, socialInfo); // Successful authentication
+        return done(null, socialInfo42); // Successful authentication
       } catch (error) {
         return done(error);
       }

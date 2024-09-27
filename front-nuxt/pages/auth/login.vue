@@ -82,7 +82,7 @@
             <v-icon left>mdi-github</v-icon>
           </v-btn>
           <v-btn class="text-black mx-2" @click="onFtLogin">
-            <v-icon left>mdi-account</v-icon>
+            <v-icon left> <FtLogo class="h-8 w-8" /></v-icon>
           </v-btn>
         </v-card-actions>
       </div>
@@ -92,6 +92,7 @@
 
 <script setup>
   import { ref } from 'vue';
+  import FtLogo from '~/assets/icons/42.svg';
 
   definePageMeta({
     // layout: 'auth',

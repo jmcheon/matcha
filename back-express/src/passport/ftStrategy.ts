@@ -71,11 +71,11 @@ export default function ft() {
 
         let account = rows[0] as Account | undefined;
 
-        // If an account with the same email exists but the Google ID does not
-        if (account?.email === email && (!account?.intra42_id || account.intra42_id === "" || account?.intra42_id !== intraLogin)) {
-          // Redirect to an account linking page
-          return done(null, false, { code: '42INTRA_NOT_LINKED' });
-        }
+        // // If an account with the same email exists but the Google ID does not
+        // if (account?.email === email && (!account?.intra42_id || account.intra42_id === "" || account?.intra42_id !== intraLogin)) {
+        //   // Redirect to an account linking page
+        //   return done(null, false, { code: '42INTRA_NOT_LINKED' });
+        // }
 
         // If account exists with Google ID, return success
         if (account && account.username) {

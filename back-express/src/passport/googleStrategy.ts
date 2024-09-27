@@ -29,11 +29,11 @@ export default function google() {
           const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE google_id = ?', [googleId]);
           let account = rows[0] as Account | undefined;
 
-          // If an account with the same email exists but the Google ID does not
-          if (account?.email === email && (!account?.google_id || account.google_id === "" || account?.google_id !== googleId)) {
-            // Redirect to an account linking page
-            return done(null, false, { code: 'GOOGLE_NOT_LINKED' });
-          }
+          // // If an account with the same email exists but the Google ID does not
+          // if (account?.email === email && (!account?.google_id || account.google_id === "" || account?.google_id !== googleId)) {
+          //   // Redirect to an account linking page
+          //   return done(null, false, { code: 'GOOGLE_NOT_LINKED' });
+          // }
 
           if (account && account.username) {
             return done(null, account);

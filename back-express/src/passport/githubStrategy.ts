@@ -30,11 +30,11 @@ export default function github() {
           const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE github_id = ?', [githubId]);
           let account = rows[0] as Account | undefined;
 
-          // If an account with the same email exists but the Google ID does not
-          if ((account?.email && account?.email === email) && (!account?.github_id || account.github_id === "" || account?.github_id !== githubId)) {
-            // Redirect to an account linking page
-            return done(null, false, { code: 'GITHUB_NOT_LINKED' });
-          }
+          // // If an account with the same email exists but the Google ID does not
+          // if ((account?.email && account?.email === email) && (!account?.github_id || account.github_id === "" || account?.github_id !== githubId)) {
+          //   // Redirect to an account linking page
+          //   return done(null, false, { code: 'GITHUB_NOT_LINKED' });
+          // }
 
           if (account && account.username) {
             return done(null, account);

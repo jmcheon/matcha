@@ -385,7 +385,6 @@ export default class AuthenticationController {
 
       // Retrieve user data to return
       const userData = await getAccountById(userId);
-      console.log(userData)
 
       // Return user data along with the access token
       return res.json({ ...userData, accessToken });

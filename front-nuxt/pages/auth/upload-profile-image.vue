@@ -36,10 +36,11 @@
               <!-- Show upload button if no image is in the current slot -->
               <div
                 class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
-                @click="$refs.imageInput.click()"
               >
+                <button v-if="accountData.github_id">TODO</button>
                 <button
                   class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2"
+                  @click="$refs.imageInput.click()"
                 >
                   <span>{{ $t('AuthUploadProfileImage.upload') }}</span>
                 </button>
@@ -113,8 +114,8 @@
   const uploadedImages = ref(Array(maxImages).fill(null));
   const { updateProfileImage } = useProfile();
 
-  const { profileData } = storeToRefs(useUserStore());
-
+  const { profileData, accountData } = storeToRefs(useUserStore());
+  console.log('hihi222', accountData.value.github_id, profileData.value);
   const handleImageUpload = async (event) => {
     const file = event.target.files[0]; // Only handle one file at a time
     if (!file) return;
@@ -160,9 +161,9 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      
-      const response = await updateProfileImage(imagesToUpload)
-      
+
+      const response = await updateProfileImage(imagesToUpload);
+
       profileData.value.image_paths = response.data;
       await navigateTo({ path: localePath('home') });
     } catch (error) {

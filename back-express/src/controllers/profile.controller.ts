@@ -6,6 +6,7 @@ import path from 'path';
 import { UploadedFile } from 'express-fileupload';
 import { addProfileImage, createProfile, getProfileByAccountId, Profile } from '../models/profile.model';
 import { randomBytes } from 'crypto';
+import axios from 'axios'; // Use axios or any HTTP client for making the request
 
 const randomizeFileNameBase64 = (originalName: string): string => {
   // Generate random bytes and convert to Base64 (trim to 8 characters)
@@ -162,6 +163,41 @@ export default class ProfileController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ code: 'Failed to upload picture.' });
+    }
+  }
+
+  static async githubGetProfileImage(req: Request, res: Response) {
+    console.log("checker", req.user)
+    try {
+      // Ensure the user is authenticated
+      if (!req.isAuthenticated() || !req.user) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Retrieve the access token from req.user (stored after GitHub OAuth authentication)
+      // const accessToken = req.user.accessToken;
+
+      // // Make a request to GitHub API to get the user's profile
+      // const githubResponse = await axios.get('https://api.github.com/user', {
+      //   headers: {
+      //     Authorization: `token ${accessToken}` // Pass the access token
+      //   }
+      // });
+
+      // const profileData = githubResponse.data;
+
+      // // Extract the avatar URL from the GitHub response
+      // const profileImage = profileData.avatar_url;
+
+      // if (!profileImage) {
+      //   return res.status(404).json({ error: 'Profile image not found' });
+      // }
+
+      // // Return the profile image URL
+      // return res.json({ profileImage });
+    } catch (error) {
+      console.error('Error fetching profile image from GitHub:', error);
+      return res.status(500).json({ error: 'Failed to fetch profile image' });
     }
   }
 }

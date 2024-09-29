@@ -26,6 +26,8 @@ function mapRowToAccount(row: RowDataPacket): Account {
     status: row.status as 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline',
     refresh_token: row.refresh_token as string,
     google_id: row.google_id as string,
+    intra42_id: row.intra42_id as string,
+    github_id: row.github_id as string,
     created_at: row.created_at as Date,
     // Map any other properties as needed
   };

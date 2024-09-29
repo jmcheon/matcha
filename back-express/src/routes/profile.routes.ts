@@ -10,5 +10,6 @@ router.get('/', ProfileController.getProfile);
 router.post('/', ProfileController.generateProfile);
 router.patch('/:id', AccountController.updateUser);
 router.post('/upload_image', ProfileController.uploadPicture);
+router.get('/social_image', ProfileController.githubGetProfileImage);
 
 export default router;

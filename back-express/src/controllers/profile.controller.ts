@@ -7,6 +7,8 @@ import { UploadedFile } from 'express-fileupload';
 import { addProfileImage, createProfile, getProfileByAccountId, Profile } from '../models/profile.model';
 import { randomBytes } from 'crypto';
 import axios from 'axios'; // Use axios or any HTTP client for making the request
+import { RowDataPacket } from 'mysql2';
+import { getGoogleUserProfile } from '../services/profile.service';
 
 const randomizeFileNameBase64 = (originalName: string): string => {
   // Generate random bytes and convert to Base64 (trim to 8 characters)
@@ -170,8 +172,12 @@ export default class ProfileController {
     console.log("checker", req.user)
     try {
       // Ensure the user is authenticated
-      if (!req.isAuthenticated() || !req.user) {
+      if (!req.isAuthenticated()) {
+        console.log("chink")
         return res.status(401).json({ error: 'Unauthorized' });
+      }
+      if (!req.user) {
+        console.log("hihihi")
       }
 
       // Retrieve the access token from req.user (stored after GitHub OAuth authentication)
@@ -197,6 +203,44 @@ export default class ProfileController {
       // return res.json({ profileImage });
     } catch (error) {
       console.error('Error fetching profile image from GitHub:', error);
+      return res.status(500).json({ error: 'Failed to fetch profile image' });
+    }
+  }
+  static async googleGetProfileImage(req: Request, res: Response) {
+    console.log("req", req.cookies)
+    try {
+      // Extract the user's account ID from the JWT token in the cookie
+      const token = req.cookies?.accessToken;
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
+
+      const accountId = decoded.accountId;
+
+      // Retrieve the Google access token from the database
+
+      const account = await getAccountById(accountId)
+      console.log("account", account)
+      if (!account || !account.google_access_token) {
+        return res.status(400).json({ error: 'Google access token not available' });
+      }
+
+      const accessToken = account.google_access_token;
+
+      // Fetch the profile image using the helper function
+      const userProfile = await getGoogleUserProfile(accountId, accessToken);
+      const profileImage = userProfile.picture;
+
+      if (!profileImage) {
+        return res.status(404).json({ error: 'Profile image not found' });
+      }
+
+      // Return the profile image URL
+      return res.json({ profileImage });
+    } catch (error: any) {
+      console.error('Error fetching profile image from Google:', error?.response?.data || error.message);
       return res.status(500).json({ error: 'Failed to fetch profile image' });
     }
   }

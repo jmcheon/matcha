@@ -37,7 +37,9 @@
               <div
                 class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
               >
-                <button v-if="accountData.github_id">TODO</button>
+                <button v-if="socialLoginType" @click="getSocialProfileImage">
+                  {{ socialLoginType }}
+                </button>
                 <button
                   class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2"
                   @click="$refs.imageInput.click()"
@@ -112,10 +114,11 @@
   const localePath = useLocalePath();
   const maxImages = 5;
   const uploadedImages = ref(Array(maxImages).fill(null));
-  const { updateProfileImage } = useProfile();
+  const { updateProfileImage, getSocialProfileImage } = useProfile();
 
-  const { profileData, accountData } = storeToRefs(useUserStore());
-  console.log('hihi222', accountData.value.github_id, profileData.value);
+  const { profileData, accountData, socialLoginType } =
+    storeToRefs(useUserStore());
+
   const handleImageUpload = async (event) => {
     const file = event.target.files[0]; // Only handle one file at a time
     if (!file) return;

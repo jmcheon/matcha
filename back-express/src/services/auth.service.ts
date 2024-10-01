@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
 import { Response, CookieOptions } from "express";
 import { pool } from "../utils/db"
-[]
+import { RowDataPacket } from "mysql2";
+import axios from "axios";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secret_key'; // You should set this securely
 const ACCESS_TOKEN_EXPIRATION = 900; // Example: 15 minutes in seconds
@@ -76,3 +77,42 @@ export const saveRefreshToken = async (accountId: number, token: string): Promis
     console.log("DB connection released for account", accountId);
   }
 };
+
+export async function refreshGoogleAccessToken(accountId: number): Promise<string> {
+  // Retrieve the refresh token from the database
+  const [rows] = await pool.query<RowDataPacket[]>(
+    'SELECT google_refresh_token FROM account WHERE account_id = ?',
+    [accountId]
+  );
+  const refreshToken = rows[0]?.google_refresh_token;
+
+  if (!refreshToken) {
+    throw new Error('Refresh token not available');
+  }
+
+  // Request a new access token using the refresh token
+  const params = new URLSearchParams();
+  params.append('client_id', process.env.GOOGLE_CLIENT_ID as string);
+  params.append('client_secret', process.env.GOOGLE_CLIENT_SECRET as string);
+  params.append('refresh_token', refreshToken);
+  params.append('grant_type', 'refresh_token');
+
+  try {
+    const response = await axios.post('https://oauth2.googleapis.com/token', params.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const newAccessToken = response.data.access_token;
+
+    // Update the access token in the database
+    await pool.query(
+      'UPDATE account SET google_access_token = ? WHERE account_id = ?',
+      [newAccessToken, accountId]
+    );
+
+    return newAccessToken;
+  } catch (error: any) {
+    console.error('Error refreshing Google access token:', error?.response?.data || error.message);
+    throw new Error('Failed to refresh access token');
+  }
+}

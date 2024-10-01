@@ -33,8 +33,14 @@ export const useProfile = () => {
     return result.data;
   };
 
+  const getSocialProfileImage = async (userInfo: ProfileData) => {
+    const result = await axios.get('/api/profile/social-image', userInfo);
+    console.log(result);
+    return result.data;
+  };
   return {
     generateProfile,
+    getSocialProfileImage,
     updateProfileImage,
     updateProfile,
   };

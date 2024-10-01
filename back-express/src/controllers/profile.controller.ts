@@ -237,8 +237,7 @@ export default class ProfileController {
         return res.status(404).json({ error: 'Profile image not found' });
       }
 
-      // Return the profile image URL
-      return res.json({ profileImage });
+      return res.send(profileImage);
     } catch (error: any) {
       console.error('Error fetching profile image from Google:', error?.response?.data || error.message);
       return res.status(500).json({ error: 'Failed to fetch profile image' });

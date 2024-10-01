@@ -37,7 +37,7 @@
               <div
                 class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
               >
-                <button v-if="socialLoginType" @click="getSocialProfileImage">
+                <button v-if="socialLoginType" @click="fetchSocialProfileImage">
                   {{ socialLoginType }}
                 </button>
                 <button
@@ -116,10 +116,10 @@
   const uploadedImages = ref(Array(maxImages).fill(null));
   const { updateProfileImage, getSocialProfileImage } = useProfile();
 
-  const { profileData, accountData, socialLoginType } =
-    storeToRefs(useUserStore());
+  const { profileData, socialLoginType } = storeToRefs(useUserStore());
+  const socialImageFetched = ref(false);
 
-  const handleImageUpload = async (event) => {
+  const handleImageUpload = (event) => {
     const file = event.target.files[0]; // Only handle one file at a time
     if (!file) return;
 
@@ -141,6 +141,10 @@
     if (uploadedImages.value[index]) {
       URL.revokeObjectURL(uploadedImages.value[index].url);
       uploadedImages.value[index] = null;
+      // Reset socialImageFetched if the social image was removed
+      if (socialImageFetched.value && index === currentImageIndex.value) {
+        socialImageFetched.value = false;
+      }
     }
 
     // Optionally reset currentImageIndex if needed
@@ -172,6 +176,45 @@
     } catch (error) {
       console.error('Upload error:', error);
       errorGlobal.value = t('Error.GENERAL_ERROR');
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const fetchSocialProfileImage = async () => {
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+
+      // Get user information if needed
+      const userInfo = profileData.value; // Adjust as necessary
+
+      // Call the composable function
+      const imageUrl = await getSocialProfileImage(userInfo);
+
+      if (!imageUrl) {
+        throw new Error('Profile image not found');
+      }
+
+      // Fetch the image data as a Blob
+      const imageResponse = await fetch(imageUrl);
+      const imageBlob = await imageResponse.blob();
+
+      // Create a File object from the Blob
+      const file = new File([imageBlob], 'profile.jpg', {
+        type: imageBlob.type,
+      });
+      // Create a URL for the File object
+      const url = URL.createObjectURL(file);
+
+      // Assign the image to the current slot in uploadedImages
+      uploadedImages.value[currentImageIndex.value] = { file, url };
+
+      // Set socialImageFetched to true to disable the button
+      socialImageFetched.value = true;
+    } catch (error) {
+      console.error('Error fetching social profile image:', error);
+      errorGlobal.value = t('Error.FAILED_TO_FETCH_PROFILE_IMAGE');
     } finally {
       loading.value = false;
     }

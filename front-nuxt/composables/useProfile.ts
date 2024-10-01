@@ -33,10 +33,17 @@ export const useProfile = () => {
     return result.data;
   };
 
+  // const getSocialProfileImage = async (userInfo: ProfileData) => {
+  //   const result = await axios.get('/api/profile/social-image', userInfo);
+  //   return result;
+  // };
+
   const getSocialProfileImage = async (userInfo: ProfileData) => {
-    const result = await axios.get('/api/profile/social-image', userInfo);
-    console.log(result);
-    return result.data;
+    const result = await axios.get('/api/profile/social-image', {
+      params: userInfo, // Ensure correct parameter passing
+      withCredentials: true, // Include cookies if necessary
+    });
+    return result.data; // This should now be a plain string (image URL)
   };
   return {
     generateProfile,

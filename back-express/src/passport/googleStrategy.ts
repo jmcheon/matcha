@@ -16,6 +16,7 @@ export default function google() {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          console.log("checker", accessToken, refreshToken)
           const googleId = profile.id;
           const email = profile.emails?.[0]?.value as string;
 

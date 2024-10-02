@@ -19,7 +19,6 @@
                   <img
                     :src="uploadedImages[currentImageIndex].url"
                     class="max-w-full max-h-full object-contain"
-                    @click="$refs.imageInput.click()"
                   />
                   <div
                     v-if="isHovering"
@@ -37,7 +36,10 @@
               <div
                 class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
               >
-                <button v-if="socialLoginType" @click="fetchSocialProfileImage">
+                <button
+                  v-if="socialLoginType && socialImageFetched === false"
+                  @click="fetchSocialProfileImage"
+                >
                   {{ socialLoginType }}
                 </button>
                 <button

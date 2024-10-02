@@ -34,20 +34,20 @@
             <template v-else>
               <!-- Show upload button if no image is in the current slot -->
               <div
-                class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
+                class="flex flex-col items-center justify-center bg-slate-500 h-full w-full cursor-pointer space-y-4"
               >
-                <button
-                  v-if="socialLoginType && socialImageFetched === false"
-                  @click="fetchSocialProfileImage"
-                >
-                  {{ socialLoginType }}
-                </button>
-                <button
-                  class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2"
+                <v-btn
+                  class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2 mb-4"
                   @click="$refs.imageInput.click()"
                 >
                   <span>{{ $t('AuthUploadProfileImage.upload') }}</span>
-                </button>
+                </v-btn>
+                <v-btn
+                  v-if="socialLoginType && socialImageFetched === false"
+                  @click="fetchSocialProfileImage"
+                >
+                  Get profile image from {{ socialLoginType }}
+                </v-btn>
               </div>
             </template>
           </div>

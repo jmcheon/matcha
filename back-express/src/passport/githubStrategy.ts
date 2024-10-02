@@ -41,7 +41,7 @@ export default function github() {
           }
 
           if (!account) {
-            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account  (github_id, status) VALUES (?, ?)', [githubId, 'incomplete_social']);
+            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (github_id, status, github_access_token, github_refresh_token) VALUES (?, ?, ?, ?)', [githubId, 'incomplete_social', accessToken, refreshToken]);
             account = { account_id: result.insertId, status: 'incomplete_social', github_id: githubId, created_at: new Date() }; // Return newly created account
           }
 

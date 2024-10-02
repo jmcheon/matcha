@@ -12,7 +12,7 @@ router.get('/', ProfileController.getProfile);
 router.post('/', ProfileController.generateProfile);
 router.patch('/:id', AccountController.updateUser);
 router.post('/upload_image', ProfileController.uploadPicture);
-router.get('/social-image', ProfileController.googleGetProfileImage);
+router.get('/social-image', ProfileController.getSocialProfileImage);
 // router.get('/social_image', passport.authenticate('github'), (req, res, next) => {
 //   console.log(req.user); // Check if user is populated after authentication
 //   ProfileController.githubGetProfileImage(req, res);

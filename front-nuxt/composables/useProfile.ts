@@ -33,8 +33,12 @@ export const useProfile = () => {
     return result.data;
   };
 
-  const getSocialProfileImage = async () => {
+  const getSocialProfileImage = async (socialLoginType: string) => {
+    console.log('socialLoginType', socialLoginType);
     const result = await axios.get('/api/profile/social-image', {
+      params: {
+        type: socialLoginType,
+      },
       withCredentials: true, // Include cookies if necessary
     });
     return result.data; // This should now be a plain string (image URL)

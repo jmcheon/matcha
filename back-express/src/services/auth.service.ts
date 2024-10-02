@@ -116,3 +116,42 @@ export async function refreshGoogleAccessToken(accountId: number): Promise<strin
     throw new Error('Failed to refresh access token');
   }
 }
+
+export async function refreshGithubAccessToken(accountId: number): Promise<string> {
+  // Retrieve the refresh token from the database
+  const [rows] = await pool.query<RowDataPacket[]>(
+    'SELECT github_refresh_token FROM account WHERE account_id = ?',
+    [accountId]
+  );
+  const refreshToken = rows[0]?.github_refresh_token;
+
+  if (!refreshToken) {
+    throw new Error('Refresh token not available');
+  }
+
+  // Request a new access token using the refresh token
+  const params = new URLSearchParams();
+  params.append('client_id', process.env.GITHUB_CLIENT_ID as string);
+  params.append('client_secret', process.env.GITHUB_CLIENT_SECRET as string);
+  params.append('refresh_token', refreshToken);
+  params.append('grant_type', 'refresh_token');
+
+  try {
+    const response = await axios.post('https://github.com/login/oauth/access_token', params.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
+    });
+
+    const newAccessToken = response.data.access_token;
+
+    // Update the access token in the database
+    await pool.query(
+      'UPDATE account SET github_access_token = ? WHERE account_id = ?',
+      [newAccessToken, accountId]
+    );
+
+    return newAccessToken;
+  } catch (error: any) {
+    console.error('Error refreshing GitHub access token:', error?.response?.data || error.message);
+    throw new Error('Failed to refresh access token');
+  }
+}

@@ -189,7 +189,7 @@
       errorGlobal.value = '';
 
       // Call the composable function
-      const imageUrl = await getSocialProfileImage();
+      const imageUrl = await getSocialProfileImage(socialLoginType.value);
 
       if (!imageUrl) {
         throw new Error('Profile image not found');

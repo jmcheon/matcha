@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { refreshGithubAccessToken, refreshGoogleAccessToken } from './auth.service';
+import { refreshGithubAccessToken, refreshGoogleAccessToken, refreshIntra42AccessToken } from './auth.service';
 
 export async function getGoogleUserProfile(accountId: number, accessToken: string): Promise<any> {
   const apiUrl = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json';
@@ -66,3 +66,33 @@ export async function getGithubUserProfile(accountId: number, accessToken: strin
   }
 }
 
+export async function getIntra42UserProfile(accountId: number, accessToken: string): Promise<any> {
+  const apiUrl = 'https://api.intra.42.fr/v2/me'; // GitHub API endpoint for authenticated user
+  console.log("Fetching intra42 user profile");
+  try {
+    // Make API call with the access token
+    const response = await axios.get(apiUrl, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response && error.response.status === 401) {
+      // Access token expired, refresh it
+      const newAccessToken = await refreshIntra42AccessToken(accountId); // You should implement this function to refresh the GitHub token
+
+      // Retry the API call with the new access token
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${newAccessToken}`,
+        },
+      });
+
+      return response.data;
+    } else {
+      console.error('Error accessing GitHub API:', error?.response?.data || error.message);
+      throw error;
+    }
+  }
+}

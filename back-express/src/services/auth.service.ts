@@ -103,11 +103,12 @@ export async function refreshGoogleAccessToken(accountId: number): Promise<strin
     });
 
     const newAccessToken = response.data.access_token;
+    const newRefreshToken = response.data.refresh_token || refreshToken; // Use existing if none provided
 
-    // Update the access token in the database
+    // Update both access and refresh tokens in the database
     await pool.query(
-      'UPDATE account SET google_access_token = ? WHERE account_id = ?',
-      [newAccessToken, accountId]
+      'UPDATE account SET google_access_token = ?, google_refresh_token = ? WHERE account_id = ?',
+      [newAccessToken, newRefreshToken, accountId]
     );
 
     return newAccessToken;
@@ -155,3 +156,44 @@ export async function refreshGithubAccessToken(accountId: number): Promise<strin
     throw new Error('Failed to refresh access token');
   }
 }
+
+export async function refreshIntra42AccessToken(accountId: number): Promise<string> {
+  // Retrieve the refresh token from the database
+  const [rows] = await pool.query<RowDataPacket[]>(
+    'SELECT intra42_refresh_token FROM account WHERE account_id = ?',
+    [accountId]
+  );
+  const refreshToken = rows[0]?.intra42_refresh_token;
+
+  if (!refreshToken) {
+    throw new Error('Refresh token not available');
+  }
+
+  // Request a new access token using the refresh token
+  const params = new URLSearchParams();
+  params.append('grant_type', 'refresh_token');
+  params.append('client_id', process.env.INTRA42_CLIENT_ID as string);
+  params.append('client_secret', process.env.INTRA42_CLIENT_SECRET as string);
+  params.append('refresh_token', refreshToken);
+
+  try {
+    const response = await axios.post('https://api.intra.42.fr/oauth/token', params.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    });
+
+    const newAccessToken = response.data.access_token;
+    const newRefreshToken = response.data.refresh_token || refreshToken; // Use existing if none provided
+
+    // Update the access token and refresh token in the database
+    await pool.query(
+      'UPDATE account SET intra42_access_token = ?, intra42_refresh_token = ? WHERE account_id = ?',
+      [newAccessToken, newRefreshToken, accountId]
+    );
+
+    return newAccessToken;
+  } catch (error: any) {
+    console.error('Error refreshing 42 Intra access token:', error?.response?.data || error.message);
+    throw new Error('Failed to refresh access token');
+  }
+}
+

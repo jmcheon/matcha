@@ -8,7 +8,7 @@ import { addProfileImage, createProfile, getProfileByAccountId, Profile } from '
 import { randomBytes } from 'crypto';
 import axios from 'axios'; // Use axios or any HTTP client for making the request
 import { RowDataPacket } from 'mysql2';
-import { getGithubUserProfile, getGoogleUserProfile } from '../services/profile.service';
+import { getGithubUserProfile, getGoogleUserProfile, getIntra42UserProfile } from '../services/profile.service';
 
 const randomizeFileNameBase64 = (originalName: string): string => {
   // Generate random bytes and convert to Base64 (trim to 8 characters)
@@ -232,7 +232,6 @@ export default class ProfileController {
       let profileImage
       // Fetch the profile image using the helper function
       if (socialLoginType === "google") {
-        console.log("account", account)
         if (!account || !account.google_access_token) {
           return res.status(400).json({ error: 'Google access token not available' });
         }
@@ -240,13 +239,19 @@ export default class ProfileController {
         userProfile = await getGoogleUserProfile(accountId, accessToken);
         profileImage = userProfile.picture;
       }
-      if (socialLoginType === 'github') {
-        console.log("hi")
+      else if (socialLoginType === 'github') {
         if (!account || !account.github_access_token) {
           return res.status(400).json({ error: 'github access token not available' });
         }
         userProfile = await getGithubUserProfile(accountId, account.github_access_token);
         profileImage = userProfile.avatar_url;
+      }
+      else if (socialLoginType === 'intra42') {
+        if (!account || !account.intra42_access_token) {
+          return res.status(400).json({ error: 'github access token not available' });
+        }
+        userProfile = await getIntra42UserProfile(accountId, account.intra42_access_token);
+        profileImage = userProfile.image.link;
       }
       else {
         return res.status(400).json({ error: 'Invalid social login type' });

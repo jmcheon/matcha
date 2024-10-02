@@ -186,11 +186,8 @@
       loading.value = true;
       errorGlobal.value = '';
 
-      // Get user information if needed
-      const userInfo = profileData.value; // Adjust as necessary
-
       // Call the composable function
-      const imageUrl = await getSocialProfileImage(userInfo);
+      const imageUrl = await getSocialProfileImage();
 
       if (!imageUrl) {
         throw new Error('Profile image not found');
@@ -213,7 +210,6 @@
       // Set socialImageFetched to true to disable the button
       socialImageFetched.value = true;
     } catch (error) {
-      console.error('Error fetching social profile image:', error);
       errorGlobal.value = t('Error.FAILED_TO_FETCH_PROFILE_IMAGE');
     } finally {
       loading.value = false;

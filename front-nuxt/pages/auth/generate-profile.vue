@@ -1,14 +1,12 @@
 <template>
   <v-container class="fill-height" fluid>
     <v-row justify="center">
-      <!-- Adjust column sizes for responsiveness and use Vuetify's margin classes -->
       <v-col cols="12" sm="10" md="8" lg="4" class="ma-auto ma-sm-0 ma-sm-5">
         <v-card class="pa-4" elevation="8">
           <v-card-title class="text-h5 text-center">
             {{ $t('AuthGenerateProfile.title') }}
           </v-card-title>
           <v-form @submit.prevent="handleGenerateProfile">
-            <!-- Adjust field sizes for responsiveness -->
             <v-text-field
               v-model="firstName"
               :label="$t('_Global.firstName')"
@@ -27,7 +25,6 @@
             <v-select
               v-model="gender"
               :items="['Male', 'Female', 'Other']"
-              :rules="gender.value === '' ? ['Please select a gender'] : []"
               label="Gender"
               required
             />
@@ -60,15 +57,16 @@
               :messages="[errorBio]"
               required
             />
-            <v-text-field
+            <v-combobox
               v-model="interests"
+              :items="availableInterests"
               label="Interests (Hashtags)"
-              hint="Example: #music, #travel, #food"
-              persistent-hint
+              multiple
+              chips
+              clearable
               required
+              :rules="[(v) => !!v.length || 'Please add at least one interest']"
             />
-
-            <!-- Use full-width button on small screens -->
             <v-btn color="green" :loading="loading" block large type="submit">
               Generate Profile
             </v-btn>
@@ -81,11 +79,14 @@
 
 <script setup>
   import { ref } from 'vue';
+  import { useI18n } from 'vue-i18n';
+  import { storeToRefs } from 'pinia';
+  // ... other imports ...
 
   definePageMeta({
-    // layout: 'auth',
     middleware: ['strict-auth'],
   });
+
   const dirty = ref(false);
   const loading = ref(false);
   const errorGlobal = ref('');
@@ -98,7 +99,16 @@
   const height = ref(130);
   const iLike = ref('');
   const bio = ref('');
-  const interests = ref('');
+  const interests = ref([]);
+  const availableInterests = ref([
+    '#music',
+    '#travel',
+    '#food',
+    '#sports',
+    '#art',
+    // Add more predefined interests if desired
+  ]);
+
   const { t } = useI18n();
   const { generateProfile } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
@@ -111,7 +121,6 @@
 
   const handleGenerateProfile = async () => {
     dirty.value = true;
-    // Validate the form before submission
     if (
       errorFirstName.value ||
       errorLastName.value ||
@@ -119,9 +128,10 @@
       !gender.value ||
       !iLike.value ||
       errorBio.value ||
-      !interests.value
-    )
+      interests.value.length === 0
+    ) {
       return;
+    }
 
     const generatedProfile = {
       firstName: firstName.value,
@@ -132,7 +142,7 @@
       height: height.value,
       iLike: iLike.value,
       bio: bio.value,
-      interests: interests.value.split(',').map((tag) => tag.trim()),
+      interests: interests.value,
     };
 
     try {

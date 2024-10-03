@@ -26,18 +26,23 @@ CREATE TABLE IF NOT EXISTS `profile` (
     `first_name` VARCHAR(50) NULL,
     `last_name` VARCHAR(50) NULL,
     `image_paths` JSON NULL,
+    `image_paths_length` INT GENERATED ALWAYS AS (JSON_LENGTH(`image_paths`)) VIRTUAL,
     `location` VARCHAR(50) NULL,
     `gender` ENUM('male', 'female', 'other') NULL,
     `like_gender` ENUM('male', 'female', 'other', 'both') NULL,
     `height` INT NULL,
     `user_language` VARCHAR(50) NULL,
-    `interests` TEXT NULL,
+    `interests` JSON NULL,
+    `interests_length` INT GENERATED ALWAYS AS (JSON_LENGTH(`interests`)) VIRTUAL,
     `bio` VARCHAR(140) NULL,
     `fame_score` INT NULL,
     PRIMARY KEY (`profile_id`),
     UNIQUE (`account_id`),
-    FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`)
+    FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`),
+    CONSTRAINT `chk_interests_length` CHECK (`interests_length` <= 5),
+    CONSTRAINT `chk_image_paths_length` CHECK (`image_paths_length` <= 5)
 );
+
 
 CREATE TABLE IF NOT EXISTS `date_match` (
     `match_id` INT NOT NULL AUTO_INCREMENT,
@@ -85,4 +90,10 @@ CREATE TABLE IF NOT EXISTS `block` (
     PRIMARY KEY (`block_id`),
     FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`),
     FOREIGN KEY (`blocked_account_id`) REFERENCES `account` (`account_id`)
+);
+
+CREATE TABLE IF NOT EXISTS `interest` (
+    `interest_id` INT NOT NULL AUTO_INCREMENT,
+    `interest_name` VARCHAR(100) NOT NULL,
+    PRIMARY KEY (`interest_id`)
 );

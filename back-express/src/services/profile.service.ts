@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { refreshGithubAccessToken, refreshGoogleAccessToken, refreshIntra42AccessToken } from './auth.service';
+import { pool } from '../utils/db';
 
 export async function getGoogleUserProfile(accountId: number, accessToken: string): Promise<any> {
   const apiUrl = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json';

@@ -59,14 +59,26 @@
             />
             <v-combobox
               v-model="interests"
+              v-model:search="search"
               :items="availableInterests"
-              label="Interests (Hashtags)"
+              label="Interests"
               multiple
               chips
               clearable
               required
               :rules="[(v) => !!v.length || 'Please add at least one interest']"
-            />
+              :menu-props="{ persistent: true }"
+              no-filter
+              @keydown.enter.prevent="handleAddInterestEnter"
+            >
+              <template #append-item>
+                <v-list-item v-if="canAddNewInterest" @click="addNewInterest">
+                  <v-list-item-title>
+                    Add new interest '{{ search }}'
+                  </v-list-item-title>
+                </v-list-item>
+              </template>
+            </v-combobox>
             <v-btn color="green" :loading="loading" block large type="submit">
               Generate Profile
             </v-btn>
@@ -100,17 +112,12 @@
   const iLike = ref('');
   const bio = ref('');
   const interests = ref([]);
-  const availableInterests = ref([
-    '#music',
-    '#travel',
-    '#food',
-    '#sports',
-    '#art',
-    // Add more predefined interests if desired
-  ]);
+  const availableInterests = ref([]);
+  const unlistedInterests = ref([]); // List to keep track of unlisted interests
+  const search = ref('');
 
   const { t } = useI18n();
-  const { generateProfile } = useProfile();
+  const { generateProfile, getInterests } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
 
   const { firstNameValidator, lastNameValidator, bioValidator } =
@@ -118,6 +125,66 @@
   const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
   const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
   const { error: errorBio } = bioValidator(dirty, bio, t);
+
+  onMounted(async () => {
+    try {
+      const fetchedInterests = await getInterests();
+      console.log('response val', fetchedInterests);
+      availableInterests.value = fetchedInterests;
+      console.log('response interest', availableInterests.value);
+    } catch (error) {
+      console.error('Error fetching interests:', error);
+    }
+  });
+
+  watch(search, (newValue) => {
+    console.log('Search value:', newValue);
+  });
+
+  const handleAddInterestEnter = () => {
+    console.log('bitch');
+    // const interest = search.value.trim();
+    // interests.value.push(interest);
+    // unlistedInterests.value.push(interest);
+    search.value = ''; // Clear the search value
+    // console.log('Added new interest and cleared search:', interest);
+  };
+
+  const canAddNewInterest = computed(() => {
+    const searchValue = search.value;
+    const existsInAvailable = interestExists(
+      searchValue,
+      availableInterests.value,
+    );
+    const existsInInterests = interestExists(searchValue, interests.value);
+    const result =
+      searchValue.length > 0 ? !existsInAvailable && !existsInInterests : false;
+    console.log('--- Debugging canAddNewInterest ---');
+    console.log('Search Value:', searchValue);
+    console.log('Exists in Available Interests:', existsInAvailable);
+    console.log('Exists in User Interests:', existsInInterests);
+    console.log('Can Add New Interest:', result);
+    console.log('--- Debugging canAddNewInterest ---');
+
+    return result;
+  });
+
+  const interestExists = (interest, list) => {
+    const exists = list.some(
+      (item) => item.toLowerCase() === interest.toLowerCase(),
+    );
+    console.log(`Checking if "${interest}" exists in list:`, exists);
+    return exists;
+  };
+
+  const addNewInterest = () => {
+    const interest = search.value.trim();
+    if (canAddNewInterest.value) {
+      interests.value.push(interest);
+      unlistedInterests.value.push(interest);
+      search.value = '';
+    }
+  };
 
   const handleGenerateProfile = async () => {
     dirty.value = true;

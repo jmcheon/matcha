@@ -43,10 +43,17 @@ export const useProfile = () => {
     });
     return result.data; // This should now be a plain string (image URL)
   };
+
+  const getInterests = async () => {
+    const result = await axios.get('/api/profile/interests');
+    return result.data.interests; // This should now be a plain string (image URL)
+  };
+
   return {
     generateProfile,
     getSocialProfileImage,
     updateProfileImage,
     updateProfile,
+    getInterests,
   };
 };

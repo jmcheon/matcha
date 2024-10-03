@@ -9,6 +9,8 @@ import { randomBytes } from 'crypto';
 import axios from 'axios'; // Use axios or any HTTP client for making the request
 import { RowDataPacket } from 'mysql2';
 import { getGithubUserProfile, getGoogleUserProfile, getIntra42UserProfile } from '../services/profile.service';
+import { pool } from '../utils/db';
+
 
 const randomizeFileNameBase64 = (originalName: string): string => {
   // Generate random bytes and convert to Base64 (trim to 8 characters)
@@ -267,4 +269,22 @@ export default class ProfileController {
       return res.status(500).json({ error: 'Failed to fetch profile image' });
     }
   }
+
+  static async getInterests(req: Request, res: Response) {
+    try {
+      // Use 'any' or a more general typing for 'rows'
+      const [rows]: any[] = await pool.query('SELECT interest_name FROM interest');
+
+      // Provide the type directly in the map function
+      const interestNames = rows.map((row: { interest_name: string }) => row.interest_name);
+
+      res.status(200).json({ interests: interestNames });
+
+    } catch (error) {
+      console.error('Error adding profile image:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  }
+
+
 }

@@ -15,7 +15,7 @@ export const useAuth = () => {
 
     const cookie = useRequestHeaders(['cookie']);
     try {
-      const data: AccountData = await $fetch(`http://localhost:3005/refresh`, {
+      const data: AccountData = await $fetch(`http://localhost:3006/refresh`, {
         method: 'POST',
         headers: {
           ...cookie,

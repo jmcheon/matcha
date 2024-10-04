@@ -1,2 +1,8 @@
 fastapi[standard]
 uvicorn
+
+#
+bcrypt
+mysql-connector-python
+aiomysql
+cryptography

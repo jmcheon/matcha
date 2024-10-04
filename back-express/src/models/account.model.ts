@@ -4,16 +4,24 @@ import { RowDataPacket, ResultSetHeader } from 'mysql2';
 
 export interface Account {
   account_id: number;
+  username?: string;
   email?: string;
   password?: string;
   google_id?: string;
-  intra_username?: string;
+  intra42_id?: string;
+  github_id?: string;
   status: 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline';
   created_at: Date;
   last_modified_at?: Date;
   deleted_at?: Date;
   access_token?: string;
   refresh_token?: string;
+  google_access_token?: string;
+  google_refresh_token?: string;
+  github_access_token?: string;
+  github_refresh_token?: string;
+  intra42_access_token?: string;
+  intra42_refresh_token?: string;
 }
 
 function mapRowToAccount(row: RowDataPacket): Account {
@@ -24,7 +32,15 @@ function mapRowToAccount(row: RowDataPacket): Account {
     status: row.status as 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline',
     refresh_token: row.refresh_token as string,
     google_id: row.google_id as string,
+    intra42_id: row.intra42_id as string,
+    github_id: row.github_id as string,
     created_at: row.created_at as Date,
+    google_access_token: row.google_access_token as string,
+    google_refresh_token: row.google_refresh_token as string,
+    github_access_token: row.github_access_token as string,
+    github_refresh_token: row.github_refresh_token as string,
+    intra42_access_token: row.intra42_access_token as string,
+    intra42_refresh_token: row.intra42_refresh_token as string
     // Map any other properties as needed
   };
   return account;
@@ -84,6 +100,29 @@ export async function getAccountById(account_id: number): Promise<Account | unde
   }
 }
 
+export async function getAccountBySocialLogin(provider: string, social_id: string): Promise<Account | undefined> {
+  let query = '';
+
+  // Dynamically choose the query based on the provider
+  if (provider === '42') {
+    query = 'SELECT * FROM account WHERE intra42_id = ? LIMIT 1';
+  } else if (provider === 'google') {
+    query = 'SELECT * FROM account WHERE google_id = ? LIMIT 1';
+  } else if (provider === 'github') {
+    query = 'SELECT * FROM account WHERE github_id = ? LIMIT 1';
+  } else {
+    throw new Error(`Unsupported provider: ${provider}`);
+  }
+
+  const [rows] = await pool.query<RowDataPacket[]>(query, [social_id]);
+  if (rows.length > 0) {
+    return mapRowToAccount(rows[0]);
+  } else {
+    return undefined;
+  }
+}
+
+
 export async function getAccountStatus(account_id: number): Promise<string | null> {
   const [rows] = await pool.query<RowDataPacket[]>(
     'SELECT * FROM account WHERE account_id = ? LIMIT 1',
@@ -130,7 +169,7 @@ export async function updateAccount(
   email: string | null,
   password: string | null,
   google_id: string | null,
-  intra_username: string | null
+  intra42_id: string | null
 ): Promise<void> {
   // Create an array to hold the fields to update
   const fields: string[] = [];
@@ -149,9 +188,9 @@ export async function updateAccount(
     fields.push('google_id = ?');
     values.push(google_id);
   }
-  if (intra_username !== null) {
-    fields.push('intra_username = ?');
-    values.push(intra_username);
+  if (intra42_id !== null) {
+    fields.push('intra42_id = ?');
+    values.push(intra42_id);
   }
 
   // Always add the account_id to the values array for the WHERE clause

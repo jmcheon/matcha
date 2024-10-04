@@ -19,7 +19,6 @@
                   <img
                     :src="uploadedImages[currentImageIndex].url"
                     class="max-w-full max-h-full object-contain"
-                    @click="$refs.imageInput.click()"
                   />
                   <div
                     v-if="isHovering"
@@ -35,14 +34,20 @@
             <template v-else>
               <!-- Show upload button if no image is in the current slot -->
               <div
-                class="flex items-center justify-center bg-slate-500 h-full w-full cursor-pointer"
-                @click="$refs.imageInput.click()"
+                class="flex flex-col items-center justify-center bg-slate-500 h-full w-full cursor-pointer space-y-4"
               >
-                <button
-                  class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2"
+                <v-btn
+                  class="bg-primary text-white py-2 px-4 rounded-lg flex items-center space-x-2 mb-4"
+                  @click="$refs.imageInput.click()"
                 >
                   <span>{{ $t('AuthUploadProfileImage.upload') }}</span>
-                </button>
+                </v-btn>
+                <v-btn
+                  v-if="socialLoginType && socialImageFetched === false"
+                  @click="fetchSocialProfileImage"
+                >
+                  Get profile image from {{ socialLoginType }}
+                </v-btn>
               </div>
             </template>
           </div>
@@ -111,11 +116,12 @@
   const localePath = useLocalePath();
   const maxImages = 5;
   const uploadedImages = ref(Array(maxImages).fill(null));
-  const { updateProfileImage } = useProfile();
+  const { updateProfileImage, getSocialProfileImage } = useProfile();
 
-  const { profileData } = storeToRefs(useUserStore());
+  const { profileData, socialLoginType } = storeToRefs(useUserStore());
+  const socialImageFetched = ref(false);
 
-  const handleImageUpload = async (event) => {
+  const handleImageUpload = (event) => {
     const file = event.target.files[0]; // Only handle one file at a time
     if (!file) return;
 
@@ -137,6 +143,10 @@
     if (uploadedImages.value[index]) {
       URL.revokeObjectURL(uploadedImages.value[index].url);
       uploadedImages.value[index] = null;
+      // Reset socialImageFetched if the social image was removed
+      if (socialImageFetched.value && index === currentImageIndex.value) {
+        socialImageFetched.value = false;
+      }
     }
 
     // Optionally reset currentImageIndex if needed
@@ -160,14 +170,49 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      
-      const response = await updateProfileImage(imagesToUpload)
-      
+
+      const response = await updateProfileImage(imagesToUpload);
+
       profileData.value.image_paths = response.data;
       await navigateTo({ path: localePath('home') });
     } catch (error) {
       console.error('Upload error:', error);
       errorGlobal.value = t('Error.GENERAL_ERROR');
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const fetchSocialProfileImage = async () => {
+    try {
+      loading.value = true;
+      errorGlobal.value = '';
+
+      // Call the composable function
+      const imageUrl = await getSocialProfileImage(socialLoginType.value);
+
+      if (!imageUrl) {
+        throw new Error('Profile image not found');
+      }
+
+      // Fetch the image data as a Blob
+      const imageResponse = await fetch(imageUrl);
+      const imageBlob = await imageResponse.blob();
+
+      // Create a File object from the Blob
+      const file = new File([imageBlob], 'profile.jpg', {
+        type: imageBlob.type,
+      });
+      // Create a URL for the File object
+      const url = URL.createObjectURL(file);
+
+      // Assign the image to the current slot in uploadedImages
+      uploadedImages.value[currentImageIndex.value] = { file, url };
+
+      // Set socialImageFetched to true to disable the button
+      socialImageFetched.value = true;
+    } catch (error) {
+      errorGlobal.value = t('Error.FAILED_TO_FETCH_PROFILE_IMAGE');
     } finally {
       loading.value = false;
     }

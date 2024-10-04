@@ -7,6 +7,7 @@ import {
   createAccount,
   getAccountByEmail,
   getAccountById,
+  getAccountBySocialLogin,
   getAccountStatus,
   updateAccountStatus,
 } from '../models/account.model';
@@ -21,6 +22,7 @@ import jwt from 'jsonwebtoken';
 import passport from 'passport';
 import { JwtPayloadModel } from '../models/payload.model';
 import { getProfileByAccountId } from '../models/profile.model';
+import { isSocialInfo, SocialInfo } from '../passport/SocialInfo';
 
 export default class AuthenticationController {
   // Helper function to generate tokens, set cookies, and save refresh token
@@ -96,11 +98,12 @@ export default class AuthenticationController {
   }
 
   static async registerAfterSocialLogin(req: Request, res: Response) {
-    const { username, email, password } = req.body;
+    console.log("body checker", req.body);
+    const { username, email, password, socialInfo } = req.body;
     const { lang } = req.query;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({ code: 'Email is required' });
+    if (!username || !email || !password || !socialInfo) {
+      return res.status(400).json({ code: 'INVALID_USER_CREDENTIALS' });
     }
 
     try {
@@ -111,9 +114,14 @@ export default class AuthenticationController {
         return res.status(409).json({ code: 'USERNAME_ALREADY_EXISTS' });
       }
 
-      const existingUser = await getAccountByEmail(email);
+      const emailExists = await checkIfEmailExists(email);
+      if (emailExists) {
+        return res.status(409).json({ code: 'EMAIL_ALREADY_EXISTS' });
+      }
+
+      const existingUser = await getAccountBySocialLogin(socialInfo.provider, socialInfo.id)
       if (!existingUser) {
-        return res.status(409).json({ error: 'No account associated with this email' });
+        return res.status(409).json({ code: 'GENERAL_ERROR' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -200,7 +208,10 @@ export default class AuthenticationController {
   }
 
   static googleLogin(req: Request, res: Response, next: NextFunction) {
-    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+    passport.authenticate('google', {
+      scope: ['profile', 'email'], accessType: 'offline',
+      prompt: 'consent',
+    })(req, res, next);
   }
 
   static googleCallback(req: Request, res: Response, next: NextFunction) {
@@ -208,38 +219,140 @@ export default class AuthenticationController {
 
     const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
 
-    passport.authenticate('google', async (err: any, account: Account | false, info: { code: string }) => {
+    passport.authenticate('google', async (err: any, payload: Account | false | SocialInfo, info: { code: string }) => {
       if (err) return next(err);
-      if (!account) {
+      if (!payload) {
         if (info?.code) {
           return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
         }
         return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
       }
 
-      if (account.status === 'incomplete_social') {
+      if (isSocialInfo(payload)) {
+        console.log("callback test", payload)
+        const token = jwt.sign(
+          //TODO: account_id
+          payload,
+          process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
+          { expiresIn: '24h' }
+        );
         return res.redirect(
-          `${process.env.NGINX_HOST}/${language}/auth/register?email=${encodeURIComponent(account.email as string)}&socialLogin=true`
+          `${process.env.NGINX_HOST}/${language}/auth/register?token=${token}`
         );
       }
 
       // Use the helper function to generate tokens and set cookies
-      await AuthenticationController.generateTokensAndSetCookies(res, account.account_id);
+      await AuthenticationController.generateTokensAndSetCookies(res, payload.account_id);
 
-      if (account.status === 'pending_verification') {
+      if (payload.status === 'pending_verification') {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
       }
 
-      if (account.status === 'incomplete_profile') {
+      const profileData: any = await getProfileByAccountId(String(payload.account_id));
+      if (!profileData) {
         return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
       }
-      // const profileData: any = await getProfileByAccountId(String(account.account_id));
-      // if (!profileData) {
-      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
-      // }
-      // else if (!profileData.image_paths) {
-      //   return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
-      // }
+      else if (!profileData.image_paths) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      }
+      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
+
+    })(req, res, next);
+  }
+
+  static ftLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('42', { scope: ['public'] })(req, res, next);
+  }
+
+  static ftCallback(req: Request, res: Response, next: NextFunction) {
+    const { lang } = req.query;
+
+    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
+
+    passport.authenticate('42', async (err: any, payload: Account | false | SocialInfo, info: { code: string }) => {
+      if (err) return next(err);
+      if (!payload) {
+        if (info?.code) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
+        }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
+      }
+
+      if (isSocialInfo(payload)) {
+        const token = jwt.sign(
+          //TODO: account_id
+          payload,
+          process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
+          { expiresIn: '24h' }
+        );
+        return res.redirect(
+          `${process.env.NGINX_HOST}/${language}/auth/register?token=${token}`
+        );
+      }
+
+      // Use the helper function to generate tokens and set cookies
+      await AuthenticationController.generateTokensAndSetCookies(res, payload.account_id);
+
+      if (payload.status === 'pending_verification') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
+      }
+
+      const profileData: any = await getProfileByAccountId(String(payload.account_id));
+      if (!profileData) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      }
+      else if (!profileData.image_paths) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      }
+      return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
+
+    })(req, res, next);
+  }
+
+  static githubLogin(req: Request, res: Response, next: NextFunction) {
+    passport.authenticate('github', { scope: ['profile', 'email'] })(req, res, next);
+  }
+
+  static githubCallback(req: Request, res: Response, next: NextFunction) {
+    const { lang } = req.query;
+
+    const language = ['en', 'fr'].includes(lang as string) ? (lang as string) : 'en';
+
+    passport.authenticate('github', async (err: any, payload: Account | false | SocialInfo, info: { code: string }) => {
+      if (err) return next(err);
+      if (!payload) {
+        if (info?.code) {
+          return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent(info.code)}`);
+        }
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/error?message=${encodeURIComponent('INVALID_USER_CREDENTIALS')}`);
+      }
+
+      if (isSocialInfo(payload)) {
+        const token = jwt.sign(
+          //TODO: account_id
+          payload,
+          process.env.JWT_SECRET as string, // Ensure JWT_SECRET is set in .env
+          { expiresIn: '24h' }
+        );
+        return res.redirect(
+          `${process.env.NGINX_HOST}/${language}/auth/register?token=${token}`
+        );
+      }
+
+      // Use the helper function to generate tokens and set cookies
+      await AuthenticationController.generateTokensAndSetCookies(res, payload.account_id);
+
+      if (payload.status === 'pending_verification') {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/verify-email`);
+      }
+
+      const profileData: any = await getProfileByAccountId(String(payload.account_id));
+      if (!profileData) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);
+      }
+      else if (!profileData.image_paths) {
+        return res.redirect(`${process.env.NGINX_HOST}/${language}/auth/upload-profile-image`);
+      }
       return res.redirect(`${process.env.NGINX_HOST}/${language}/home`);
 
     })(req, res, next);
@@ -275,7 +388,6 @@ export default class AuthenticationController {
 
       // Retrieve user data to return
       const userData = await getAccountById(userId);
-      console.log(userData)
 
       // Return user data along with the access token
       return res.json({ ...userData, accessToken });

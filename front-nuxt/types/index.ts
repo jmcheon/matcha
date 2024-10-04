@@ -1,8 +1,11 @@
 export interface AccountData {
   accountId?: number;
-  email?: String;
-  status?: String;
-  accessToken?: String;
+  email?: string;
+  status?: string;
+  accessToken?: string;
+  google_id?: string;
+  intra42_id?: string;
+  github_id?: string;
 }
 export interface ProfileData {
   account_id?: number;

@@ -4,7 +4,7 @@ const MAX_IMAGE_SIZE = 5242880; // 5MB
 
 export const useProfile = () => {
   const axios = useAxios();
-  
+
   const updateProfileImage = async (imagesToUpload: any) => {
     const formData = new FormData();
     imagesToUpload.forEach((image, index) => {
@@ -15,23 +15,16 @@ export const useProfile = () => {
       console.log(`${key}: ${value}`);
     }
 
-    const response = await axios.post(
-      '/api/profile/upload_image',
-      formData,
-      {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        withCredentials: true, // Add this line to send cookies
+    const response = await axios.post('/api/profile/upload_image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
       },
-    );
+      withCredentials: true, // Add this line to send cookies
+    });
     return response;
-  }
+  };
 
-  const updateProfile = async (
-    userId: string,
-    userInfo: AccountData,
-  ) => {
+  const updateProfile = async (userId: string, userInfo: AccountData) => {
     await axios.patch('/api/account/' + userId, userInfo);
   };
 
@@ -40,9 +33,27 @@ export const useProfile = () => {
     return result.data;
   };
 
+  const getSocialProfileImage = async (socialLoginType: string) => {
+    console.log('socialLoginType', socialLoginType);
+    const result = await axios.get('/api/profile/social-image', {
+      params: {
+        type: socialLoginType,
+      },
+      withCredentials: true, // Include cookies if necessary
+    });
+    return result.data; // This should now be a plain string (image URL)
+  };
+
+  const getInterests = async () => {
+    const result = await axios.get('/api/profile/interests');
+    return result.data.interests; // This should now be a plain string (image URL)
+  };
+
   return {
     generateProfile,
+    getSocialProfileImage,
     updateProfileImage,
     updateProfile,
+    getInterests,
   };
 };

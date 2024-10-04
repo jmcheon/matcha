@@ -99,23 +99,26 @@ export const useAuth = () => {
     api: AxiosInstance,
     info: AccountData,
     lang: string,
-    isSocialLogin: boolean = false,
+    socialLogin: Record<string, any> = {},
   ) => {
     try {
       let endpoint = '/register'; // Default to plain register
 
+      const payload = { ...info } as Record<string, any>;
       // If it's a social login, use the social registration endpoint
-      if (isSocialLogin) {
+      if (Object.keys(socialLogin).length > 0) {
         endpoint = '/social-register';
+        payload.socialInfo = socialLogin; // Dynamically add socialInfo field
       }
 
       // Make API request to the appropriate endpoint
-      const { data } = await api.post(`${BACK_HOST}${endpoint}?lang=${lang}`, {
-        ...info,
-      });
-
+      const { data } = await api.post(
+        `${BACK_HOST}${endpoint}?lang=${lang}`,
+        payload,
+      );
       // Set user data and trigger the refresh auth process
       accountData.value = data;
+      console.log('acconutData check', accountData.value);
       startRefreshAuth();
 
       return data; // Return data if needed for further handling
@@ -127,9 +130,9 @@ export const useAuth = () => {
 
   const onGoogleLogin = () => (window.location.href = `${BACK_HOST}/google`);
 
-  const onFtLogin = () => (window.location.href = `${BACK_HOST}/auth/ft/login`);
+  const onFtLogin = () => (window.location.href = `${BACK_HOST}/ft`);
   const onGithubLogin = () => {
-    window.location.href = `${BACK_HOST}/auth/github/login`;
+    window.location.href = `${BACK_HOST}/github`;
   };
 
   return {

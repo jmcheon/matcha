@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { getAccountById, updateAccountStatus } from '../models/account.model';
 import { JwtPayloadModel } from '../models/payload.model';
+import AuthenticationController from '../controllers/auth.controller';
 class EmailService {
 
   public static transporter = nodemailer.createTransport({
@@ -74,6 +75,7 @@ class EmailService {
       }
 
       await updateAccountStatus(user.account_id, 'incomplete_profile');
+      await AuthenticationController.generateTokensAndSetCookies(res, user.account_id);
 
       // Redirect to the confirmation page
       res.redirect(`${process.env.NGINX_HOST}/${language}/auth/generate-profile`);

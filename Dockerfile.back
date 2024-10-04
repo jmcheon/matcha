@@ -3,11 +3,10 @@ WORKDIR /code
 
 FROM base AS dependencies
 COPY ./back-fastapi/requirements.txt /code/requirements.txt
-# COPY ./back-fastapi/requirements-dev.txt /code/requirements-dev.txt
 RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 
 
 FROM dependencies AS development
 COPY ./back-fastapi /code/app
-CMD ["fastapi", "run", "app/main.py", "--port", "80"]
-EXPOSE 3000
+CMD ["fastapi", "run", "app/main.py"]
+EXPOSE $FASTAPI_PORT

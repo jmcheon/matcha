@@ -67,7 +67,6 @@ export default function ft() {
           provider: '42'
         }
 
-
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE intra42_id = ?', [profile.login]);
 
         let account = rows[0] as Account | undefined;

@@ -67,7 +67,6 @@ export default function ft() {
           provider: '42'
         }
 
-
         const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM account WHERE intra42_id = ?', [profile.login]);
 
         let account = rows[0] as Account | undefined;
@@ -86,6 +85,7 @@ export default function ft() {
         // If account does not exist, create a new account
         if (!account) {
           const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (intra42_id, status, intra42_access_token, intra42_refresh_token) VALUES (?, ?, ?, ?)', [intraLogin, 'incomplete_social', accessToken, refreshToken]);
+
           account = { account_id: result.insertId, status: 'incomplete_social', intra42_id: intraLogin, created_at: new Date() }; // Return newly created account
         }
 

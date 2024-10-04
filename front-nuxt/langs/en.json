@@ -54,7 +54,9 @@
     "USERNAME_ALREADY_EXISTS": "Username already exists.",
     "GOOGLE_NOT_LINKED": "Account exists but Google Social Login is not linked",
     "42INTRA_NOT_LINKED": "Account exists but 42 Intra Social Login is not linked",
-    "NO_IMAGES_UPLOADED": "No images to upload"
+
+    "NO_IMAGES_UPLOADED": "No images to upload",
+    "FAILED_TO_FETCH_PROFILE_IMAGE": "Failed to fetch profile image"
   },
   "AuthRegister": {
     "description": "Create an account to enjoy unlimited movies",

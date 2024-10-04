@@ -208,7 +208,10 @@ export default class AuthenticationController {
   }
 
   static googleLogin(req: Request, res: Response, next: NextFunction) {
-    passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next);
+    passport.authenticate('google', {
+      scope: ['profile', 'email'], accessType: 'offline',
+      prompt: 'consent',
+    })(req, res, next);
   }
 
   static googleCallback(req: Request, res: Response, next: NextFunction) {
@@ -385,7 +388,6 @@ export default class AuthenticationController {
 
       // Retrieve user data to return
       const userData = await getAccountById(userId);
-      console.log(userData)
 
       // Return user data along with the access token
       return res.json({ ...userData, accessToken });

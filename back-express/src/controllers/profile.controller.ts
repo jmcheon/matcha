@@ -6,6 +6,9 @@ import path from 'path';
 import { UploadedFile } from 'express-fileupload';
 import { addProfileImage, createProfile, getProfileByAccountId, Profile } from '../models/profile.model';
 import { randomBytes } from 'crypto';
+import axios from 'axios'; // Use axios or any HTTP client for making the request
+import { RowDataPacket } from 'mysql2';
+import { getGithubUserProfile, getGoogleUserProfile, getIntra42UserProfile } from '../services/profile.service';
 
 const randomizeFileNameBase64 = (originalName: string): string => {
   // Generate random bytes and convert to Base64 (trim to 8 characters)
@@ -162,6 +165,106 @@ export default class ProfileController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ code: 'Failed to upload picture.' });
+    }
+  }
+
+  static async githubGetProfileImage(req: Request, res: Response) {
+    console.log("checker", req.user)
+    try {
+      // Ensure the user is authenticated
+      if (!req.isAuthenticated()) {
+        console.log("chink")
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+      if (!req.user) {
+        console.log("hihihi")
+      }
+
+      // Retrieve the access token from req.user (stored after GitHub OAuth authentication)
+      // const accessToken = req.user.accessToken;
+
+      // // Make a request to GitHub API to get the user's profile
+      // const githubResponse = await axios.get('https://api.github.com/user', {
+      //   headers: {
+      //     Authorization: `token ${accessToken}` // Pass the access token
+      //   }
+      // });
+
+      // const profileData = githubResponse.data;
+
+      // // Extract the avatar URL from the GitHub response
+      // const profileImage = profileData.avatar_url;
+
+      // if (!profileImage) {
+      //   return res.status(404).json({ error: 'Profile image not found' });
+      // }
+
+      // // Return the profile image URL
+      // return res.json({ profileImage });
+    } catch (error) {
+      console.error('Error fetching profile image from GitHub:', error);
+      return res.status(500).json({ error: 'Failed to fetch profile image' });
+    }
+  }
+  static async getSocialProfileImage(req: Request, res: Response) {
+    try {
+      // Extract the user's account ID from the JWT token in the cookie
+      const token = req.cookies?.accessToken;
+      if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+      }
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET as string)
+
+      const accountId = decoded.accountId;
+
+      // Retrieve the Google access token from the database
+
+      const account = await getAccountById(accountId)
+
+      if (!account) {
+        return res.status(400).json({ error: 'Account not available' });
+      }
+
+      const socialLoginType = (req.query.type as string)?.trim().toLowerCase();
+
+      let userProfile
+      let profileImage
+      // Fetch the profile image using the helper function
+      if (socialLoginType === "google") {
+        if (!account || !account.google_access_token) {
+          return res.status(400).json({ error: 'Google access token not available' });
+        }
+        const accessToken = account.google_access_token;
+        userProfile = await getGoogleUserProfile(accountId, accessToken);
+        profileImage = userProfile.picture;
+      }
+      else if (socialLoginType === 'github') {
+        if (!account || !account.github_access_token) {
+          return res.status(400).json({ error: 'github access token not available' });
+        }
+        userProfile = await getGithubUserProfile(accountId, account.github_access_token);
+        profileImage = userProfile.avatar_url;
+      }
+      else if (socialLoginType === 'intra42') {
+        if (!account || !account.intra42_access_token) {
+          return res.status(400).json({ error: 'github access token not available' });
+        }
+        userProfile = await getIntra42UserProfile(accountId, account.intra42_access_token);
+        profileImage = userProfile.image.link;
+      }
+      else {
+        return res.status(400).json({ error: 'Invalid social login type' });
+      }
+
+      if (!profileImage) {
+        return res.status(404).json({ error: 'Profile image not found' });
+      }
+
+      return res.send(profileImage);
+    } catch (error: any) {
+      console.error('Error fetching profile image from Google:', error?.response?.data || error.message);
+      return res.status(500).json({ error: 'Failed to fetch profile image' });
     }
   }
 }

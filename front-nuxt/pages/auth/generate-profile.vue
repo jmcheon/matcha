@@ -53,13 +53,13 @@
               label="I Like"
               required
             />
-            <v-textarea 
-              v-model="bio" 
+            <v-textarea
+              v-model="bio"
               :label="$t('_Global.bio')"
               :error="!!errorBio"
               :messages="[errorBio]"
-              required 
-              />
+              required
+            />
             <v-text-field
               v-model="interests"
               label="Interests (Hashtags)"
@@ -103,7 +103,8 @@
   const { generateProfile } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
 
-  const { firstNameValidator, lastNameValidator, bioValidator } = useValidator();
+  const { firstNameValidator, lastNameValidator, bioValidator } =
+    useValidator();
   const { error: errorFirstName } = firstNameValidator(dirty, firstName, t);
   const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
   const { error: errorBio } = bioValidator(dirty, bio, t);

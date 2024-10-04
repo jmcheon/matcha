@@ -16,6 +16,12 @@ export interface Account {
   deleted_at?: Date;
   access_token?: string;
   refresh_token?: string;
+  google_access_token?: string;
+  google_refresh_token?: string;
+  github_access_token?: string;
+  github_refresh_token?: string;
+  intra42_access_token?: string;
+  intra42_refresh_token?: string;
 }
 
 function mapRowToAccount(row: RowDataPacket): Account {
@@ -26,7 +32,15 @@ function mapRowToAccount(row: RowDataPacket): Account {
     status: row.status as 'incomplete_social' | 'incomplete_profile' | 'pending_verification' | 'online' | 'offline',
     refresh_token: row.refresh_token as string,
     google_id: row.google_id as string,
+    intra42_id: row.intra42_id as string,
+    github_id: row.github_id as string,
     created_at: row.created_at as Date,
+    google_access_token: row.google_access_token as string,
+    google_refresh_token: row.google_refresh_token as string,
+    github_access_token: row.github_access_token as string,
+    github_refresh_token: row.github_refresh_token as string,
+    intra42_access_token: row.intra42_access_token as string,
+    intra42_refresh_token: row.intra42_refresh_token as string
     // Map any other properties as needed
   };
   return account;

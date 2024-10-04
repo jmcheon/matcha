@@ -35,7 +35,6 @@ export const useValidator = () => {
   };
 
   const minLengthRule = (errorMessage: string, minLength?: number) => {
-    console.log('min len ', minLength)
     return (value: string) =>
       value.length < (minLength ?? DEFAULT_MIN) ? errorMessage : undefined;
   };
@@ -56,14 +55,14 @@ export const useValidator = () => {
           value: t('_Global.username'),
           length: DEFAULT_MIN,
         }),
-        DEFAULT_MIN
+        DEFAULT_MIN,
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.username'),
           length: DEFAULT_MAX,
         }),
-        DEFAULT_MAX
+        DEFAULT_MAX,
       ),
     ]);
   };
@@ -80,14 +79,14 @@ export const useValidator = () => {
           value: t('_Global.firstName'),
           length: DEFAULT_MIN,
         }),
-        DEFAULT_MIN
+        DEFAULT_MIN,
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.firstName'),
           length: DEFAULT_MAX,
         }),
-        DEFAULT_MAX
+        DEFAULT_MAX,
       ),
     ]);
   };
@@ -104,14 +103,14 @@ export const useValidator = () => {
           value: t('_Global.lastName'),
           length: DEFAULT_MIN,
         }),
-        DEFAULT_MIN
+        DEFAULT_MIN,
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.lastName'),
           length: DEFAULT_MAX,
         }),
-        DEFAULT_MAX
+        DEFAULT_MAX,
       ),
     ]);
   };
@@ -128,14 +127,14 @@ export const useValidator = () => {
           value: t('_Global.bio'),
           length: 12,
         }),
-        12
+        12,
       ),
       maxLengthRule(
         t('Error.MAX_LENGTH', {
           value: t('_Global.bio'),
           length: 140,
         }),
-        140
+        140,
       ),
     ]);
   };

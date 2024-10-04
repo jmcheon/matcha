@@ -53,7 +53,8 @@
     "REQUIRED": "{value} est requis",
     "USERNAME_ALREADY_EXISTS": "Le nom d'utilisateur existe déjà.",
     "GOOGLE_NOT_LINKED": "Le compte existe mais la connexion Google n'est pas liée",
-    "NO_IMAGES_UPLOADED": "Aucune image à télécharger"
+    "NO_IMAGES_UPLOADED": "Aucune image à télécharger",
+    "FAILED_TO_FETCH_PROFILE_IMAGE": "Échec de la récupération de l'image de profil"
   },
   "AuthRegister": {
     "description": "Créez un compte pour profiter de films illimités",

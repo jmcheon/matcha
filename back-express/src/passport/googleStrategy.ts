@@ -16,6 +16,7 @@ export default function google() {
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
+          console.log("checker", accessToken, refreshToken)
           const googleId = profile.id;
           const email = profile.emails?.[0]?.value as string;
 
@@ -40,7 +41,8 @@ export default function google() {
           }
 
           if (!account) {
-            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account  (google_id, status) VALUES (?, ?)', [googleId, 'incomplete_social']);
+            const [result] = await pool.query<ResultSetHeader>('INSERT INTO account (google_id, status, google_access_token, google_refresh_token) VALUES (?, ?, ?, ?)', [googleId, 'incomplete_social', accessToken, refreshToken]);
+
             account = { account_id: result.insertId, status: 'incomplete_social', google_id: googleId, created_at: new Date() }; // Return newly created account
           }
 

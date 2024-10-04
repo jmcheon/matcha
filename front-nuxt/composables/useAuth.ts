@@ -116,9 +116,9 @@ export const useAuth = () => {
         `${BACK_HOST}${endpoint}?lang=${lang}`,
         payload,
       );
-
       // Set user data and trigger the refresh auth process
       accountData.value = data;
+      console.log('acconutData check', accountData.value);
       startRefreshAuth();
 
       return data; // Return data if needed for further handling

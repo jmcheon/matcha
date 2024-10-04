@@ -29,6 +29,7 @@ export default defineNuxtPlugin(async (nuxtApp) => {
     accountData.value.accessToken = useCookie('accessToken').value as string;
 
     if (accountData.value.accessToken) {
+      auth.doRefreshTokenClient();
       auth.startRefreshAuth();
 
       if (!profileData.value) {

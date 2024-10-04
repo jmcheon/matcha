@@ -52,7 +52,7 @@
 
         <v-card-text>
           <!-- Conditional rendering based on errorCode -->
-          <span v-if="isSocialLogin">{{
+          <span v-if="socialProvider">{{
             t(`AuthRegister.socialLoginMessage`)
           }}</span>
         </v-card-text>
@@ -99,13 +99,15 @@
 <script setup>
   import { ref, onMounted } from 'vue';
   import { useRoute } from 'vue-router';
+  import { jwtDecode } from 'jwt-decode';
 
   const axios = useAxios();
   const username = ref('');
   const email = ref('');
   const password = ref('');
   const retypePassword = ref('');
-  const isSocialLogin = ref(false);
+  const socialProvider = ref('');
+  const socialId = ref('');
   const localePath = useLocalePath();
   const { t } = useI18n();
   const loading = ref(false);
@@ -118,25 +120,37 @@
   const { error: errorUsername } = usernameValidator(dirty, username, t);
   const { error: errorEmail } = emailValidator(dirty, email, t);
   const { error: errorPassword } = passwordValidator(dirty, password, t);
-  const { error: errorRetypePassword } = passwordValidator(dirty, retypePassword, t);
+  const { error: errorRetypePassword } = passwordValidator(
+    dirty,
+    retypePassword,
+    t,
+  );
 
   const { doRegister } = useAuth();
   const { locale } = useI18n();
   const route = useRoute();
 
   onMounted(() => {
-    const queryEmail = route.query.email;
-    const socialLogin = route.query.socialLogin === 'true';
-    if (queryEmail) {
-      email.value = queryEmail;
-      isSocialLogin.value = socialLogin;
+    const queryToken = route.query.token;
+    if (queryToken) {
+      // Decode the token without verifying it
+      const decodedPayload = jwtDecode(queryToken);
+      email.value = decodedPayload.email;
+      socialProvider.value = decodedPayload.provider;
+      socialId.value = decodedPayload.id;
+      console.log('Decoded Token:', decodedPayload);
     }
   });
 
   const handleRegister = async () => {
     dirty.value = true;
 
-    if (errorUsername.value || errorEmail.value || errorPassword.value || errorRetypePassword.value) {
+    if (
+      errorUsername.value ||
+      errorEmail.value ||
+      errorPassword.value ||
+      errorRetypePassword.value
+    ) {
       return;
     }
 
@@ -151,10 +165,21 @@
       password: password.value,
     };
 
+    let socialInfo = {};
+    if (socialProvider.value && socialId.value) {
+      socialInfo = {
+        id: socialId.value,
+        provider: socialProvider.value,
+      };
+    }
+
     try {
       loading.value = true;
       errorGlobal.value = '';
-      await doRegister(axios, userInfo, locale.value, isSocialLogin.value);
+      // if (token.value) {
+      //   console.log('token check', token.value);
+      // }
+      await doRegister(axios, userInfo, locale.value, socialInfo);
       await navigateTo({ path: localePath('auth-verify-email') });
     } catch (e) {
       if (e.response && e.response.data.code) {

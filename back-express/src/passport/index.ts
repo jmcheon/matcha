@@ -2,6 +2,8 @@ import passport from 'passport';
 import local from './localStrategy'
 import google from './googleStrategy'
 import { getAccountById } from '../models/account.model';
+import ft from './ftStrategy';
+import github from './githubStrategy';
 export default () => {
   passport.serializeUser((user: any, done) => {
     done(null, user.id);
@@ -15,4 +17,6 @@ export default () => {
 
   local();
   google();
+  ft();
+  github();
 };

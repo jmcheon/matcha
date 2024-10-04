@@ -27,7 +27,7 @@ services:
       - server_network
 
   back:
-    container_name: "back-express"
+    container_name: "back-fastapi"
     build:
       context: .
       dockerfile: Dockerfile.back

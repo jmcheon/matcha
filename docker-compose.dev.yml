@@ -12,14 +12,16 @@ services:
     build:
       target: development
     ports:
-      - "${BACK_PORT}:3005"
+      - "${FASTAPI_PORT}:8000"
     volumes:
-      - ./back-express:/usr/src/app
-      - back_node_modules:/usr/src/app/node_modules
+      - ./back-fastapi:/code/app
+    # volumes:
+    #   - ./back-express:/usr/src/app
+    #   - back_node_modules:/usr/src/app/node_modules
 
-  db:
-    volumes:
-      - ./db-mysql/dev:/var/lib/mysql
+  # db:
+  #   volumes:
+  #     - ./db-mysql/dev:/var/lib/mysql
 
 volumes:
   front_node_modules:

@@ -1,23 +1,12 @@
-FROM node:20-slim AS base
-WORKDIR /usr/src/app
+FROM python:3.9 AS base
+WORKDIR /code
 
 FROM base AS dependencies
-COPY ./back-express/package*.json ./
-# RUN npm i --prod=false
-RUN npm i
+COPY ./back-fastapi/requirements.txt /code/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
+
 
 FROM dependencies AS development
-CMD [ "npm", "run", "start" ]
-EXPOSE $BACK_PORT
-
-FROM dependencies AS build
-COPY ./back-express .
-RUN npm run build
-
-FROM base AS production
-COPY ./back-express/package.json ./
-COPY --from=dependencies /usr/src/app/node_modules ./node_modules
-ENV NODE_ENV=production
-COPY --from=build /usr/src/app/dist ./dist
-RUN npm prune --prod
-CMD [ "node", "dist/app.js" ]
+COPY ./back-fastapi /code/app
+CMD ["fastapi", "run", "app/main.py"]
+EXPOSE $FASTAPI_PORT

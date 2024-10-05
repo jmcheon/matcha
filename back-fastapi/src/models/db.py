@@ -34,7 +34,7 @@ db_info = {
     "db": DB_DATABASE,
 }
 
-print("hihi", db_info)
+# print("hihi", db_info)
 database = Database(db_info)
 
 

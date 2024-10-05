@@ -10,7 +10,8 @@ import axios from 'axios'; // Use axios or any HTTP client for making the reques
 import { RowDataPacket } from 'mysql2';
 import { getGithubUserProfile, getGoogleUserProfile, getIntra42UserProfile } from '../services/profile.service';
 import { pool } from '../utils/db';
-
+import geoip from 'geoip-lite';
+import _ from 'lodash';
 
 const randomizeFileNameBase64 = (originalName: string): string => {
   // Generate random bytes and convert to Base64 (trim to 8 characters)
@@ -285,6 +286,26 @@ export default class ProfileController {
       res.status(500).json({ message: 'Server error' });
     }
   }
+
+
+  static async getLocation(req: Request, res: Response) {
+    const uinfo = req.body;
+    const clientIp = req.clientIp;
+    const default_location = { lat: 48.8566, lng: 2.3522 };
+    // Find location by IP if browser gps diabled
+    if (!_.isEmpty(uinfo.location)) res.status(500).json({ message: 'Server error' });
+
+    if (!clientIp) return default_location;
+    console.log(clientIp)
+
+    const found_ll = geoip.lookup(clientIp)?.ll;
+    uinfo.location = found_ll ? { lat: found_ll[0], lng: found_ll[1] } : default_location;
+
+    console.log("location", uinfo)
+
+    return res.status(200).json({ uinfo: uinfo.location });
+
+  };
 
 
 }

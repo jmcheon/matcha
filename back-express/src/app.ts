@@ -9,7 +9,7 @@ import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import passport from 'passport'
 import cors from 'cors';
-
+import requestIp from 'request-ip';
 import fileUpload from 'express-fileupload';
 
 import passportConfig from './passport'
@@ -37,6 +37,7 @@ app.use(session({
 app.use(cookieParser());
 app.use(express.json())
 app.use(fileUpload())
+app.use(requestIp.mw());
 
 app.use(passport.initialize())
 app.use(passport.session())

@@ -21,7 +21,12 @@
               :messages="[errorLastName]"
               required
             />
-            <v-text-field v-model="location" label="Location" required />
+            <v-text-field
+              v-model="location"
+              label="Location"
+              required
+              readonly
+            />
             <v-select
               v-model="gender"
               :items="['Male', 'Female', 'Other']"
@@ -99,6 +104,8 @@
     middleware: ['strict-auth'],
   });
 
+  const axios = useAxios();
+
   const dirty = ref(false);
   const loading = ref(false);
   const errorGlobal = ref('');
@@ -126,7 +133,68 @@
   const { error: errorLastName } = lastNameValidator(dirty, lastName, t);
   const { error: errorBio } = bioValidator(dirty, bio, t);
 
+  const getGeolocation = () => {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log(
+              'User granted geolocation permission:',
+              latitude,
+              longitude,
+            );
+            resolve({ lat: latitude, lng: longitude });
+          },
+          (error) => {
+            console.error(
+              'User denied geolocation permission or an error occurred:',
+              error,
+            );
+            reject(error);
+          },
+        );
+      } else {
+        reject(new Error('Geolocation is not supported by this browser.'));
+      }
+    });
+  };
+
+  const getIpLocation = async () => {
+    try {
+      const response = await axios.get('/api/profile/location');
+      if (response && response.data.uinfo) {
+        console.log('Location retrieved from IP:', response.data.uinfo);
+        return response.data.uinfo;
+      } else {
+        throw new Error('Unable to retrieve IP-based location');
+      }
+    } catch (error) {
+      console.error('Error getting IP-based location:', error);
+      throw error;
+    }
+  };
+
+  const getUserLocation = async () => {
+    try {
+      loading.value = true;
+      const loc = await getGeolocation();
+      location.value = `${loc.lat}, ${loc.lng}`;
+    } catch (error) {
+      console.log('Falling back to IP-based location');
+      try {
+        const ipLoc = await getIpLocation();
+        location.value = `${ipLoc.lat}, ${ipLoc.lng}`;
+      } catch (err) {
+        location.value = 'Unknown Location';
+      }
+    } finally {
+      loading.value = false;
+    }
+  };
+
   onMounted(async () => {
+    getUserLocation();
     try {
       const fetchedInterests = await getInterests();
       console.log('response val', fetchedInterests);

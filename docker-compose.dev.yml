@@ -14,7 +14,7 @@ services:
     ports:
       - "${FASTAPI_PORT}:8000"
     volumes:
-      - ./back-fastapi:/code/app
+      - ./back-fastapi:/code/
     # volumes:
     #   - ./back-express:/usr/src/app
     #   - back_node_modules:/usr/src/app/node_modules

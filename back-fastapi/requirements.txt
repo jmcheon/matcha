@@ -1,2 +1,16 @@
 fastapi[standard]
 uvicorn
+
+# db
+mysql-connector-python
+aiomysql
+
+# password hash
+cryptography
+passlib
+
+# token
+python-jose # python JWT
+
+# email verification
+aiosmtplib

@@ -1,20 +1,10 @@
-from src.models.db import get_db_connection
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from fastapi import status
 from aiomysql import DictCursor
 
+from src.models.db import get_db_connection
+
 async def check_account(username: str, email: str) -> None: 
-    """
-    Check if an account already exists for the given username or email.
-
-    Args:
-        username (str): The username to check.
-        email (str): The email to check.
-
-    Raises:
-        HTTPException: If the username or email already exists in the database
-                        with a 409 Conflict status code.
-    """
     connection = await get_db_connection()
     async with connection.cursor(DictCursor) as cursor:
         # check by username
@@ -37,22 +27,6 @@ async def check_account(username: str, email: str) -> None:
             )
 
 async def create_account(username: str, email: str, password:str, user_status:str) -> int:
-    """
-    Create a new account after checking for existing username and email.
-
-    Args:
-        username (str): The desired username for the new account.
-        email (str): The email address for the new account.
-        password (str): The password for the new account.
-
-    Raises:
-        HTTPException: If there are issues during account creation.
-
-    Returns:
-        account_id (int): Created account id
-    """
-    print("create_account(): ", username, email, password, user_status)
-
     connection = await get_db_connection()
     async with connection.cursor(DictCursor) as cursor:
         try:

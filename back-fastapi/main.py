@@ -5,14 +5,14 @@ from fastapi import HTTPException, Depends
 from src.models.db import get_db_connection, database
 import aiomysql
 from src.controllers import auth_controller
-from src.middlewares import core_middleware
+from src.middlewares import cors_middleware
 
 
 
 
 app = FastAPI()
 
-core_middleware.add(app)
+cors_middleware.add(app)
 
 @app.on_event("startup")
 async def startup_event():

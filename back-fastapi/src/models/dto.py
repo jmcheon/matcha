@@ -2,7 +2,7 @@
 class CreateUser():
     username: str
     email: str
-    password: str#()
+    password: str
 
 
 # class GetUser():

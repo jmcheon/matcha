@@ -19,7 +19,8 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       JWT_ACCESS_DURATION: process.env.JWT_ACCESS_DURATION,
-      BACK_HOST: process.env.BACK_HOST,
+      // BACK_HOST: process.env.BACK_HOST,
+      BACK_HOST: process.env.FASTAPI_HOST,
       FRONT_HOST: process.env.FRONT_HOST,
     },
   },

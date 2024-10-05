@@ -7,17 +7,6 @@ COPY ./back-express/package*.json ./
 RUN npm i
 
 FROM dependencies AS development
-CMD [ "npm", "run", "start" ]
-EXPOSE $BACK_PORT
-
-FROM dependencies AS build
-COPY ./back-express .
-RUN npm run build
-
-FROM base AS production
-COPY ./back-express/package.json ./
-COPY --from=dependencies /usr/src/app/node_modules ./node_modules
-ENV NODE_ENV=production
-COPY --from=build /usr/src/app/dist ./dist
-RUN npm prune --prod
-CMD [ "node", "dist/app.js" ]
+COPY ./back-fastapi /code/
+CMD ["uvicorn", "main:app", "--host", "back", "--reload"]
+EXPOSE $FASTAPI_PORT

@@ -13,6 +13,17 @@ db-mysql/prod/
 
 *.sw*
 
+# Python
+# Ignore Python cache files
+__pycache__/
+
+# Other common ignores
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+
 # Logs
 logs
 *.log

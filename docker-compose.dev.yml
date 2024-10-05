@@ -14,8 +14,10 @@ services:
     ports:
       - "${BACK_PORT}:3005"
     volumes:
-      - ./back-express:/usr/src/app
-      - back_node_modules:/usr/src/app/node_modules
+      - ./back-fastapi:/code/
+    # volumes:
+    #   - ./back-express:/usr/src/app
+    #   - back_node_modules:/usr/src/app/node_modules
 
   db:
     volumes:

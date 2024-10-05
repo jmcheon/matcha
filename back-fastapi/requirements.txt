@@ -2,7 +2,8 @@ fastapi[standard]
 uvicorn
 
 #
-bcrypt
 mysql-connector-python
 aiomysql
 cryptography
+python-jose # python JWT
+passlib

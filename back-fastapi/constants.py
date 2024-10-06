@@ -2,8 +2,8 @@ from enum import Enum
 import os
 
 class AccountStatus(Enum):
-    INCOMPLETE_PROFILE = "incomplete_profile"
     PENDING_VERIFICATION = "pending_verification"
+    INCOMPLETE_PROFILE = "incomplete_profile"
     LOGIN = "login"
     LOGOUT = "logout"
 

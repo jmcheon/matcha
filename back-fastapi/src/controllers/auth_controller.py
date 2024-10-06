@@ -36,8 +36,6 @@ async def register(data: Dict[str, Any], lang: str = Query("en")):
     if lang not in ["en", "fr"]:
         lang = "en"
 
-    await account_service.check_account(username, email)
-
     account_id = await account_service.create_account(username, email, password)
     print("account id:", account_id)
 
@@ -47,8 +45,9 @@ async def register(data: Dict[str, Any], lang: str = Query("en")):
         "email": email,
     }
 
+# TODO: data validation
 @router.post("/request-email", status_code=status.HTTP_200_OK, response_model=None)
-async def request_email(data: Dict[str, Any], res: Response, lang: str = Query("en")):
+async def request_email(res: Response, data: Dict[str, Any], lang: str = Query("en")):
     print(data)
     account_id, username, email = data.values()
     access_token = await auth_service.set_token_cookies(res, account_id)

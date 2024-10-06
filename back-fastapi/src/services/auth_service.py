@@ -66,6 +66,9 @@ async def save_refresh_token(account_id: int, refresh_token: str) -> None:
 
 async def set_token_cookies(res: Response, account_id: int) -> str:
     try:
+        # account check
+        await account_service.get_account_by_id(account_id)
+
         access_token_info = create_access_token(account_id)
         refresh_token_info = create_refresh_token(account_id)
 

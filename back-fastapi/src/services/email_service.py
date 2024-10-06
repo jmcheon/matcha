@@ -59,7 +59,7 @@ async def verify_email(res: Response, token: str, lang: str):
     # print("service verify_email() account:", account)
 
     await account_service.update_account_status(account_id, AccountStatus.INCOMPLETE_PROFILE.value)
-    auth_service.set_token_cookies(res, account_id)
+    await auth_service.set_token_cookies(res, account_id)
 
     redirect_url = f'{NGINX_HOST}/{lang}/auth/generate-profile'
     return RedirectResponse(url=redirect_url)

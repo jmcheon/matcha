@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 
 from constants import JWT_SECRET, JWT_ACCESS_DURATION, JWT_REFRESH_DURATION, DOMAIN, ENV
+import src.services.account_service as account_service
 
 # Password hasing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -59,7 +60,11 @@ def create_refresh_token(account_id: int, expire_delta: timedelta=None) -> str:
         "options": cookie_options
     }
 
-def set_token_cookies(res: Response, account_id: int) -> str:
+async def save_refresh_token(account_id: int, refresh_token: str) -> None:
+    await account_service.get_account_by_id(account_id)
+    await account_service.update_account_refresh_token(account_id, refresh_token)
+
+async def set_token_cookies(res: Response, account_id: int) -> str:
     try:
         access_token_info = create_access_token(account_id)
         refresh_token_info = create_refresh_token(account_id)
@@ -73,7 +78,7 @@ def set_token_cookies(res: Response, account_id: int) -> str:
                         secure=refresh_token_info["options"]["secure"],
                         expires=refresh_token_info["options"]["expires"])
 
-        # await save_refresh_token(account_id, refresh_token_info["refreshToken"])
+        await save_refresh_token(account_id, refresh_token_info["refreshToken"])
     except Exception as e:
         raise HTTPException(
             detail="Error generating tokens",
@@ -88,7 +93,3 @@ def decode_token(token: str):
     except JWTError as e:
         print("JWTError:", e)
         return None
-    
-
-def save_refresh_token(account_id: int, refresh_token: str):
-    pass

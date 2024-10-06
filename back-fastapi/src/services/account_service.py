@@ -78,6 +78,25 @@ async def update_account_status(account_id: int, account_status: str) -> None:
     
     await account_repository.update_status(account_id, account_status)
 
+async def update_account_refresh_token(account_id: int, token: str) -> None:
+    """
+    Update the refresh token of an account.
+
+    Args:
+        account_id (int): The ID of the account to update.
+        token (str): The new refresh token to set for the account.
+
+    Raises:
+        HTTPException: If the account refresh token is invalid.
+    """
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid token"
+        )
+    
+    await account_repository.update_refresh_token(account_id, token)
+
 async def get_account_by_id(account_id: int) -> Dict[str, Any]:
     """
     Retrieve an account by its ID.

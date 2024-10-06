@@ -13,7 +13,7 @@ import src.services.account_service as account_service
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
 router = APIRouter(
     # prefix="/auth", 
-    # tags=["Auth"]
+    tags=["Auth"]
 )
 
 # pydantic validator 안 쓸시 response_model=None 지정 필수
@@ -51,7 +51,7 @@ async def register(data: Dict[str, Any], lang: str = Query("en")):
 async def request_email(data: Dict[str, Any], res: Response, lang: str = Query("en")):
     print(data)
     account_id, username, email = data.values()
-    access_token = auth_service.set_token_cookies(res, account_id)
+    access_token = await auth_service.set_token_cookies(res, account_id)
     print("access token:", access_token)
 
     await email_service.send_verification_email(

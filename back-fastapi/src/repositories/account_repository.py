@@ -63,6 +63,23 @@ async def update_status(account_id: int, account_status: str) -> None:
                 status_code=status.HTTP_400_BAD_REQUEST
             )
 
+async def update_refresh_token(account_id: int, token: str) -> None:
+    connection = await get_db_connection()
+    async with connection.cursor(DictCursor) as cursor:
+        try:
+            await cursor.execute(
+                'UPDATE account SET refresh_token = %s WHERE account_id = %s',
+                (token, account_id)
+            )
+            await connection.commit()
+            print("account refresh token updated: ", token, account_id)
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                detail=str(e),
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
 async def get_by_id(account_id: int) -> Dict[str, Any]:
     connection = await get_db_connection()
     async with connection.cursor(DictCursor) as cursor:

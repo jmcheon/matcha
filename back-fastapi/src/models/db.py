@@ -3,15 +3,7 @@ from mysql.connector import Error
 from fastapi import HTTPException
 from fastapi import Depends
 import aiomysql
-import os
-
-# Get database info from .env
-DB_PORT = int(os.getenv("DB_PORT"))
-# DB_HOST = os.getenv("MYSQL_HOST")
-DB_USER = os.getenv("MYSQL_USER")
-DB_PASSWORD = os.getenv("MYSQL_PASSWORD")
-DB_DATABASE = os.getenv("MYSQL_DATABASE")
-
+from constants import DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE
 
 class Database:
     def __init__(self, db_info):

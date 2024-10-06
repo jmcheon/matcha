@@ -92,16 +92,17 @@ export const useAuth = () => {
     clearInterval(refreshTokenIntervalId.value);
   };
 
-  const doLogin = async (
-    api: AxiosInstance,
-    info: { username: string; password: string },
-  ) => {
-    const { data } = await api.post('/login', {
+  const doLogin = async (info: { username: string; password: string }) => {
+    console.log({
+      username: info.username,
+      password: info.password,
+    });
+    const { data } = await axios.post('/login', {
       username: info.username,
       password: info.password,
     });
     try {
-      const profileResponse = await api.get('/api/profile/', {
+      const profileResponse = await axios.get('/api/profile/', {
         headers: { Authorization: `Bearer ${data.accessToken}` },
       });
 

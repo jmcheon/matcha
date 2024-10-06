@@ -1,11 +1,12 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from jose import JWTError, jwt
 from fastapi import Response, HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 
-from constants import JWT_SECRET, JWT_ACCESS_DURATION, JWT_REFRESH_DURATION, DOMAIN, ENV
+from constants import JWT_SECRET, JWT_ACCESS_DURATION, JWT_REFRESH_DURATION, DOMAIN, ENV, AccountStatus
 import src.services.account_service as account_service
+import src.repositories.account_repository as account_repository
 
 # Password hasing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -15,6 +16,34 @@ def hash_password(password: str) -> str:
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
+
+
+async def authenticate(res: Response, username: str, password: str) -> dict:
+    account = await account_service.get_account_by_username(username)
+    hashed_password = account["password"]
+    verified = verify_password(password, hashed_password)
+    if verified is False:
+        HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid password"
+        )
+    account = await account_repository.authenticate(username, hashed_password)
+    if not account:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Invalid login credentials"
+            )
+    account_id = account["account_id"]
+    access_token = await set_token_cookies(res, account_id)
+    account_status = account_service.get_account_status(account_id)
+    if account_status == AccountStatus.LOGOUT.value:
+        await account_service.update_account_status(account_id, AccountStatus.LOGIN.value)
+    return {
+        "accountId": account_id,
+        "username": username,
+        "accessToken": access_token
+    }
+
 
 def create_access_token(account_id: int, expire_delta: timedelta=None) -> str:
     payload = {"accountId": account_id}
@@ -66,9 +95,6 @@ async def save_refresh_token(account_id: int, refresh_token: str) -> None:
 
 async def set_token_cookies(res: Response, account_id: int) -> str:
     try:
-        # account check
-        await account_service.get_account_by_id(account_id)
-
         access_token_info = create_access_token(account_id)
         refresh_token_info = create_refresh_token(account_id)
 
@@ -89,7 +115,7 @@ async def set_token_cookies(res: Response, account_id: int) -> str:
         )
     return access_token_info["accessToken"]
 
-def decode_token(token: str):
+def decode_token(token: str) -> Optional[dict]:
     try:
         payload = jwt.decode(token, JWT_SECRET)
         return payload

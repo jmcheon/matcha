@@ -17,7 +17,7 @@ router = APIRouter(
 )
 
 # pydantic validator 안 쓸시 response_model=None 지정 필수
-# TODO: data validation
+# TODO: data validation: username, email, password
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
 async def register(data: Dict[str, Any], lang: str = Query("en")):
     """
@@ -45,7 +45,7 @@ async def register(data: Dict[str, Any], lang: str = Query("en")):
         "email": email,
     }
 
-# TODO: data validation
+# TODO: data validation: account_id, username, email
 @router.post("/request-email", status_code=status.HTTP_200_OK, response_model=None)
 async def request_email(res: Response, data: dict, lang: str = Query("en")):
     print(data)
@@ -74,9 +74,12 @@ async def request_email(res: Response, data: dict, lang: str = Query("en")):
 @router.get("/verify-email", status_code=status.HTTP_200_OK, response_model=None)
 async def verify_email(res: Response, token: str, lang: str = Query("en")):
     print(token, lang)
-    if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token is required",
-        )
     return await email_service.verify_email(res, token, lang)
+
+
+# TODO: data validation: username, password
+@router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
+async def login(res: Response, data: dict) -> dict:
+    print(data)
+    username, password = data.values()
+    return await auth_service.authenticate(res, username, password)

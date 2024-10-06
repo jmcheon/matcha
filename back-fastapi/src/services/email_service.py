@@ -25,8 +25,6 @@ async def send_verification_email(data: Dict[str, Any], lang: str, token: str) -
         'fr': f'<a href="{BACK_HOST}/verify-email?token={token}&lang=fr">Vérifiez votre email pour votre username: {username}</a>',
     }
 
-
-
     subject = subject_template.get(lang, subject_template['en'])
     html = html_template.get(lang, html_template['en'])
 
@@ -41,6 +39,11 @@ async def send_verification_email(data: Dict[str, Any], lang: str, token: str) -
         await smtp.send_message(message)
 
 async def verify_email(res: Response, token: str, lang: str):
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token is required",
+        )
     # TODO: access token 만료시 에러처리
     payload = auth_service.decode_token(token)
     print("service verify_email() payload:", payload)

@@ -99,7 +99,6 @@
     middleware: ['non-auth'],
   });
 
-  const axios = useAxios();
   const localePath = useLocalePath();
   const username = ref('');
   const password = ref('');
@@ -120,7 +119,7 @@
     try {
       loading.value = true;
       errorGlobal.value = '';
-      await doLogin(axios, {
+      await doLogin({
         username: username.value,
         password: password.value,
       });

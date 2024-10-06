@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from fastapi import HTTPException
 from fastapi import status
 from aiomysql import DictCursor
@@ -84,7 +84,47 @@ async def get_by_id(account_id: int) -> Dict[str, Any]:
             )
             account = await cursor.fetchone()
             # print("account: ", account)
-            return account
+            if account:
+                return dict(account)
+            return None
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                detail=str(e),
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+async def get_by_username(username: str) -> Optional[dict]:
+    connection = await get_db_connection()
+    async with connection.cursor(DictCursor) as cursor:
+        try:
+            await cursor.execute(
+                'SELECT * FROM account WHERE username = %s', (username, )
+            )
+            account = await cursor.fetchone()
+            # print("account: ", account)
+            if account:
+                return dict(account)
+            return None
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                detail=str(e),
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+async def authenticate(username: str, hashed_password: str) -> Optional[dict]:
+    connection = await get_db_connection()
+    async with connection.cursor(DictCursor) as cursor:
+        try:
+            await cursor.execute(
+                "SELECT account_id, username FROM account WHERE username = %s AND password = %s",
+                (username, hashed_password)
+            )
+            account = await cursor.fetchone()
+            if account:
+                return dict(account)
+            return None
         except Exception as e:
             print(e)
             raise HTTPException(

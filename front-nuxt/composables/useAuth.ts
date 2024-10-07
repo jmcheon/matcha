@@ -93,10 +93,6 @@ export const useAuth = () => {
   };
 
   const doLogin = async (info: { username: string; password: string }) => {
-    console.log({
-      username: info.username,
-      password: info.password,
-    });
     const { data } = await axios.post('/login', {
       username: info.username,
       password: info.password,

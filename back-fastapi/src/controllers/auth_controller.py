@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from fastapi import Response
+from fastapi import Cookie, Request, Response
 from fastapi import status
 from fastapi import APIRouter
 from fastapi import HTTPException, Query
@@ -19,7 +19,7 @@ router = APIRouter(
 # pydantic validator 안 쓸시 response_model=None 지정 필수
 # TODO: data validation: username, email, password
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
-async def register(data: Dict[str, Any], lang: str = Query("en")):
+async def register(data: dict, lang: str = Query("en")):
     """
     Register a new user account.
 
@@ -80,6 +80,12 @@ async def verify_email(res: Response, token: str, lang: str = Query("en")):
 # TODO: data validation: username, password
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
 async def login(res: Response, data: dict) -> dict:
+    print("login route")
     print(data)
     username, password = data.values()
     return await auth_service.authenticate(res, username, password)
+
+@router.delete("/logout", status_code=status.HTTP_200_OK, response_model=None)
+async def logout(res: Response, accessToken: str = Cookie(None)):
+    print("logout():", accessToken)
+    return await auth_service.logout(res, accessToken)

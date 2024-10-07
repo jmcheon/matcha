@@ -1,5 +1,5 @@
 from typing import Dict, Any, Optional
-from jose import JWTError, jwt
+from jose import JWTError, jwt, ExpiredSignatureError
 from fastapi import Response, HTTPException, status
 from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
@@ -43,6 +43,27 @@ async def authenticate(res: Response, username: str, password: str) -> dict:
         "username": username,
         "accessToken": access_token
     }
+
+async def logout(res: Response, token: str):
+    if not token:
+        return {"success": "Logged out"}
+
+    try:
+        payload = jwt.decode(token, JWT_SECRET)
+        account_id = payload["accountId"]
+
+        await save_refresh_token(account_id, "")
+        account_status = await account_service.get_account_status(account_id)
+        if account_status is AccountStatus.LOGIN.value:
+            await account_service.update_account_status(account_id, AccountStatus.LOGOUT.value)
+
+        res.delete_cookie(key="accessToken", domain=DOMAIN, httponly=True, path='/')
+        res.delete_cookie(key="refreshToken", domain=DOMAIN, httponly=True, path='/')
+    except ExpiredSignatureError or JWTError:
+        pass
+    print("loggingout")
+    return {"success": "Logged out"}
+
 
 
 def create_access_token(account_id: int, expire_delta: timedelta=None) -> str:
@@ -95,6 +116,9 @@ async def save_refresh_token(account_id: int, refresh_token: str) -> None:
 
 async def set_token_cookies(res: Response, account_id: int) -> str:
     try:
+        # account check
+        await account_service.get_account_by_id(account_id)
+
         access_token_info = create_access_token(account_id)
         refresh_token_info = create_refresh_token(account_id)
 

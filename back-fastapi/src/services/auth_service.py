@@ -1,12 +1,13 @@
-from typing import Dict, Any, Optional
-from jose import JWTError, jwt, ExpiredSignatureError
-from fastapi import Response, HTTPException, status
-from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
+from typing import Any, Dict, Optional
 
-from constants import JWT_SECRET, JWT_ACCESS_DURATION, JWT_REFRESH_DURATION, DOMAIN, ENV, AccountStatus
-import src.services.account_service as account_service
 import src.repositories.account_repository as account_repository
+import src.services.account_service as account_service
+from constants import (DOMAIN, ENV, JWT_ACCESS_DURATION, JWT_REFRESH_DURATION,
+                       JWT_SECRET, AccountStatus)
+from fastapi import HTTPException, Response, status
+from jose import ExpiredSignatureError, JWTError, jwt
+from passlib.context import CryptContext
 
 # Password hasing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -64,7 +65,32 @@ async def logout(res: Response, token: str):
     print("loggingout")
     return {"success": "Logged out"}
 
+async def refresh(res: Response, token: str) -> dict:
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
 
+    try:
+        payload = jwt.decode(token, JWT_SECRET)
+        account_id = payload["accountId"]
+
+        res.delete_cookie(key="accessToken", domain=DOMAIN, httponly=True, path='/')
+        res.delete_cookie(key="refreshToken", domain=DOMAIN, httponly=True, path='/')
+
+        access_token = await set_token_cookies(res, account_id)
+        account = await account_service.get_account_by_id(account_id)
+        if not account:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Account not found"
+            )
+
+    except ExpiredSignatureError or JWTError:
+        pass
+    print("refresh", access_token)
+    return account.update({"accessToken": access_token})
 
 def create_access_token(account_id: int, expire_delta: timedelta=None) -> str:
     payload = {"accountId": account_id}
@@ -82,6 +108,7 @@ def create_access_token(account_id: int, expire_delta: timedelta=None) -> str:
         "secure": ENV == "production",
         "expires": expire
     }
+    # print("encoded access token:", token, payload, expire)
     
     return {
         "accessToken": token,

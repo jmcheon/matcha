@@ -112,6 +112,25 @@ async def get_by_username(username: str) -> Optional[dict]:
                 detail=str(e),
             )
 
+async def get_by_email(email: str) -> Optional[dict]:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
+        try:
+            print("get_by_email():", email)
+            await cursor.execute(
+                'SELECT * FROM account WHERE email = %s', (email, )
+            )
+            account = await cursor.fetchone()
+            # print("account: ", account)
+            if account:
+                return dict(account)
+            return None
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+
 async def authenticate(username: str, hashed_password: str) -> Optional[dict]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:

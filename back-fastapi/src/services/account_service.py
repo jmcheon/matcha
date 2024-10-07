@@ -129,6 +129,21 @@ async def get_account_by_username(username: str) -> Optional[dict]:
     """
     return await account_repository.get_by_username(username)
 
+async def get_account_by_email(email: str) -> Optional[dict]:
+    """
+    Retrieve an account by its email.
+
+    Args:
+        email (str): The email of the account to retrieve.
+
+    Returns:
+        Optional[dict]: A dictionary containing the account details or None if account not found.
+
+    Raises:
+        HTTPException: Any bad requests.
+    """
+    return await account_repository.get_by_email(email)
+
 async def get_account_status(account_id: int) -> str:
     """
     Retrieve the account status by its ID.

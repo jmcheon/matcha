@@ -1,6 +1,6 @@
 import type { AxiosInstance } from 'axios';
 
-import type { AccountData, ProfileData } from '~/types';
+import type { AccountData } from '~/types';
 
 export const useAuth = () => {
   const axios = useAxios();
@@ -128,11 +128,10 @@ export const useAuth = () => {
   };
 
   const doCheckUserCredentials = async (
-    api: AxiosInstance,
     info: { email: string },
     lang: string,
   ) => {
-    await api.post(`/forgot-password?lang=${lang}`, info);
+    await axios.post(`/forgot-password?lang=${lang}`, info);
   };
 
   const onGoogleLogin = () => (window.location.href = `${BACK_HOST}/google`);

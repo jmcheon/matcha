@@ -1,4 +1,4 @@
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 from fastapi import HTTPException, status
 from constants import AccountStatus
 
@@ -99,7 +99,7 @@ async def update_account_refresh_token(account_id: int, token: str) -> None:
     await get_account_by_id(account_id)
     await account_repository.update_refresh_token(account_id, token)
 
-async def get_account_by_id(account_id: int) -> Dict[str, Any]:
+async def get_account_by_id(account_id: int) -> Optional[dict]:
     """
     Retrieve an account by its ID.
 

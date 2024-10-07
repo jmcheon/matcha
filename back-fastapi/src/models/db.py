@@ -2,6 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 from fastapi import HTTPException
 from fastapi import Depends
+from contextlib import asynccontextmanager
 import aiomysql
 from constants import DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE
 
@@ -29,9 +30,13 @@ db_info = {
 # print("hihi", db_info)
 database = Database(db_info)
 
-
+@asynccontextmanager
 async def get_db_connection():
     if database.pool is None:
         raise RuntimeError("Connection pool hasn't been initialized")
     # async with database.pool.acquire() as connection:
-    return await database.pool.acquire()
+    connection = await database.pool.acquire()
+    try:
+        yield connection
+    finally:
+        database.pool.release(connection)

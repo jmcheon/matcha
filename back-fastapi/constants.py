@@ -1,5 +1,6 @@
-from enum import Enum
 import os
+from enum import Enum
+
 
 class AccountStatus(Enum):
     PENDING_VERIFICATION = "pending_verification"
@@ -8,7 +9,7 @@ class AccountStatus(Enum):
     LOGOUT = "logout"
 
 NGINX_HOST = os.getenv("NGINX_HOST")
-FASTAPI_HOST = os.getenv("FASTAPI_HOST")
+BACK_HOST = os.getenv("BACK_HOST")
 DOMAIN = os.getenv("DOMAIN")
 ENV = "development" # "production"
 

@@ -1,9 +1,9 @@
-from typing import Dict, Any, Optional
-from fastapi import HTTPException
-from fastapi import status
-from aiomysql import DictCursor
+from typing import Any, Dict, Optional
 
+from aiomysql import DictCursor
+from fastapi import HTTPException, status
 from src.models.db import get_db_connection
+
 
 async def check(username: str, email: str) -> None: 
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:

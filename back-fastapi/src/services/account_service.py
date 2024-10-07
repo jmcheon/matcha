@@ -1,9 +1,9 @@
-from typing import Dict, Any, Optional
-from fastapi import HTTPException, status
-from constants import AccountStatus
+from typing import Any, Dict, Optional
 
-import src.services.auth_service as auth_service
 import src.repositories.account_repository as account_repository
+import src.services.auth_service as auth_service
+from constants import AccountStatus
+from fastapi import HTTPException, status
 
 
 async def check_account(username: str, email: str) -> None: 

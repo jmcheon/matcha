@@ -1,14 +1,13 @@
 from datetime import timedelta
 from typing import Any, Dict
 
-from fastapi.responses import RedirectResponse
-
 import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 import src.services.email_service as email_service
 from constants import FRONT_HOST
 from fastapi import (APIRouter, Cookie, HTTPException, Query, Request,
                      Response, status)
+from fastapi.responses import RedirectResponse
 from src.models import dto
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작

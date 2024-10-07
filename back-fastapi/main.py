@@ -1,14 +1,10 @@
 from typing import Union
 
-from fastapi import FastAPI, status
-from fastapi import HTTPException, Depends
-from src.models.db import get_db_connection, database
 import aiomysql
+from fastapi import Depends, FastAPI, HTTPException, status
 from src.controllers import auth_controller
 from src.middlewares import cors_middleware
-
-
-
+from src.models.db import database, get_db_connection
 
 app = FastAPI()
 

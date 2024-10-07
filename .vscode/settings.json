@@ -51,26 +51,16 @@
 
   // Python
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
+    // "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
-    ///multi_bin_packing
     "editor.codeActionsOnSave": {
       "source.organizeImports": "explicit"
-    },
+    }
   },
-  "pylint.args": [
-    "--disable=F0401,I1101,E1101" //C0330 removed
-  ],
-  "black-formatter.interpreter": [
-    "/home/c-sungyong/.pyenv/shims/python"
-  ],
-  "black-formatter.path": [
-    "/home/c-sungyong/.pyenv/shims/black"
-  ],
-  "black-formatter.args": [
-    "--line-length",
-    "100"
+
+  // Python - For matcha
+  "black-formatter.args": ["--line-length", "88"]
 }

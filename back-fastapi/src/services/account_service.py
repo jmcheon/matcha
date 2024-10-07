@@ -1,4 +1,7 @@
+from typing import Dict, Any, Optional
 from fastapi import HTTPException, status
+from constants import AccountStatus
+
 import src.services.auth_service as auth_service
 import src.repositories.account_repository as account_repository
 
@@ -17,12 +20,12 @@ async def check_account(username: str, email: str) -> None:
     """
     if not (username or email):
         raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="All fields are required",
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
-    await account_repository.check_account(username, email)
+    await account_repository.check(username, email)
 
-async def create_account(username: str, email: str, password:str, user_status:str) -> int:
+async def create_account(username: str, email: str, password:str) -> int:
     """
     Create a new account after checking for existing username and email.
 
@@ -37,14 +40,76 @@ async def create_account(username: str, email: str, password:str, user_status:st
     Returns:
         account_id (int): Created account id
     """
-    print("create_account(): ", username, email, password, user_status)
+    print("create_account(): ", username, email, password)
+    await check_account(username, email)
+
 
     if not password:
         raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="Password can not be empty",
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
     hashed_password = auth_service.hash_password(password)
     print("all passed", hashed_password)
 
-    return await account_repository.create_account(username, email, hashed_password, user_status)
+    return await account_repository.create(
+        username, 
+        email, 
+        hashed_password, 
+        AccountStatus.PENDING_VERIFICATION.value
+        )
+
+async def update_account_status(account_id: int, account_status: str) -> None:
+    """
+    Update the status of an account.
+
+    Args:
+        account_id (int): The ID of the account to update.
+        account_status (str): The new status to set for the account.
+
+    Raises:
+        HTTPException: If the account status is invalid.
+    """
+    try:
+        AccountStatus(account_status)
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid account status: {account_status}. Must be one of {[status.value for status in AccountStatus]}",
+        )
+    await get_account_by_id(account_id)
+    await account_repository.update_status(account_id, account_status)
+
+async def update_account_refresh_token(account_id: int, token: str) -> None:
+    """
+    Update the refresh token of an account.
+
+    Args:
+        account_id (int): The ID of the account to update.
+        token (str): The new refresh token to set for the account.
+
+    Raises:
+        HTTPException: If the account refresh token is invalid.
+    """
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid token"
+        )
+    await get_account_by_id(account_id)
+    await account_repository.update_refresh_token(account_id, token)
+
+async def get_account_by_id(account_id: int) -> Optional[dict]:
+    """
+    Retrieve an account by its ID.
+
+    Args:
+        account_id (int): The ID of the account to retrieve.
+
+    Returns:
+        Dict[str, Any]: A dictionary containing the account details.
+
+    Raises:
+        HTTPException: If the account is not found.
+    """
+    return await account_repository.get_by_id(account_id)

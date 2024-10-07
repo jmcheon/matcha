@@ -101,7 +101,6 @@
   import { useRoute } from 'vue-router';
   import { jwtDecode } from 'jwt-decode';
 
-  const axios = useAxios();
   const username = ref('');
   const email = ref('');
   const password = ref('');
@@ -126,7 +125,7 @@
     t,
   );
 
-  const { doRegister } = useAuth();
+  const { doRegister, doRequestEmail } = useAuth();
   const { locale } = useI18n();
   const route = useRoute();
 
@@ -179,7 +178,8 @@
       // if (token.value) {
       //   console.log('token check', token.value);
       // }
-      await doRegister(axios, userInfo, locale.value, socialInfo);
+      await doRegister(userInfo, locale.value, socialInfo);
+      await doRequestEmail(locale.value);
       await navigateTo({ path: localePath('auth-verify-email') });
     } catch (e) {
       if (e.response && e.response.data.code) {

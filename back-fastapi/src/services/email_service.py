@@ -1,12 +1,13 @@
-from typing import Dict, Any
-from aiosmtplib import SMTP
-from fastapi import Response, HTTPException, status
-from fastapi.responses import RedirectResponse
 from email.message import EmailMessage
-from constants import FASTAPI_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
+from typing import Any, Dict
 
-import src.services.auth_service as auth_service
 import src.services.account_service as account_service
+import src.services.auth_service as auth_service
+from aiosmtplib import SMTP
+from constants import (BACK_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST,
+                       AccountStatus)
+from fastapi import HTTPException, Response, status
+from fastapi.responses import RedirectResponse
 
 
 # TODO: data validation
@@ -20,8 +21,8 @@ async def send_verification_email(data: Dict[str, Any], lang: str, token: str) -
     }
 
     html_template = {
-        'en': f'<a href="{FASTAPI_HOST}/verify-email?token={token}&lang=en">Verify your email for username: {username}</a>',
-        'fr': f'<a href="{FASTAPI_HOST}/verify-email?token={token}&lang=fr">Vérifiez votre email pour votre username: {username}</a>',
+        'en': f'<a href="{BACK_HOST}/verify-email?token={token}&lang=en">Verify your email for username: {username}</a>',
+        'fr': f'<a href="{BACK_HOST}/verify-email?token={token}&lang=fr">Vérifiez votre email pour votre username: {username}</a>',
     }
 
 

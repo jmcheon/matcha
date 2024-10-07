@@ -9,4 +9,4 @@ RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
 FROM dependencies AS development
 COPY ./back-fastapi /code/
 CMD ["uvicorn", "main:app", "--host", "back", "--reload"]
-EXPOSE $FASTAPI_PORT
+EXPOSE $BACK_PORT

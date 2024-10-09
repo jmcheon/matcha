@@ -1,14 +1,10 @@
 from typing import Union
 
-from fastapi import FastAPI, status
-from fastapi import HTTPException, Depends
-from src.models.db import get_db_connection, database
 import aiomysql
-from src.controllers import auth_controller
+from fastapi import Depends, FastAPI, HTTPException, status
+from src.controllers import auth_controller, account_controller
 from src.middlewares import cors_middleware
-
-
-
+from src.models.db import database, get_db_connection
 
 app = FastAPI()
 
@@ -40,3 +36,4 @@ async def read_account(account_id: int, connection=Depends(get_db_connection)):
         return account
 
 app.include_router(auth_controller.router)
+app.include_router(account_controller.router)

@@ -10,6 +10,7 @@ class AccountStatus(Enum):
 
 NGINX_HOST = os.getenv("NGINX_HOST")
 BACK_HOST = os.getenv("BACK_HOST")
+FRONT_HOST = os.getenv("FRONT_HOST")
 DOMAIN = os.getenv("DOMAIN")
 ENV = "development" # "production"
 

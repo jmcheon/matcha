@@ -1,9 +1,9 @@
-from typing import Dict, Any
-from fastapi import HTTPException
-from fastapi import status
-from aiomysql import DictCursor
+from typing import Any, Dict, Optional
 
+from aiomysql import DictCursor
+from fastapi import HTTPException, status
 from src.models.db import get_db_connection
+
 
 async def check(username: str, email: str) -> None: 
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
@@ -13,8 +13,8 @@ async def check(username: str, email: str) -> None:
         )
         if rows > 0:
             raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
                 detail="Account already exists",
-                status_code=status.HTTP_409_CONFLICT
             )
         # check by email
         rows = await cursor.execute(
@@ -22,8 +22,8 @@ async def check(username: str, email: str) -> None:
         )
         if rows > 0:
             raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
                 detail="Account already exists",
-                status_code=status.HTTP_409_CONFLICT
             )
 
 async def create(username: str, email: str, password:str, account_status:str) -> int:
@@ -40,8 +40,8 @@ async def create(username: str, email: str, password:str, account_status:str) ->
         except Exception as e:
             print(e)
             raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e),
-                status_code=status.HTTP_400_BAD_REQUEST
             )
 
 async def update_status(account_id: int, account_status: str) -> None:
@@ -56,8 +56,8 @@ async def update_status(account_id: int, account_status: str) -> None:
         except Exception as e:
             print(e)
             raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e),
-                status_code=status.HTTP_400_BAD_REQUEST
             )
 
 async def update_refresh_token(account_id: int, token: str) -> None:
@@ -72,11 +72,27 @@ async def update_refresh_token(account_id: int, token: str) -> None:
         except Exception as e:
             print(e)
             raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e),
-                status_code=status.HTTP_400_BAD_REQUEST
             )
 
-async def get_by_id(account_id: int) -> Dict[str, Any]:
+async def update_password(account_id: int, hashed_password: str) -> None:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
+        try:
+            await cursor.execute(
+                'UPDATE account SET password = %s WHERE account_id = %s',
+                (hashed_password, account_id)
+            )
+            await connection.commit()
+            print("account password updated: ", hashed_password, account_id)
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+
+async def get_by_id(account_id: int) -> Optional[dict]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
@@ -84,10 +100,67 @@ async def get_by_id(account_id: int) -> Dict[str, Any]:
             )
             account = await cursor.fetchone()
             # print("account: ", account)
-            return account
+            if account:
+                return dict(account)
+            return None
         except Exception as e:
             print(e)
             raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e),
-                status_code=status.HTTP_400_BAD_REQUEST
+            )
+
+async def get_by_username(username: str) -> Optional[dict]:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
+        try:
+            await cursor.execute(
+                'SELECT * FROM account WHERE username = %s', (username, )
+            )
+            account = await cursor.fetchone()
+            # print("account: ", account)
+            if account:
+                return dict(account)
+            return None
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+
+async def get_by_email(email: str) -> Optional[dict]:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
+        try:
+            print("get_by_email():", email)
+            await cursor.execute(
+                'SELECT * FROM account WHERE email = %s', (email, )
+            )
+            account = await cursor.fetchone()
+            # print("account: ", account)
+            if account:
+                return dict(account)
+            return None
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+
+async def authenticate(username: str, hashed_password: str) -> Optional[dict]:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
+        try:
+            await cursor.execute(
+                "SELECT account_id, username FROM account WHERE username = %s AND password = %s",
+                (username, hashed_password)
+            )
+            account = await cursor.fetchone()
+            if account:
+                return dict(account)
+            return None
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
             )

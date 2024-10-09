@@ -1,9 +1,9 @@
-from typing import Dict, Any, Optional
-from fastapi import HTTPException, status
-from constants import AccountStatus
+from typing import Any, Dict, Optional
 
-import src.services.auth_service as auth_service
 import src.repositories.account_repository as account_repository
+import src.services.auth_service as auth_service
+from constants import AccountStatus
+from fastapi import HTTPException, status
 
 
 async def check_account(username: str, email: str) -> None: 
@@ -99,6 +99,27 @@ async def update_account_refresh_token(account_id: int, token: str) -> None:
     await get_account_by_id(account_id)
     await account_repository.update_refresh_token(account_id, token)
 
+async def update_account_password(account_id: str, password: str) -> None:
+    """
+    Update the password of an account.
+
+    Args:
+        account_id (int): The ID of the account to update.
+        password (str): The new password to set for the account.
+
+    Raises:
+        HTTPException: Any bad requests.
+    """
+    if password is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid password"
+        )
+    hashed_password = auth_service.hash_password(password)
+
+    await get_account_by_id(account_id)
+    await account_repository.update_password(account_id, hashed_password)
+
 async def get_account_by_id(account_id: int) -> Optional[dict]:
     """
     Retrieve an account by its ID.
@@ -107,9 +128,60 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
         account_id (int): The ID of the account to retrieve.
 
     Returns:
-        Dict[str, Any]: A dictionary containing the account details.
+        Optional[dict]: A dictionary containing the account details or None if account not found.
 
     Raises:
-        HTTPException: If the account is not found.
+        HTTPException: Any bad requests.
     """
     return await account_repository.get_by_id(account_id)
+
+async def get_account_by_username(username: str) -> Optional[dict]:
+    """
+    Retrieve an account by its username.
+
+    Args:
+        username (str): The username of the account to retrieve.
+
+    Returns:
+        Optional[dict]: A dictionary containing the account details or None if account not found.
+
+    Raises:
+        HTTPException: Any bad requests.
+    """
+    return await account_repository.get_by_username(username)
+
+async def get_account_by_email(email: str) -> Optional[dict]:
+    """
+    Retrieve an account by its email.
+
+    Args:
+        email (str): The email of the account to retrieve.
+
+    Returns:
+        Optional[dict]: A dictionary containing the account details or None if account not found.
+
+    Raises:
+        HTTPException: Any bad requests.
+    """
+    return await account_repository.get_by_email(email)
+
+async def get_account_status(account_id: int) -> str:
+    """
+    Retrieve the account status by its ID.
+
+    Args:
+        account_id (int): The ID of the account to retrieve.
+
+    Returns:
+        str: The retrieved account status.
+
+    Raises:
+        HTTPException: Any bad requests.
+    """
+    account = await account_repository.get_by_id(account_id)
+    if account is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Account not found"
+        )
+    return account["status"]

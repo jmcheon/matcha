@@ -61,9 +61,8 @@
 
 <script setup>
   import { ref } from 'vue';
-  import { useAxios, useLocalePath, useI18n, navigateTo } from '#imports';
+  import { useLocalePath, useI18n, navigateTo } from '#imports';
 
-  const axios = useAxios();
   const email = ref('');
   const loading = ref(false);
   const errorGlobal = ref('');
@@ -90,7 +89,7 @@
       loading.value = true;
       errorGlobal.value = '';
       // Simulating API request to send reset password email
-      await doCheckUserCredentials(axios, { email: email.value }, locale.value);
+      await doCheckUserCredentials({ email: email.value }, locale.value);
 
       // Redirect to a confirmation page or display success message
       await navigateTo({

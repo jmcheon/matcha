@@ -1,5 +1,4 @@
-
-class CreateUser():
+class CreateUser:
     username: str
     email: str
     password: str

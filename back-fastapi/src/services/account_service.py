@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Optional
 
 import src.repositories.account_repository as account_repository
 import src.services.auth_service as auth_service
@@ -6,7 +6,7 @@ from constants import AccountStatus
 from fastapi import HTTPException, status
 
 
-async def check_account(username: str, email: str) -> None: 
+async def check_account(username: str, email: str) -> None:
     """
     Check if an account already exists for the given username or email.
 
@@ -25,7 +25,8 @@ async def check_account(username: str, email: str) -> None:
         )
     await account_repository.check(username, email)
 
-async def create_account(username: str, email: str, password:str) -> int:
+
+async def create_account(username: str, email: str, password: str) -> int:
     """
     Create a new account after checking for existing username and email.
 
@@ -43,7 +44,6 @@ async def create_account(username: str, email: str, password:str) -> int:
     print("create_account(): ", username, email, password)
     await check_account(username, email)
 
-
     if not password:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -53,11 +53,9 @@ async def create_account(username: str, email: str, password:str) -> int:
     print("all passed", hashed_password)
 
     return await account_repository.create(
-        username, 
-        email, 
-        hashed_password, 
-        AccountStatus.PENDING_VERIFICATION.value
-        )
+        username, email, hashed_password, AccountStatus.PENDING_VERIFICATION.value
+    )
+
 
 async def update_account_status(account_id: int, account_status: str) -> None:
     """
@@ -75,14 +73,16 @@ async def update_account_status(account_id: int, account_status: str) -> None:
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Invalid account status: {account_status}. Must be one of {[status.value for status in AccountStatus]}",
+            detail=f"Invalid account status: {account_status}."
+            + " Must be one of {[status.value for status in AccountStatus]}",
         )
     await get_account_by_id(account_id)
     await account_repository.update_status(account_id, account_status)
 
+
 async def update_account_refresh_token(account_id: int, token: str) -> None:
     """
-    Update the refresh token of an account.
+    Update the refresh token of an account."
 
     Args:
         account_id (int): The ID of the account to update.
@@ -92,12 +92,10 @@ async def update_account_refresh_token(account_id: int, token: str) -> None:
         HTTPException: If the account refresh token is invalid.
     """
     if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid token"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid token")
     await get_account_by_id(account_id)
     await account_repository.update_refresh_token(account_id, token)
+
 
 async def update_account_password(account_id: str, password: str) -> None:
     """
@@ -111,14 +109,12 @@ async def update_account_password(account_id: str, password: str) -> None:
         HTTPException: Any bad requests.
     """
     if password is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid password"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid password")
     hashed_password = auth_service.hash_password(password)
 
     await get_account_by_id(account_id)
     await account_repository.update_password(account_id, hashed_password)
+
 
 async def get_account_by_id(account_id: int) -> Optional[dict]:
     """
@@ -135,6 +131,7 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
     """
     return await account_repository.get_by_id(account_id)
 
+
 async def get_account_by_username(username: str) -> Optional[dict]:
     """
     Retrieve an account by its username.
@@ -149,6 +146,7 @@ async def get_account_by_username(username: str) -> Optional[dict]:
         HTTPException: Any bad requests.
     """
     return await account_repository.get_by_username(username)
+
 
 async def get_account_by_email(email: str) -> Optional[dict]:
     """
@@ -165,6 +163,7 @@ async def get_account_by_email(email: str) -> Optional[dict]:
     """
     return await account_repository.get_by_email(email)
 
+
 async def get_account_status(account_id: int) -> str:
     """
     Retrieve the account status by its ID.
@@ -180,8 +179,5 @@ async def get_account_status(account_id: int) -> str:
     """
     account = await account_repository.get_by_id(account_id)
     if account is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Account not found"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
     return account["status"]

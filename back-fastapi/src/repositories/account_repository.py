@@ -6,22 +6,16 @@ from src.models.db import get_db_connection
 
 
 async def check(username: str, email: str) -> None:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         # check by username
-        rows = await cursor.execute(
-            "SELECT username FROM account WHERE username = %s", (username,)
-        )
+        rows = await cursor.execute("SELECT username FROM account WHERE username = %s", (username,))
         if rows > 0:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Account already exists",
             )
         # check by email
-        rows = await cursor.execute(
-            "SELECT username FROM account WHERE email = %s", (email,)
-        )
+        rows = await cursor.execute("SELECT username FROM account WHERE email = %s", (email,))
         if rows > 0:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -30,9 +24,7 @@ async def check(username: str, email: str) -> None:
 
 
 async def create(username: str, email: str, password: str, account_status: str) -> int:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             print("creating account...", account_status)
             await cursor.execute(
@@ -51,9 +43,7 @@ async def create(username: str, email: str, password: str, account_status: str) 
 
 
 async def update_status(account_id: int, account_status: str) -> None:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
                 "UPDATE account SET status = %s WHERE account_id = %s",
@@ -70,9 +60,7 @@ async def update_status(account_id: int, account_status: str) -> None:
 
 
 async def update_refresh_token(account_id: int, token: str) -> None:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
                 "UPDATE account SET refresh_token = %s WHERE account_id = %s",
@@ -89,9 +77,7 @@ async def update_refresh_token(account_id: int, token: str) -> None:
 
 
 async def update_password(account_id: int, hashed_password: str) -> None:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
                 "UPDATE account SET password = %s WHERE account_id = %s",
@@ -108,13 +94,9 @@ async def update_password(account_id: int, hashed_password: str) -> None:
 
 
 async def get_by_id(account_id: int) -> Optional[dict]:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
-            await cursor.execute(
-                "SELECT * FROM account WHERE account_id = %s", (account_id,)
-            )
+            await cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
             account = await cursor.fetchone()
             # print("account: ", account)
             if account:
@@ -129,13 +111,9 @@ async def get_by_id(account_id: int) -> Optional[dict]:
 
 
 async def get_by_username(username: str) -> Optional[dict]:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
-            await cursor.execute(
-                "SELECT * FROM account WHERE username = %s", (username,)
-            )
+            await cursor.execute("SELECT * FROM account WHERE username = %s", (username,))
             account = await cursor.fetchone()
             # print("account: ", account)
             if account:
@@ -150,9 +128,7 @@ async def get_by_username(username: str) -> Optional[dict]:
 
 
 async def get_by_email(email: str) -> Optional[dict]:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             print("get_by_email():", email)
             await cursor.execute("SELECT * FROM account WHERE email = %s", (email,))
@@ -170,9 +146,7 @@ async def get_by_email(email: str) -> Optional[dict]:
 
 
 async def authenticate(username: str, hashed_password: str) -> Optional[dict]:
-    async with get_db_connection() as connection, connection.cursor(
-        DictCursor
-    ) as cursor:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
                 "SELECT account_id, username FROM account WHERE username = %s AND password = %s",

@@ -50,9 +50,7 @@ async def verify_email(res: Response, token: str, lang: str):
     # access token 만료시
     if payload is None:
         # temp exception
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
         # example
         redirect_url = f"{NGINX_HOST}/{lang}/auth/request-email"
         return RedirectResponse(url=redirect_url, headers=res.headers)
@@ -61,9 +59,7 @@ async def verify_email(res: Response, token: str, lang: str):
     account = await account_service.get_account_by_id(account_id)
     # print("service verify_email() account:", account)
 
-    await account_service.update_account_status(
-        account_id, AccountStatus.INCOMPLETE_PROFILE.value
-    )
+    await account_service.update_account_status(account_id, AccountStatus.INCOMPLETE_PROFILE.value)
     await auth_service.set_token_cookies(res, account_id)
 
     redirect_url = f"{NGINX_HOST}/{lang}/auth/generate-profile"

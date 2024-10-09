@@ -99,6 +99,27 @@ async def update_account_refresh_token(account_id: int, token: str) -> None:
     await get_account_by_id(account_id)
     await account_repository.update_refresh_token(account_id, token)
 
+async def update_account_password(account_id: str, password: str) -> None:
+    """
+    Update the password of an account.
+
+    Args:
+        account_id (int): The ID of the account to update.
+        password (str): The new password to set for the account.
+
+    Raises:
+        HTTPException: Any bad requests.
+    """
+    if password is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid password"
+        )
+    hashed_password = auth_service.hash_password(password)
+
+    await get_account_by_id(account_id)
+    await account_repository.update_password(account_id, hashed_password)
+
 async def get_account_by_id(account_id: int) -> Optional[dict]:
     """
     Retrieve an account by its ID.
@@ -158,8 +179,8 @@ async def get_account_status(account_id: int) -> str:
         HTTPException: Any bad requests.
     """
     account = await account_repository.get_by_id(account_id)
-    if not account:
-        HTTPException(
+    if account is None:
+        raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Account not found"
         )

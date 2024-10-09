@@ -28,7 +28,10 @@ export const useAuth = () => {
 
       const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
       // Set user data and trigger the refresh auth process
-      accountData.value = data;
+      console.log('doRegister data:', data);
+      // accountData.value = data;
+
+      accountData.value = { ...accountData.value, ...data };
       console.log('doRegister acconutData:', accountData.value);
       startRefreshAuth();
 
@@ -45,7 +48,8 @@ export const useAuth = () => {
         `/request-email?lang=${lang}`,
         accountData.value,
       );
-      accountData.value = data;
+      console.log('doRequestEmail data:', data);
+      accountData.value = { ...accountData.value, ...data };
       console.log('doRequestEmail acconutData:', accountData.value);
       startRefreshAuth();
     } catch (error) {
@@ -66,7 +70,10 @@ export const useAuth = () => {
           Authorization: `Bearer ${accountData.value.accessToken}`,
         },
       });
+      console.log('doRefreshTokenServer data:', data);
+      // accountData.value = { ...accountData.value, ...data };
       accountData.value = data || {};
+      console.log('doRefreshTokenServer acconutData:', accountData.value);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -75,7 +82,9 @@ export const useAuth = () => {
   const doRefreshTokenClient = async () => {
     try {
       const { data } = await axios.post(`/refresh`);
+      console.log('doRefreshTokenClient data:', data);
       accountData.value = data || {};
+      console.log('doRefreshTokenClient acconutData:', accountData.value);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -117,7 +126,9 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
-    accountData.value = data;
+    console.log('doLogin data:', data);
+    accountData.value = { ...accountData.value, ...data };
+    console.log('doLogin acconutData:', accountData.value);
     startRefreshAuth();
   };
 

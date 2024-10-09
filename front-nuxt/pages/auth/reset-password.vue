@@ -72,6 +72,7 @@
 
   const { accountData } = storeToRefs(useUserStore());
   const { updateProfile } = useProfile();
+  const { updateAccountPassword } = useAccount();
 
   const { passwordValidator } = useValidator();
   const { error: errorPassword } = passwordValidator(dirty, newPassword, t);
@@ -94,10 +95,15 @@
 
     try {
       loading.value = true;
-      console.log(accountData.value);
+      console.log('reset-password', accountData.value);
       // Simulate API call for resetting password
-      await updateProfile(accountData.value.account_id, {
-        password: newPassword.value,
+      // await updateProfile(accountData.value.account_id, {
+      //   password: newPassword.value,
+      // });
+      await updateAccountPassword({
+        // account_id: accountData.value.account_id,
+        new_password: newPassword.value,
+        confirm_password: confirmPassword.value,
       });
 
       // Redirect to login page after successful reset

@@ -57,7 +57,7 @@ async def verify_email(res: Response, token: str, lang: str):
         )
         # example
         redirect_url = f'{NGINX_HOST}/{lang}/auth/request-email'
-        return RedirectResponse(url=redirect_url)
+        return RedirectResponse(url=redirect_url, headers=res.headers)
     account_id = payload["accountId"]
 
     account = await account_service.get_account_by_id(account_id)
@@ -67,7 +67,7 @@ async def verify_email(res: Response, token: str, lang: str):
     await auth_service.set_token_cookies(res, account_id)
 
     redirect_url = f'{NGINX_HOST}/{lang}/auth/generate-profile'
-    return RedirectResponse(url=redirect_url)
+    return RedirectResponse(url=redirect_url, headers=res.headers)
 
 # TODO: data validation
 # TODO: exception handling

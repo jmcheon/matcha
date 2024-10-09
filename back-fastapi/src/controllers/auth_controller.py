@@ -4,7 +4,7 @@ from typing import Any, Dict
 import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 import src.services.email_service as email_service
-from constants import FRONT_HOST
+from constants import NGINX_HOST 
 from fastapi import (APIRouter, Cookie, HTTPException, Query, Request,
                      Response, status)
 from fastapi.responses import RedirectResponse
@@ -113,6 +113,11 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
 async def reset_password(res: Response, token: str, lang: str = Query("en")) -> None:
     print("reset-password():", token, lang)
 
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token is required",
+        )
     payload = auth_service.decode_token(token)
     # TODO: token 만료 시 redirection
     if payload is None:
@@ -123,8 +128,8 @@ async def reset_password(res: Response, token: str, lang: str = Query("en")) -> 
         )
         # example
         redirect_url = f'{NGINX_HOST}/{lang}/auth/forgot-password'
-        return RedirectResponse(url=redirect_url)
+        return RedirectResponse(url=redirect_url, headers=res.headers)
     account_id = payload["accountId"]
     await auth_service.set_token_cookies(res, account_id)
-    redirect_url = f'{FRONT_HOST}/{lang}/auth/reset-password'
-    return RedirectResponse(url=redirect_url)
+    redirect_url = f'{NGINX_HOST}/{lang}/auth/reset-password'
+    return RedirectResponse(url=redirect_url, headers=res.headers)

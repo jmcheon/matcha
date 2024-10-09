@@ -1,10 +1,8 @@
-import mysql.connector
-from mysql.connector import Error
-from fastapi import HTTPException
-from fastapi import Depends
 from contextlib import asynccontextmanager
+
 import aiomysql
-from constants import DB_PORT, DB_USER, DB_PASSWORD, DB_DATABASE
+from constants import DB_DATABASE, DB_PASSWORD, DB_PORT, DB_USER
+
 
 class Database:
     def __init__(self, db_info):
@@ -29,6 +27,7 @@ db_info = {
 
 # print("hihi", db_info)
 database = Database(db_info)
+
 
 @asynccontextmanager
 async def get_db_connection():

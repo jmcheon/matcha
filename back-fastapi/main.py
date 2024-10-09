@@ -1,8 +1,6 @@
-from typing import Union
-
 import aiomysql
 from fastapi import Depends, FastAPI, HTTPException, status
-from src.controllers import auth_controller, account_controller
+from src.controllers import account_controller, auth_controller
 from src.middlewares import cors_middleware
 from src.models.db import database, get_db_connection
 
@@ -29,20 +27,12 @@ def read_root():
 @app.get("/accounts/{account_id}")
 async def read_account(account_id: int, connection=Depends(get_db_connection)):
     async with connection.cursor(aiomysql.DictCursor) as cursor:
-        await cursor.execute(
-            "SELECT * FROM account WHERE account_id = %s", (account_id,)
-        )
+        await cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
         account = await cursor.fetchone()
         if account is None:
-            raise HTTPException(
-                detail="Account not found", status_code=status.HTTP_404_NOT_FOUND
-            )
+            raise HTTPException(detail="Account not found", status_code=status.HTTP_404_NOT_FOUND)
         return account
 
-<<<<<<< HEAD
 
 app.include_router(auth_controller.router)
-=======
-app.include_router(auth_controller.router)
 app.include_router(account_controller.router)
->>>>>>> 94f6a27 (feat: fastapi - login/out & forgot/reset password (#51))

@@ -36,8 +36,7 @@ async def create(username: str, email: str, password: str, account_status: str) 
         try:
             print("creating account...", account_status)
             await cursor.execute(
-                "INSERT INTO account (username, email, password, status)"
-                + " VALUES (%s, %s, %s, %s)",
+                "INSERT INTO account (username, email, password, status) VALUES (%s, %s, %s, %s)",
                 (username, email, password, account_status),
             )
             await connection.commit()

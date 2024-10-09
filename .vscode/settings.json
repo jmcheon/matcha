@@ -49,18 +49,18 @@
   "i18n-ally.enabledFrameworks": ["vue"],
   "i18n-ally.keystyle": "nested",
 
-  // Python
   "[python]": {
-    // "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.rulers": [88],
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
     "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
       "source.organizeImports": "explicit"
-    }
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
-
-  // Python - For matcha
-  "black-formatter.args": ["--line-length", "88"]
+  "ruff.importStrategy": "fromEnvironment",
+  "ruff.lint.args": ["--config=${workspaceFolder}/back-fastapi/pyproject.toml"]
 }

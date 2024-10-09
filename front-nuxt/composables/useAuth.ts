@@ -1,10 +1,10 @@
 import type { AxiosInstance } from 'axios';
 
-import type { AccountData, ProfileData } from '~/types';
+import type { AccountData } from '~/types';
 
 export const useAuth = () => {
   const axios = useAxios();
-  const BACK_HOST = useRuntimeConfig().public.BACK_HOST;
+  const BACK_HOST = useRuntimeConfig().public.NGINX_HOST;
   const { accountData, profileData } = storeToRefs(useUserStore());
   const refreshTokenIntervalId = ref();
   const tokenDurationMins = Number(
@@ -28,7 +28,8 @@ export const useAuth = () => {
 
       const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
       // Set user data and trigger the refresh auth process
-      accountData.value = data;
+      console.log('doRegister data:', data);
+      accountData.value = { ...accountData.value, ...data };
       console.log('doRegister acconutData:', accountData.value);
       startRefreshAuth();
 
@@ -45,7 +46,8 @@ export const useAuth = () => {
         `/request-email?lang=${lang}`,
         accountData.value,
       );
-      accountData.value = data;
+      console.log('doRequestEmail data:', data);
+      accountData.value = { ...accountData.value, ...data };
       console.log('doRequestEmail acconutData:', accountData.value);
       startRefreshAuth();
     } catch (error) {
@@ -66,7 +68,10 @@ export const useAuth = () => {
           Authorization: `Bearer ${accountData.value.accessToken}`,
         },
       });
+      console.log('doRefreshTokenServer data:', data);
+      // accountData.value = { ...accountData.value, ...data };
       accountData.value = data || {};
+      console.log('doRefreshTokenServer acconutData:', accountData.value);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -75,7 +80,9 @@ export const useAuth = () => {
   const doRefreshTokenClient = async () => {
     try {
       const { data } = await axios.post(`/refresh`);
+      console.log('doRefreshTokenClient data:', data);
       accountData.value = data || {};
+      console.log('doRefreshTokenClient acconutData:', accountData.value);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -92,16 +99,13 @@ export const useAuth = () => {
     clearInterval(refreshTokenIntervalId.value);
   };
 
-  const doLogin = async (
-    api: AxiosInstance,
-    info: { username: string; password: string },
-  ) => {
-    const { data } = await api.post('/login', {
+  const doLogin = async (info: { username: string; password: string }) => {
+    const { data } = await axios.post('/login', {
       username: info.username,
       password: info.password,
     });
     try {
-      const profileResponse = await api.get('/api/profile/', {
+      const profileResponse = await axios.get('/api/profile/', {
         headers: { Authorization: `Bearer ${data.accessToken}` },
       });
 
@@ -120,7 +124,9 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
-    accountData.value = data;
+    console.log('doLogin data:', data);
+    accountData.value = { ...accountData.value, ...data };
+    console.log('doLogin acconutData:', accountData.value);
     startRefreshAuth();
   };
 
@@ -131,11 +137,10 @@ export const useAuth = () => {
   };
 
   const doCheckUserCredentials = async (
-    api: AxiosInstance,
     info: { email: string },
     lang: string,
   ) => {
-    await api.post(`/forgot-password?lang=${lang}`, info);
+    await axios.post(`/forgot-password?lang=${lang}`, info);
   };
 
   const onGoogleLogin = () => (window.location.href = `${BACK_HOST}/google`);

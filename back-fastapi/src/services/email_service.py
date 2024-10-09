@@ -11,9 +11,10 @@ from fastapi.responses import RedirectResponse
 
 
 # TODO: data validation
-async def send_verification_email(data: Dict[str, Any], lang: str, token: str) -> None:
+# TODO: exception handling
+async def send_verification_email(data: dict, lang: str, token: str) -> None:
     account_id, username, email = data.values()
-    print("send_verification_email():", lang, account_id, username, email)
+    print("send_verification_email():", data, lang)
 
     subject_template = {
         'en': '[Matcha-reloaded] Verify your email',
@@ -24,8 +25,6 @@ async def send_verification_email(data: Dict[str, Any], lang: str, token: str) -
         'en': f'<a href="{BACK_HOST}/verify-email?token={token}&lang=en">Verify your email for username: {username}</a>',
         'fr': f'<a href="{BACK_HOST}/verify-email?token={token}&lang=fr">Vérifiez votre email pour votre username: {username}</a>',
     }
-
-
 
     subject = subject_template.get(lang, subject_template['en'])
     html = html_template.get(lang, html_template['en'])
@@ -41,6 +40,11 @@ async def send_verification_email(data: Dict[str, Any], lang: str, token: str) -
         await smtp.send_message(message)
 
 async def verify_email(res: Response, token: str, lang: str):
+    if token is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Token is required",
+        )
     # TODO: access token 만료시 에러처리
     payload = auth_service.decode_token(token)
     print("service verify_email() payload:", payload)
@@ -53,7 +57,7 @@ async def verify_email(res: Response, token: str, lang: str):
         )
         # example
         redirect_url = f'{NGINX_HOST}/{lang}/auth/request-email'
-        return RedirectResponse(url=redirect_url)
+        return RedirectResponse(url=redirect_url, headers=res.headers)
     account_id = payload["accountId"]
 
     account = await account_service.get_account_by_id(account_id)
@@ -63,4 +67,33 @@ async def verify_email(res: Response, token: str, lang: str):
     await auth_service.set_token_cookies(res, account_id)
 
     redirect_url = f'{NGINX_HOST}/{lang}/auth/generate-profile'
-    return RedirectResponse(url=redirect_url)
+    return RedirectResponse(url=redirect_url, headers=res.headers)
+
+# TODO: data validation
+# TODO: exception handling
+async def send_password_reset_email(data: dict, lang: str, token: str) -> None:
+    email, = data.values()
+    print("send_password_reset_email():", data, lang)
+
+    subject_template = {
+        'en': '[Matcha-reloaded] Password reset for Matcha',
+        'fr': '[Matcha-reloaded] Reinitialisation du mot de passe pour Matcha'
+    }
+
+    html_template = {
+        'en': f'<a href="{BACK_HOST}/reset-password?token={token}&lang=en">Password reset for Matcha</a>',
+        'fr': f'<a href="{BACK_HOST}/reset-password?token={token}&lang=fr">Reinitialisation du mot de passe pour Matcha</a>',
+    }
+
+    subject = subject_template.get(lang, subject_template['en'])
+    html = html_template.get(lang, html_template['en'])
+
+    message = EmailMessage()
+    message['From'] = GMAIL_ID
+    message['To'] = email
+    message['Subject'] = subject
+    message.set_content(html, subtype='html')
+
+    async with SMTP(hostname='smtp.gmail.com', port=587, start_tls=True) as smtp:
+        await smtp.login(GMAIL_ID, GMAIL_PASSWORD)
+        await smtp.send_message(message)

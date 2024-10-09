@@ -28,6 +28,10 @@ export const useProfile = () => {
     await axios.patch('/api/account/' + userId, userInfo);
   };
 
+  const updateAccountPassword = async (userInfo: AccountData) => {
+    await axios.post('/api/update-password/', userInfo);
+  };
+
   const generateProfile = async (userInfo: ProfileData) => {
     const result = await axios.post('/api/profile', userInfo);
     return result.data;
@@ -55,5 +59,6 @@ export const useProfile = () => {
     updateProfileImage,
     updateProfile,
     getInterests,
+    updateAccountPassword,
   };
 };

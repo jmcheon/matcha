@@ -1,6 +1,8 @@
+from typing import Union
+
 import aiomysql
 from fastapi import Depends, FastAPI, HTTPException, status
-from src.controllers import auth_controller
+from src.controllers import auth_controller, account_controller
 from src.middlewares import cors_middleware
 from src.models.db import database, get_db_connection
 
@@ -37,5 +39,10 @@ async def read_account(account_id: int, connection=Depends(get_db_connection)):
             )
         return account
 
+<<<<<<< HEAD
 
 app.include_router(auth_controller.router)
+=======
+app.include_router(auth_controller.router)
+app.include_router(account_controller.router)
+>>>>>>> 94f6a27 (feat: fastapi - login/out & forgot/reset password (#51))

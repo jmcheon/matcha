@@ -21,6 +21,7 @@ export default defineNuxtConfig({
       JWT_ACCESS_DURATION: process.env.JWT_ACCESS_DURATION,
       BACK_HOST: process.env.BACK_HOST,
       FRONT_HOST: process.env.FRONT_HOST,
+      NGINX_HOST: process.env.NGINX_HOST,
     },
   },
   modules: [

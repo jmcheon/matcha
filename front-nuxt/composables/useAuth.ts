@@ -4,7 +4,7 @@ import type { AccountData } from '~/types';
 
 export const useAuth = () => {
   const axios = useAxios();
-  const BACK_HOST = useRuntimeConfig().public.BACK_HOST;
+  const BACK_HOST = useRuntimeConfig().public.NGINX_HOST;
   const { accountData, profileData } = storeToRefs(useUserStore());
   const refreshTokenIntervalId = ref();
   const tokenDurationMins = Number(
@@ -29,8 +29,6 @@ export const useAuth = () => {
       const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
       // Set user data and trigger the refresh auth process
       console.log('doRegister data:', data);
-      // accountData.value = data;
-
       accountData.value = { ...accountData.value, ...data };
       console.log('doRegister acconutData:', accountData.value);
       startRefreshAuth();

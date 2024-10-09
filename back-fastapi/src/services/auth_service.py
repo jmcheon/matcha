@@ -21,6 +21,11 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 async def authenticate(res: Response, username: str, password: str) -> dict:
     account = await account_service.get_account_by_username(username)
+    if not account:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="Invalid login credentials"
+        )
     hashed_password = account["password"]
     verified = verify_password(password, hashed_password)
     if verified is False:

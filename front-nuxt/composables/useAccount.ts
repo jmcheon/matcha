@@ -6,7 +6,7 @@ export const useAccount = () => {
 
   const updateAccountPassword = async (userInfo: AccountData) => {
     console.log('updateAccountPassword():', userInfo);
-    await axios.post('/api/update-password/', userInfo);
+    await axios.post('/update-password/', userInfo);
   };
 
   return {

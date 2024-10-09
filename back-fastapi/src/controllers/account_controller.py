@@ -19,12 +19,12 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
             detail="Account not found"
         )
 
-# TODO: data validation: new_password, confirm_password
+# TODO: data validation: account_id, new_password, confirm_password
 @router.post("/update-password/", status_code=status.HTTP_200_OK, response_model=None)
 @token_required()
-async def update_account_password(res: Response, data: dict, account_id: str) -> Optional[dict]:
-    print("update_account_password()", data, account_id)
-    new_password, confirm_password = data.values()
+async def update_account_password(req: Request, data: dict) -> Optional[dict]:
+    print("update_account_password()", data)
+    new_password, confirm_password, account_id = data.values()
     if new_password != confirm_password:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

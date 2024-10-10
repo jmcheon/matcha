@@ -17,7 +17,6 @@ router = APIRouter(
 
 
 # pydantic validator 안 쓸시 response_model=None 지정 필수
-# TODO: data validation: username, email, password
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
 async def register(
     res: Response,
@@ -41,9 +40,7 @@ async def register(
         created_account.accessToken = access_token
         return created_account
     except HTTPException as e:
-        if e.status_code == status.HTTP_409_CONFLICT:
-            return JSONResponse(status_code=e.status_code, content=e.detail)
-        return JSONResponse(status_code=e.status_code, content={"code": "INVALID_LOGIN"})
+        return JSONResponse(status_code=e.status_code, content=e.detail)
     except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}

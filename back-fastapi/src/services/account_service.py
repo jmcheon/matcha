@@ -7,26 +7,6 @@ from fastapi import HTTPException, status
 from src.models.dto import RegisterAccountDTO
 
 
-async def check_account(username: str, email: str) -> None:
-    """
-    Check if an account already exists for the given username or email.
-
-    Args:
-        username (str): The username to check.
-        email (str): The email to check.
-
-    Raises:
-        HTTPException: If the username or email already exists in the database
-                        with a 409 Conflict status code.
-    """
-    if not (username or email):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="All fields are required",
-        )
-    await account_repository.check(username, email)
-
-
 async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:
     """
     Create a new account after checking for existing username and email.
@@ -43,7 +23,7 @@ async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:
         account_id (int): Created account id
     """
     print("create_account(): ", data.username, data.email, data.password)
-    await check_account(data.username, data.email)
+    await account_repository.check(data.username, data.email)
     hashed_password = auth_service.hash_password(data.password)
     account_id = await account_repository.create(
         data.username, data.email, hashed_password, AccountStatus.PENDING_VERIFICATION.value

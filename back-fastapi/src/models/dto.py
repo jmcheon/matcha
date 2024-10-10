@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from constants import AccountStatus
 
@@ -42,6 +42,43 @@ class AccountDTO:
         attrs = {k: v for k, v in self.__dict__.items() if v is not None}
         attrs_str = ", ".join(f"{key}={value!r}" for key, value in attrs.items())
         return f"{cls}({attrs_str})"
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "AccountDTO":
+        def map_account_fields(db_record: Dict[str, Any]) -> Dict[str, Any]:
+            mapping = {
+                "account_id": "accountId",
+                "username": "username",
+                "email": "email",
+                "password": "password",
+                "google_id": "google_id",
+                "intra42_id": "intra42_id",
+                "github_id": "github_id",
+                "refresh_token": "refreshToken",
+                "google_access_token": "google_access_token",
+                "google_refresh_token": "google_refresh_token",
+                "github_access_token": "github_access_token",
+                "github_refresh_token": "github_refresh_token",
+                "intra42_access_token": "intra42_access_token",
+                "intra42_refresh_token": "intra42_refresh_token",
+                "status": "status",
+                "created_at": "created_at",
+                "last_modified_at": "last_modified_at",
+                "deleted_at": "deleted_at",
+                "access_token": "accessToken",
+            }
+
+            return {mapping.get(k, k): v for k, v in db_record.items()}
+
+        # Optionally map database fields to DTO fields
+        mapped_data = map_account_fields(data)
+        # Handle datetime fields if they are strings or need conversion
+        for field_name, field_type in cls.__annotations__.items():
+            if field_type is Optional[datetime] and field_name in mapped_data:
+                if isinstance(mapped_data[field_name], str):
+                    # Convert string to datetime
+                    mapped_data[field_name] = datetime.fromisoformat(mapped_data[field_name])
+        return cls(**mapped_data)
 
 
 # @dataclass

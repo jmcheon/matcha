@@ -29,14 +29,26 @@ class AccountDTO:
 
     def __post_init__(self):
         # Remove attributes with None values after initialization
-        to_remove = [key for key, value in self.__dict__.items() if value is None]
-        for key in to_remove:
-            delattr(self, key)
+        for key in list(self.__dict__.keys()):
+            if getattr(self, key) is None:
+                delattr(self, key)
 
     def __repr__(self):
         # Custom __repr__ to exclude None attributes when printing
-        attrs = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
-        return f"{self.__class__.__name__}({attrs})"
+        cls = self.__class__.__name__
+        attrs = {k: v for k, v in self.__dict__.items() if v is not None}
+        attrs_str = ", ".join(f"{key}={value!r}" for key, value in attrs.items())
+        return f"{cls}({attrs_str})"
+
+
+# @dataclass
+# class RegisterAccountDTO(AccountDTO):
+#     # Override the init method to exclude unwanted fields
+#     username: str
+#     email: str
+#     status: Optional[AccountStatus]
+#     password: Optional[str]
+#     accountId: Optional[int]
 
 
 @dataclass

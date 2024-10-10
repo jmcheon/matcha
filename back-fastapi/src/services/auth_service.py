@@ -54,7 +54,7 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
         username=data.username,
         accessToken=access_token,
         status=account_status,
-    )
+    ).to_dict()
 
 
 async def logout(res: Response, token: str):
@@ -67,8 +67,8 @@ async def logout(res: Response, token: str):
 
         await save_refresh_token(account_id, "")
         account_status = await account_service.get_account_status(account_id)
-        if account_status is AccountStatus.LOGIN.value:
-            await account_service.update_account_status(account_id, AccountStatus.LOGOUT.value)
+        if account_status is AccountStatus.ONLINE.value:
+            await account_service.update_account_status(account_id, AccountStatus.OFFLINE.value)
 
         res.delete_cookie(key="accessToken", domain=DOMAIN, httponly=True, path="/")
         res.delete_cookie(key="refreshToken", domain=DOMAIN, httponly=True, path="/")

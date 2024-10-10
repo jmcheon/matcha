@@ -3,7 +3,7 @@ import re
 from constants import DEFAULT_MAX, DEFAULT_MIN
 from fastapi import HTTPException
 
-from src.models.dto import RegisterAccountDTO
+from src.models.dtos.account_dto import RegisterAccountDTO
 
 
 def validate_string_field(value: str, field_name: str, min_length: int, max_length: int) -> None:

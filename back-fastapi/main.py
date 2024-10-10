@@ -1,6 +1,6 @@
 import aiomysql
 from fastapi import Depends, FastAPI, HTTPException, status
-from src.controllers import account_controller, auth_controller
+from src.controllers import account_controller, auth_controller, profile_controller
 from src.middlewares import cors_middleware
 from src.models.db import database, get_db_connection
 
@@ -36,3 +36,4 @@ async def read_account(account_id: int, connection=Depends(get_db_connection)):
 
 app.include_router(auth_controller.router)
 app.include_router(account_controller.router)
+app.include_router(profile_controller.router)

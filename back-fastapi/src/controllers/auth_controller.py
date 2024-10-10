@@ -77,11 +77,9 @@ async def verify_email(res: Response, token: str, lang: str = Query("en")):
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
 async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     try:
-        print("login route")
-        print(data)
         return await auth_service.authenticate(res, data)
     except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content={"code": "INVALID_LOGIN"})
+        return JSONResponse(status_code=e.status_code, content=e.detail)
     except Exception as e:
         print("e2", e)
         return JSONResponse(

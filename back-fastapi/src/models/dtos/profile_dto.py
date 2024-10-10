@@ -15,6 +15,7 @@ class ProfileDTO:
     like_gender: Optional[str] = None
     height: Optional[int] = None
     interests: Optional[List[str]] = None
+    image_paths: Optional[List[str]] = None
     bio: Optional[str] = None
     fame_score: Optional[int] = None
 
@@ -38,14 +39,15 @@ class ProfileDTO:
     def from_dict(cls, data: Dict[str, Any]) -> "ProfileDTO":
         def map_account_fields(db_record: Dict[str, Any]) -> Dict[str, Any]:
             mapping = {
-                "account_id": "accountId",
                 "profile_id": "profileId",
+                "account_id": "accountId",
                 "first_name": "first_name",
                 "last_name": "last_name",
                 "location": "location",
                 "gender": "gender",
                 "like_gender": "like_gender",
                 "interests": "interests",
+                "image_paths": "image_paths",
                 "bio": "bio",
                 "fame_score": "fame_score",
             }

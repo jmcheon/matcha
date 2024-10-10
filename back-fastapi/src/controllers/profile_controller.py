@@ -2,6 +2,7 @@ from typing import Optional
 
 import src.repositories.profile_repository as profile_repository
 import src.services.auth_service as auth_service
+import src.services.profile_service as profile_service
 from fastapi import APIRouter, Cookie, HTTPException, Response, status
 from fastapi.responses import JSONResponse
 from src.models.dtos.profile_dto import GenerateProfileDTO
@@ -18,7 +19,7 @@ async def get_profile(res: Response, accessToken: str = Cookie(None)) -> Optiona
             detail="Token is required",
         )
     payload = auth_service.decode_token(accessToken)
-    print("payload bitch", payload)
+    print("payload", payload)
     account = await profile_repository.get_by_account_id(1)
     if not account:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
@@ -37,8 +38,7 @@ async def generate_profile(
     try:
         payload = auth_service.decode_token(accessToken)
         print("payload", payload)
-        await profile_repository.insert_profile(payload["accountId"], data)
-        profile = await profile_repository.get_profile(payload["accountId"])
+        profile = await profile_service.generate_profile(payload["accountId"], data)
         print("geneated profile", profile)
         return None
     except Exception as e:

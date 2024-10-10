@@ -20,7 +20,6 @@ export const useAuth = () => {
       let endpoint = '/register'; // Default to plain register
 
       const payload = { ...info } as Record<string, any>;
-      console.log('payload', payload);
       // If it's a social login, use the social registration endpoint
       if (Object.keys(socialLogin).length > 0) {
         endpoint = '/social-register';
@@ -30,7 +29,7 @@ export const useAuth = () => {
       const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
       // Set user data and trigger the refresh auth process
       console.log('doRegister data:', data);
-      accountData.value = { ...accountData.value, ...data };
+      accountData.value = data;
       console.log('doRegister acconutData:', accountData.value);
       startRefreshAuth();
 

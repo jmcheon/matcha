@@ -32,8 +32,8 @@ export const useProfile = () => {
     await axios.post('/api/update-password/', userInfo);
   };
 
-  const generateProfile = async (userInfo: ProfileData) => {
-    const result = await axios.post('/profile', userInfo);
+  const generateProfile = async (profileInfo: ProfileData) => {
+    const result = await axios.post('/profile', profileInfo);
     return result.data;
   };
 

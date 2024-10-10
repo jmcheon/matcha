@@ -4,7 +4,7 @@ import src.repositories.account_repository as account_repository
 import src.services.auth_service as auth_service
 from constants import AccountStatus
 from fastapi import HTTPException, status
-from src.models.dto import RegisterAccountDTO
+from src.models.dto import AccountDTO, RegisterAccountDTO
 
 
 async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:
@@ -130,7 +130,7 @@ async def get_account_by_username(username: str) -> Optional[dict]:
     return await account_repository.get_by_username(username)
 
 
-async def get_account_by_email(email: str) -> Optional[dict]:
+async def get_account_by_email(email: str) -> Optional[AccountDTO]:
     """
     Retrieve an account by its email.
 

@@ -38,23 +38,16 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     verified = verify_password(data.password, hashed_password)
     if verified is False:
         HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"})
-    account = await account_repository.authenticate(data.username, hashed_password)
+    account: AccountDTO = await account_repository.authenticate(data.username, hashed_password)
     if not account:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"}
         )
-    account_id = account["account_id"]
-    access_token = await set_token_cookies(res, account_id)
-    account_status = await account_service.get_account_status(account_id)
-    if account_status == AccountStatus.OFFLINE.value:
-        await account_service.update_account_status(account_id, AccountStatus.ONLINE.value)
-        account_status = AccountStatus.ONLINE.value
-    return AccountDTO(
-        accountId=account_id,
-        username=data.username,
-        accessToken=access_token,
-        status=account_status,
-    ).to_dict()
+    print("account 2", account)
+    account.accessToken = await set_token_cookies(res, account.accountId)
+    if account.status == AccountStatus.OFFLINE.value:
+        await account_service.update_account_status(account.accountId, AccountStatus.ONLINE.value)
+    return account.to_dict()
 
 
 async def logout(res: Response, token: str):

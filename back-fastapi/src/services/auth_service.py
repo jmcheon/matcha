@@ -14,6 +14,7 @@ from constants import (
 from fastapi import HTTPException, Response, status
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
+from src.models.dto import AccountDTO, CredentialAccountDTO
 
 # Password hasing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -27,27 +28,27 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def authenticate(res: Response, username: str, password: str) -> dict:
-    account = await account_service.get_account_by_username(username)
+async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
+    account = await account_service.get_account_by_username(data.username)
     if not account:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid login credentials"
         )
     hashed_password = account["password"]
-    verified = verify_password(password, hashed_password)
+    verified = verify_password(data.password, hashed_password)
     if verified is False:
-        HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")
-    account = await account_repository.authenticate(username, hashed_password)
+        HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"})
+    account = await account_repository.authenticate(data.username, hashed_password)
     if not account:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid login credentials"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"}
         )
     account_id = account["account_id"]
     access_token = await set_token_cookies(res, account_id)
-    account_status = account_service.get_account_status(account_id)
-    if account_status == AccountStatus.LOGOUT.value:
-        await account_service.update_account_status(account_id, AccountStatus.LOGIN.value)
-    return {"accountId": account_id, "username": username, "accessToken": access_token}
+    account_status = await account_service.get_account_status(account_id)
+    if account_status == AccountStatus.OFFLINE.value:
+        await account_service.update_account_status(account_id, AccountStatus.ONLINE.value)
+    return AccountDTO(accountId=account_id, username=data.username, access_token=access_token)
 
 
 async def logout(res: Response, token: str):

@@ -16,6 +16,22 @@ router = APIRouter(
 )
 
 
+# # TODO: data validation: username, password
+# @router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
+# async def login(res: Response, data: dict) -> dict:
+#     try:
+#         print("login route")
+#         print(data)
+#         username, password = data.values()
+#         return await auth_service.authenticate(res, username, password)
+#     except HTTPException as e:
+#         return JSONResponse(status_code=e.status_code, content={"code": "INVALID_LOGIN"})
+#     except Exception:
+#         return JSONResponse(
+#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+#         )
+
+
 # pydantic validator 안 쓸시 response_model=None 지정 필수
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
 async def register(

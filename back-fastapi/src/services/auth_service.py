@@ -29,11 +29,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
-<<<<<<< HEAD
     account: AccountDTO = await account_repository.get_by_username(data.username)
-=======
-    account = await account_service.get_account_by_username(data.username)
->>>>>>> 9d6a798 (feat: generate CredentialAccountDTO)
     if not account:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_LOGIN"
@@ -69,8 +65,18 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     account_status = await account_service.get_account_status(account_id)
     if account_status == AccountStatus.OFFLINE.value:
         await account_service.update_account_status(account_id, AccountStatus.ONLINE.value)
+<<<<<<< HEAD
     return AccountDTO(accountId=account_id, username=data.username, access_token=access_token)
 >>>>>>> 9d6a798 (feat: generate CredentialAccountDTO)
+=======
+        account_status = AccountStatus.ONLINE.value
+    return AccountDTO(
+        accountId=account_id,
+        username=data.username,
+        accessToken=access_token,
+        status=account_status,
+    )
+>>>>>>> 7191583 (refactor: login using AccountDTO)
 
 
 async def logout(res: Response, token: str):

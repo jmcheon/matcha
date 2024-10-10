@@ -34,7 +34,7 @@ router = APIRouter(
 # pydantic validator 안 쓸시 response_model=None 지정 필수
 # TODO: data validation: username, email, password
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
-async def register(res: Response, data: RegisterAccountDTO):
+async def register(res: Response, data: RegisterAccountDTO, lang: str = Query("en")):
     """
     Register a new user account.
 
@@ -48,6 +48,7 @@ async def register(res: Response, data: RegisterAccountDTO):
     try:
         created_account = await account_service.create_account(data)
         access_token = await auth_service.set_token_cookies(res, created_account.accountId)
+        await email_service.send_verification_email(created_account, lang, access_token)
         created_account.accessToken = access_token
         return created_account
     except HTTPException as e:

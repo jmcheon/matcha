@@ -4,7 +4,7 @@ import src.repositories.account_repository as account_repository
 import src.services.auth_service as auth_service
 from constants import AccountStatus
 from fastapi import HTTPException, status
-from src.models.dto import AccountDTO, RegisterAccountDTO
+from src.models.dtos.account_dto import AccountDTO, RegisterAccountDTO
 
 
 async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:

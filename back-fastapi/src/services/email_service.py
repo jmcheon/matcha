@@ -6,12 +6,12 @@ from aiosmtplib import SMTP
 from constants import BACK_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
 from fastapi import HTTPException, Response, status
 from fastapi.responses import RedirectResponse
+from src.models.dto import RegisterAccountDTO
 
 
 # TODO: data validation
 # TODO: exception handling
-async def send_verification_email(data: dict, lang: str, token: str) -> None:
-    account_id, username, email = data.values()
+async def send_verification_email(data: RegisterAccountDTO, lang: str, token: str) -> None:
     print("send_verification_email():", data, lang)
 
     subject_template = {
@@ -20,8 +20,10 @@ async def send_verification_email(data: dict, lang: str, token: str) -> None:
     }
 
     html_template = {
-        "en": f'<a href="{BACK_HOST}/verify-email?token={token}&lang=en">Verify your email for username: {username}</a>',
-        "fr": f'<a href="{BACK_HOST}/verify-email?token={token}&lang=fr">Vérifiez votre email pour votre username: {username}</a>',
+        "en": f'<a href="{BACK_HOST}/verify-email?token={token}&lang=en">'
+        + f"Verify your email for username: {data.username}</a>",
+        "fr": f'<a href="{BACK_HOST}/verify-email?token={token}&lang=fr">'
+        + f"Vérifiez votre email pour votre username: {data.username}</a>",
     }
 
     subject = subject_template.get(lang, subject_template["en"])
@@ -29,7 +31,7 @@ async def send_verification_email(data: dict, lang: str, token: str) -> None:
 
     message = EmailMessage()
     message["From"] = GMAIL_ID
-    message["To"] = email
+    message["To"] = data.email
     message["Subject"] = subject
     message.set_content(html, subtype="html")
 

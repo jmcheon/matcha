@@ -110,7 +110,7 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
     account = await account_service.get_account_by_email(email)
     if not account:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
-    account_id = account["account_id"]
+    account_id = account.accountId
     token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
     await email_service.send_password_reset_email({"email": email}, lang, token_info["accessToken"])
 

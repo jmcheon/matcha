@@ -48,7 +48,13 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     account_status = await account_service.get_account_status(account_id)
     if account_status == AccountStatus.OFFLINE.value:
         await account_service.update_account_status(account_id, AccountStatus.ONLINE.value)
-    return AccountDTO(accountId=account_id, username=data.username, access_token=access_token)
+        account_status = AccountStatus.ONLINE.value
+    return AccountDTO(
+        accountId=account_id,
+        username=data.username,
+        accessToken=access_token,
+        status=account_status,
+    )
 
 
 async def logout(res: Response, token: str):

@@ -106,7 +106,7 @@ export const useAuth = () => {
       password: info.password,
     });
     try {
-      const profileResponse = await axios.get('/api/profile/', {
+      const profileResponse = await axios.get('/profile', {
         headers: { Authorization: `Bearer ${data.accessToken}` },
       });
 
@@ -125,9 +125,7 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
-    console.log('doLogin data:', data);
-    accountData.value = { ...accountData.value, ...data };
-    console.log('doLogin acconutData:', accountData.value);
+    accountData.value = data;
     startRefreshAuth();
   };
 

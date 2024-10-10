@@ -178,8 +178,8 @@
       // if (token.value) {
       //   console.log('token check', token.value);
       // }
-      await doRegister(userInfo, locale.value, socialInfo);
-      await doRequestEmail(locale.value);
+      await doRegister(userInfo, socialInfo);
+      // await doRequestEmail(locale.value);
       await navigateTo({ path: localePath('auth-verify-email') });
     } catch (e) {
       if (e.response && e.response.data.code) {

@@ -124,13 +124,13 @@
       return;
 
     const generatedProfile = {
-      firstName: firstName.value,
-      lastName: lastName.value,
+      first_name: firstName.value,
+      last_name: lastName.value,
       location: location.value,
-      gender: gender.value,
       age: age.value,
+      gender: gender.value,
       height: height.value,
-      iLike: iLike.value,
+      like_gender: iLike.value,
       bio: bio.value,
       interests: interests.value.split(',').map((tag) => tag.trim()),
     };

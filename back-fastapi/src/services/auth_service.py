@@ -34,7 +34,7 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail={"code": "INVALID_USER_CREDENTIALS"}
         )
-    hashed_password = account["password"]
+    hashed_password = account.password
     verified = verify_password(data.password, hashed_password)
     if verified is False:
         HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"})

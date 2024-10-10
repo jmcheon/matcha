@@ -53,13 +53,18 @@ class AccountDTO:
 
 @dataclass
 class RegisterAccountDTO:
-    # Override the init method to exclude unwanted fields
     username: str
     email: str
     password: Optional[str] = None
     status: Optional[AccountStatus] = None
     accountId: Optional[int] = None
     accessToken: Optional[str] = None
+
+
+@dataclass
+class CredentialAccountDTO(AccountDTO):
+    username: str
+    password: str
 
 
 # @dataclass

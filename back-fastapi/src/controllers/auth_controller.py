@@ -6,7 +6,7 @@ import src.services.email_service as email_service
 from constants import NGINX_HOST
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from src.models.dto import RegisterAccountDTO
+from src.models.dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
 from src.models.validators import validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
@@ -75,15 +75,15 @@ async def verify_email(res: Response, token: str, lang: str = Query("en")):
 
 # TODO: data validation: username, password
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
-async def login(res: Response, data: dict) -> dict:
+async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     try:
         print("login route")
         print(data)
-        username, password = data.values()
-        return await auth_service.authenticate(res, username, password)
+        return await auth_service.authenticate(res, data)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"code": "INVALID_LOGIN"})
-    except Exception:
+    except Exception as e:
+        print("e2", e)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
         )

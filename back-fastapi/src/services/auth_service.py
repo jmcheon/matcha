@@ -1,136 +1,181 @@
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Optional
 
+import src.repositories.account_repository as account_repository
 import src.services.account_service as account_service
-import src.services.auth_service as auth_service
-import src.services.email_service as email_service
-from constants import NGINX_HOST
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
-from fastapi.responses import JSONResponse, RedirectResponse
-from src.models.dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
-from src.models.validators import validate_account_register
-
-# fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
-router = APIRouter(
-    # prefix="/auth",
-    tags=["Auth"]
+from constants import (
+    DOMAIN,
+    ENV,
+    JWT_ACCESS_DURATION,
+    JWT_REFRESH_DURATION,
+    JWT_SECRET,
+    AccountStatus,
 )
+from fastapi import HTTPException, Response, status
+from jose import ExpiredSignatureError, JWTError, jwt
+from passlib.context import CryptContext
+from src.models.dto import AccountDTO, CredentialAccountDTO
+
+# Password hasing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-# pydantic validator 안 쓸시 response_model=None 지정 필수
-@router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
-async def register(
-    res: Response,
-    data: RegisterAccountDTO = Depends(validate_account_register),
-    lang: str = Query("en"),
-):
-    """
-    Register a new user account.
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
 
-    Args:
-        data (dict): The user data(username, email, password)
-        lang (str) : Specific language selector
 
-    Raises:
-        HTTPException: If the account already exists or if there are issues during registration.
-    """
-    try:
-        created_account = await account_service.create_account(data)
-        access_token = await auth_service.set_token_cookies(res, created_account.account_id)
-        await email_service.send_verification_email(created_account, lang, access_token)
-        created_account.access_token = access_token
-        return created_account
-    except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
-    except Exception:
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
+    account: AccountDTO = await account_repository.get_by_username(data.username)
+    if not account:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_LOGIN"
         )
+    hashed_password = account.password
+    verified = verify_password(data.password, hashed_password)
+    if verified is False:
+        HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_USER_CREDENTIALS"}
+        )
+    account: AccountDTO = await account_repository.authenticate(data.username, hashed_password)
+    if not account:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="INVALID_USER_CREDENTIALS"
+        )
+    account.access_token = await set_token_cookies(res, account.account_id)
+    if account.status == AccountStatus.OFFLINE.value:
+        await account_service.update_account_status(account.account_id, AccountStatus.ONLINE.value)
+    return account.to_dict()
 
 
-# TODO: data validation: account_id, username, email
-@router.post("/request-email", status_code=status.HTTP_200_OK, response_model=None)
-async def request_email(res: Response, data: dict, lang: str = Query("en")):
-    print(data)
-    account_id, username, email = data.values()
-    access_token = await auth_service.set_token_cookies(res, account_id)
-    print("access token:", access_token)
+async def logout(res: Response, token: str):
+    if not token:
+        return {"success": "Logged out"}
 
-    await email_service.send_verification_email(
-        {"account_id": account_id, "username": username, "email": email}, lang, access_token
-    )
+    try:
+        payload = jwt.decode(token, JWT_SECRET)
+        account_id = payload["account_id"]
 
-    return {
-        "account_id": account_id,
-        "username": username,
-        "email": email,
-        "accessToken": access_token,
+        await save_refresh_token(account_id, "")
+        account_status = await account_service.get_account_status(account_id)
+        if account_status is AccountStatus.ONLINE.value:
+            await account_service.update_account_status(account_id, AccountStatus.OFFLINE.value)
+
+        res.delete_cookie(key="access_token", domain=DOMAIN, httponly=True, path="/")
+        res.delete_cookie(key="refresh_token", domain=DOMAIN, httponly=True, path="/")
+    except ExpiredSignatureError or JWTError:
+        pass
+    print("loggingout")
+    return {"success": "Logged out"}
+
+
+async def refresh(res: Response, token: str) -> dict:
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+
+    try:
+        payload = jwt.decode(token, JWT_SECRET)
+        account_id = payload["account_id"]
+
+        res.delete_cookie(key="access_token", domain=DOMAIN, httponly=True, path="/")
+        res.delete_cookie(key="refresh_token", domain=DOMAIN, httponly=True, path="/")
+
+        access_token = await set_token_cookies(res, account_id)
+        account = await account_service.get_account_by_id(account_id)
+        if not account:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
+
+    except ExpiredSignatureError or JWTError:
+        pass
+    print("refresh", access_token)
+    return account.update({"access_token": access_token})
+
+
+def create_access_token(account_id: int, expire_delta: timedelta = None) -> str:
+    payload = {"account_id": account_id}
+    if expire_delta:
+        expire = datetime.now(timezone.utc) + expire_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_ACCESS_DURATION)
+    payload.update({"exp": expire})
+    token = jwt.encode(payload, JWT_SECRET)
+
+    cookie_options = {
+        "domain": DOMAIN,
+        "path": "/",
+        "httponly": True,
+        "secure": ENV == "production",
+        "expires": expire,
+    }
+    # print("encoded access token:", token, payload, expire)
+
+    return {"access_token": token, "options": cookie_options}
+
+
+def create_refresh_token(account_id: int, expire_delta: timedelta = None) -> str:
+    payload = {"account_id": account_id}
+    if expire_delta:
+        expire = datetime.now(timezone.utc) + expire_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=JWT_REFRESH_DURATION)
+    payload.update({"exp": expire})
+    token = jwt.encode(payload, JWT_SECRET)
+
+    cookie_options = {
+        "domain": DOMAIN,
+        "path": "/",
+        "httponly": True,
+        "secure": ENV == "production",
+        "expires": expire,
     }
 
-
-@router.get("/verify-email", status_code=status.HTTP_200_OK, response_model=None)
-async def verify_email(res: Response, token: str, lang: str = Query("en")):
-    print(token, lang)
-    return await email_service.verify_email(res, token, lang)
+    return {"refresh_token": token, "options": cookie_options}
 
 
-# TODO: data validation: username, password
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
-async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
+async def save_refresh_token(account_id: int, refresh_token: str) -> None:
+    await account_service.get_account_by_id(account_id)
+    await account_service.update_account_refresh_token(account_id, refresh_token)
+
+
+async def set_token_cookies(res: Response, account_id: int) -> str:
     try:
-        return await auth_service.authenticate(res, data)
-    except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content={"code":e.detail})
-    except Exception as e:
-        print("e2", e)
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        # account check
+        await account_service.get_account_by_id(account_id)
+
+        access_token_info = create_access_token(account_id)
+        refresh_token_info = create_refresh_token(account_id)
+
+        res.set_cookie(
+            key="access_token",
+            value=access_token_info["access_token"],
+            httponly=access_token_info["options"]["httponly"],
+            secure=access_token_info["options"]["secure"],
+            expires=access_token_info["options"]["expires"],
+        )
+        res.set_cookie(
+            key="refresh_token",
+            value=refresh_token_info["refresh_token"],
+            httponly=refresh_token_info["options"]["httponly"],
+            secure=refresh_token_info["options"]["secure"],
+            expires=refresh_token_info["options"]["expires"],
         )
 
-
-@router.delete("/logout", status_code=status.HTTP_200_OK, response_model=None)
-async def logout(res: Response, access_token: str = Cookie(None)):
-    print("logout():", access_token)
-    return await auth_service.logout(res, access_token)
-
-
-@router.post("/refresh", status_code=status.HTTP_200_OK, response_model=None)
-async def refresh(res: Response, refresh_token: str = Cookie(None)):
-    print("refresh():", refresh_token)
-    return await auth_service.refresh(res, refresh_token)
-
-
-# TODO: data validation: email
-@router.post("/forgot-password", status_code=status.HTTP_200_OK, response_model=None)
-async def forgot_password(data: dict, lang: str = Query("en")) -> None:
-    (email,) = data.values()
-    print("forgot-password():", data, lang, email)
-
-    account = await account_service.get_account_by_email(email)
-    if not account:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
-    account_id = account.account_id
-    token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
-    await email_service.send_password_reset_email({"email": email}, lang, token_info["access_token"])
-
-
-@router.get("/reset-password", status_code=status.HTTP_200_OK, response_model=None)
-async def reset_password(res: Response, token: str, lang: str = Query("en")) -> None:
-    print("reset-password():", token, lang)
-
-    if token is None:
+        await save_refresh_token(account_id, refresh_token_info["refresh_token"])
+    except Exception:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token is required",
+            detail="Error generating tokens",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    payload = auth_service.decode_token(token)
-    # TODO: token 만료 시 redirection
-    if payload is None:
-        # temp exception
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
-        # example
-        redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-password"
-        return RedirectResponse(url=redirect_url, headers=res.headers)
-    account_id = payload["account_id"]
-    await auth_service.set_token_cookies(res, account_id)
-    redirect_url = f"{NGINX_HOST}/{lang}/auth/reset-password"
-    return RedirectResponse(url=redirect_url, headers=res.headers)
+    return access_token_info["access_token"]
+
+
+def decode_token(token: str) -> Optional[dict]:
+    try:
+        payload = jwt.decode(token, JWT_SECRET)
+        return payload
+    except JWTError as e:
+        print("JWTError:", e)
+        return None

@@ -13,20 +13,20 @@ export const useAuth = () => {
 
   const doRegister = async (
     info: AccountData,
-    lang: string,
     socialLogin: Record<string, any> = {},
   ) => {
     try {
       let endpoint = '/register'; // Default to plain register
 
       const payload = { ...info } as Record<string, any>;
+      console.log('payload', payload);
       // If it's a social login, use the social registration endpoint
       if (Object.keys(socialLogin).length > 0) {
         endpoint = '/social-register';
         payload.socialInfo = socialLogin; // Dynamically add socialInfo field
       }
 
-      const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
+      const { data } = await axios.post(`${endpoint}`, payload);
       // Set user data and trigger the refresh auth process
       console.log('doRegister data:', data);
       accountData.value = data;

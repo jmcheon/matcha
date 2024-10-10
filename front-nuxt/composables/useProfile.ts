@@ -33,13 +33,13 @@ export const useProfile = () => {
   };
 
   const generateProfile = async (userInfo: ProfileData) => {
-    const result = await axios.post('/api/profile', userInfo);
+    const result = await axios.post('/profile', userInfo);
     return result.data;
   };
 
   const getSocialProfileImage = async (socialLoginType: string) => {
     console.log('socialLoginType', socialLoginType);
-    const result = await axios.get('/api/profile/social-image', {
+    const result = await axios.get('/profile/social-image', {
       params: {
         type: socialLoginType,
       },

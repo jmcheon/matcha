@@ -6,7 +6,7 @@ import src.services.email_service as email_service
 from constants import NGINX_HOST
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from src.models.dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
+from src.models.dtos.account_dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
 from src.models.validators import validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작

@@ -29,10 +29,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
-    account = await account_service.get_account_by_username(data.username)
+    account: AccountDTO = await account_repository.get_by_username(data.username)
     if not account:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid login credentials"
+            status_code=status.HTTP_400_BAD_REQUEST, detail={"code": "INVALID_USER_CREDENTIALS"}
         )
     hashed_password = account["password"]
     verified = verify_password(data.password, hashed_password)
@@ -43,7 +43,6 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"}
         )
-    print("account 2", account)
     account.accessToken = await set_token_cookies(res, account.accountId)
     if account.status == AccountStatus.OFFLINE.value:
         await account_service.update_account_status(account.accountId, AccountStatus.ONLINE.value)

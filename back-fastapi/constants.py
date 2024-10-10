@@ -10,6 +10,9 @@ class AccountStatus(Enum):
     OFFLINE = "offline"
 
 
+DEFAULT_MAX = 20
+DEFAULT_MIN = 2
+
 NGINX_HOST = os.getenv("NGINX_HOST")
 BACK_HOST = os.getenv("BACK_HOST")
 FRONT_HOST = os.getenv("FRONT_HOST")

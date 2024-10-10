@@ -4,9 +4,10 @@ import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 import src.services.email_service as email_service
 from constants import NGINX_HOST
-from fastapi import APIRouter, Cookie, HTTPException, Query, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from src.models.dto import RegisterAccountDTO
+from src.models.validators import validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
 router = APIRouter(
@@ -34,7 +35,11 @@ router = APIRouter(
 # pydantic validator 안 쓸시 response_model=None 지정 필수
 # TODO: data validation: username, email, password
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
-async def register(res: Response, data: RegisterAccountDTO, lang: str = Query("en")):
+async def register(
+    res: Response,
+    data: RegisterAccountDTO = Depends(validate_account_register),
+    lang: str = Query("en"),
+):
     """
     Register a new user account.
 

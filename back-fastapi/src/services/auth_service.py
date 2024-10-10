@@ -29,11 +29,16 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
+<<<<<<< HEAD
     account: AccountDTO = await account_repository.get_by_username(data.username)
+=======
+    account = await account_service.get_account_by_username(data.username)
+>>>>>>> 9d6a798 (feat: generate CredentialAccountDTO)
     if not account:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_LOGIN"
         )
+<<<<<<< HEAD
     hashed_password = account.password
     verified = verify_password(data.password, hashed_password)
     if verified is False:
@@ -49,6 +54,23 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     if account.status == AccountStatus.OFFLINE.value:
         await account_service.update_account_status(account.account_id, AccountStatus.ONLINE.value)
     return account.to_dict()
+=======
+    hashed_password = account["password"]
+    verified = verify_password(data.password, hashed_password)
+    if verified is False:
+        HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"})
+    account = await account_repository.authenticate(data.username, hashed_password)
+    if not account:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_LOGIN"}
+        )
+    account_id = account["account_id"]
+    access_token = await set_token_cookies(res, account_id)
+    account_status = await account_service.get_account_status(account_id)
+    if account_status == AccountStatus.OFFLINE.value:
+        await account_service.update_account_status(account_id, AccountStatus.ONLINE.value)
+    return AccountDTO(accountId=account_id, username=data.username, access_token=access_token)
+>>>>>>> 9d6a798 (feat: generate CredentialAccountDTO)
 
 
 async def logout(res: Response, token: str):

@@ -29,9 +29,12 @@ class AccountDTO:
 
     def __post_init__(self):
         # Remove attributes with None values after initialization
-        for key in list(self.__dict__.keys()):
-            if getattr(self, key) is None:
-                delattr(self, key)
+        keys_to_remove = [key for key, value in self.__dict__.items() if value is None]
+        for key in keys_to_remove:
+            delattr(self, key)
+
+    def to_dict(self):
+        return {k: v for k, v in self.__dict__.items() if v is not None}
 
     def __repr__(self):
         # Custom __repr__ to exclude None attributes when printing

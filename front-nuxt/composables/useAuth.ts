@@ -125,7 +125,9 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
+    console.log('data check', data);
     accountData.value = data;
+    console.log('account data check', accountData.value);
     startRefreshAuth();
   };
 

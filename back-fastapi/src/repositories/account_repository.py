@@ -94,14 +94,14 @@ async def update_password(account_id: int, hashed_password: str) -> None:
             )
 
 
-async def get_by_id(account_id: int) -> Optional[dict]:
+async def get_by_id(account_id: int) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
             account = await cursor.fetchone()
             # print("account: ", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)
@@ -111,14 +111,14 @@ async def get_by_id(account_id: int) -> Optional[dict]:
             )
 
 
-async def get_by_username(username: str) -> Optional[dict]:
+async def get_by_username(username: str) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute("SELECT * FROM account WHERE username = %s", (username,))
             account = await cursor.fetchone()
             # print("account: ", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)

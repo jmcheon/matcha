@@ -1,11 +1,7 @@
 import axios from 'axios';
 import { refreshGithubAccessToken, refreshGoogleAccessToken, refreshIntra42AccessToken } from './auth.service';
-<<<<<<< HEAD
 import { pool } from '../utils/db';
 import geoip from 'geoip-lite';
-=======
-
->>>>>>> 68a82bc (feat: oauth import photo (#31))
 export async function getGoogleUserProfile(accountId: number, accessToken: string): Promise<any> {
   const apiUrl = 'https://www.googleapis.com/oauth2/v1/userinfo?alt=json';
   console.log("i am working")

@@ -270,7 +270,6 @@ export default class ProfileController {
       return res.status(500).json({ error: 'Failed to fetch profile image' });
     }
   }
-<<<<<<< HEAD
 
   static async getInterests(req: Request, res: Response) {
     try {
@@ -309,6 +308,4 @@ export default class ProfileController {
   };
 
 
-=======
->>>>>>> 68a82bc (feat: oauth import photo (#31))
 }

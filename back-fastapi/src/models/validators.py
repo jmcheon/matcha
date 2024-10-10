@@ -31,11 +31,11 @@ def validate_string_field(value: str, field_name: str, min_length: int, max_leng
         )
 
 
-async def validate_email(email: str) -> None:
+def validate_email(email: str) -> None:
     re_pattern = r"^[\w.-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$"  # Updated regex to match JS pattern
 
     # maximum email address is set 50 chars on DB.
-    validate_string_field(email, "email", DEFAULT_MIN, DEFAULT_MAX)
+    validate_string_field(email, "email", DEFAULT_MIN, 50)
     if not re.match(re_pattern, email):
         raise HTTPException(status_code=400, detail="Invalid email format")
 
@@ -52,7 +52,7 @@ def validate_username(username: str) -> None:
     validate_string_field(username, "username", DEFAULT_MIN, DEFAULT_MAX)
 
 
-async def validate_password(password: str) -> None:
+def validate_password(password: str) -> None:
     re_pattern = r"(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}"
 
     if len(password) == 0:

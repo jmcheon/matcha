@@ -145,16 +145,18 @@ async def get_by_email(email: str) -> Optional[AccountDTO]:
             )
 
 
-async def authenticate(username: str, hashed_password: str) -> Optional[dict]:
+async def authenticate(username: str, hashed_password: str) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
-                "SELECT account_id, username FROM account WHERE username = %s AND password = %s",
+                "SELECT account_id, username, status FROM account"
+                + " WHERE username = %s AND password = %s",
                 (username, hashed_password),
             )
             account = await cursor.fetchone()
+            print("account", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)

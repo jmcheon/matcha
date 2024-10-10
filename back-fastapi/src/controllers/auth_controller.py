@@ -4,8 +4,10 @@ import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 import src.services.email_service as email_service
 from constants import NGINX_HOST
-from fastapi import APIRouter, Cookie, HTTPException, Query, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
+from src.models.dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
+from src.models.validators import validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
 router = APIRouter(
@@ -15,9 +17,12 @@ router = APIRouter(
 
 
 # pydantic validator 안 쓸시 response_model=None 지정 필수
-# TODO: data validation: username, email, password
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=None)
-async def register(data: dict, lang: str = Query("en")):
+async def register(
+    res: Response,
+    data: RegisterAccountDTO = Depends(validate_account_register),
+    lang: str = Query("en"),
+):
     """
     Register a new user account.
 
@@ -28,18 +33,18 @@ async def register(data: dict, lang: str = Query("en")):
     Raises:
         HTTPException: If the account already exists or if there are issues during registration.
     """
-    username, email, password = data.values()
-    print("register", data, lang)
-    # TODO: i18n error messages in en and fr
-
-    account_id = await account_service.create_account(username, email, password)
-    print("account id:", account_id)
-
-    return {
-        "accountId": account_id,
-        "username": username,
-        "email": email,
-    }
+    try:
+        created_account = await account_service.create_account(data)
+        access_token = await auth_service.set_token_cookies(res, created_account.accountId)
+        await email_service.send_verification_email(created_account, lang, access_token)
+        created_account.accessToken = access_token
+        return created_account
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content=e.detail)
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        )
 
 
 # TODO: data validation: account_id, username, email
@@ -70,15 +75,13 @@ async def verify_email(res: Response, token: str, lang: str = Query("en")):
 
 # TODO: data validation: username, password
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
-async def login(res: Response, data: dict) -> dict:
+async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     try:
-        print("login route")
-        print(data)
-        username, password = data.values()
-        return await auth_service.authenticate(res, username, password)
+        return await auth_service.authenticate(res, data)
     except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content={"code": "INVALID_LOGIN"})
-    except Exception:
+        return JSONResponse(status_code=e.status_code, content=e.detail)
+    except Exception as e:
+        print("e2", e)
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
         )
@@ -105,7 +108,7 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
     account = await account_service.get_account_by_email(email)
     if not account:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
-    account_id = account["account_id"]
+    account_id = account.accountId
     token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
     await email_service.send_password_reset_email({"email": email}, lang, token_info["accessToken"])
 

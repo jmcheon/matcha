@@ -29,7 +29,7 @@ export const useAuth = () => {
       const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
       // Set user data and trigger the refresh auth process
       console.log('doRegister data:', data);
-      accountData.value = { ...accountData.value, ...data };
+      accountData.value = data;
       console.log('doRegister acconutData:', accountData.value);
       startRefreshAuth();
 
@@ -105,7 +105,7 @@ export const useAuth = () => {
       password: info.password,
     });
     try {
-      const profileResponse = await axios.get('/api/profile/', {
+      const profileResponse = await axios.get('/profile', {
         headers: { Authorization: `Bearer ${data.accessToken}` },
       });
 
@@ -124,9 +124,9 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
-    console.log('doLogin data:', data);
-    accountData.value = { ...accountData.value, ...data };
-    console.log('doLogin acconutData:', accountData.value);
+    console.log('data check', data);
+    accountData.value = data;
+    console.log('account data check', accountData.value);
     startRefreshAuth();
   };
 

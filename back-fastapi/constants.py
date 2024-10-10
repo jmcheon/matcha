@@ -3,11 +3,15 @@ from enum import Enum
 
 
 class AccountStatus(Enum):
-    PENDING_VERIFICATION = "pending_verification"
+    INCOMPLETE_SOCIAL = "incomplete_social"
     INCOMPLETE_PROFILE = "incomplete_profile"
-    LOGIN = "login"
-    LOGOUT = "logout"
+    PENDING_VERIFICATION = "pending_verification"
+    ONLINE = "online"
+    OFFLINE = "offline"
 
+
+DEFAULT_MAX = 20
+DEFAULT_MIN = 2
 
 NGINX_HOST = os.getenv("NGINX_HOST")
 BACK_HOST = os.getenv("BACK_HOST")

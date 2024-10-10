@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -8,12 +8,13 @@ class ProfileDTO:
     accountId: Optional[int] = None
     profileId: Optional[int] = None
     first_name: Optional[str] = None
-    last_name: Optional[Dict] = None
+    last_name: Optional[str] = None
     location: Optional[str] = None
+    age: Optional[int] = None
     gender: Optional[str] = None
     like_gender: Optional[str] = None
     height: Optional[int] = None
-    interests: Optional[Dict] = None
+    interests: Optional[List[str]] = None
     bio: Optional[str] = None
     fame_score: Optional[int] = None
 
@@ -60,3 +61,15 @@ class ProfileDTO:
                     # Convert string to datetime
                     mapped_data[field_name] = datetime.fromisoformat(mapped_data[field_name])
         return cls(**mapped_data)
+
+
+@dataclass
+class GenerateProfileDTO(ProfileDTO):
+    first_name: str
+    last_name: str
+    location: str
+    age: int
+    gender: str
+    like_gender: str
+    bio: str
+    interests: List[str]

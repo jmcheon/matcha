@@ -45,7 +45,7 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_USER_CREDENTIALS"}
         )
-    account.accessToken = await set_token_cookies(res, account.accountId)
+    account.access_token = await set_token_cookies(res, account.accountId)
     if account.status == AccountStatus.OFFLINE.value:
         await account_service.update_account_status(account.accountId, AccountStatus.ONLINE.value)
     return account.to_dict()
@@ -64,8 +64,8 @@ async def logout(res: Response, token: str):
         if account_status is AccountStatus.ONLINE.value:
             await account_service.update_account_status(account_id, AccountStatus.OFFLINE.value)
 
-        res.delete_cookie(key="accessToken", domain=DOMAIN, httponly=True, path="/")
-        res.delete_cookie(key="refreshToken", domain=DOMAIN, httponly=True, path="/")
+        res.delete_cookie(key="access_token", domain=DOMAIN, httponly=True, path="/")
+        res.delete_cookie(key="refresh_token", domain=DOMAIN, httponly=True, path="/")
     except ExpiredSignatureError or JWTError:
         pass
     print("loggingout")
@@ -80,8 +80,8 @@ async def refresh(res: Response, token: str) -> dict:
         payload = jwt.decode(token, JWT_SECRET)
         account_id = payload["accountId"]
 
-        res.delete_cookie(key="accessToken", domain=DOMAIN, httponly=True, path="/")
-        res.delete_cookie(key="refreshToken", domain=DOMAIN, httponly=True, path="/")
+        res.delete_cookie(key="access_token", domain=DOMAIN, httponly=True, path="/")
+        res.delete_cookie(key="refresh_token", domain=DOMAIN, httponly=True, path="/")
 
         access_token = await set_token_cookies(res, account_id)
         account = await account_service.get_account_by_id(account_id)
@@ -91,11 +91,11 @@ async def refresh(res: Response, token: str) -> dict:
     except ExpiredSignatureError or JWTError:
         pass
     print("refresh", access_token)
-    return account.update({"accessToken": access_token})
+    return account.update({"access_token": access_token})
 
 
 def create_access_token(account_id: int, expire_delta: timedelta = None) -> str:
-    payload = {"accountId": account_id}
+    payload = {"account_id": account_id}
     if expire_delta:
         expire = datetime.now(timezone.utc) + expire_delta
     else:
@@ -112,7 +112,7 @@ def create_access_token(account_id: int, expire_delta: timedelta = None) -> str:
     }
     # print("encoded access token:", token, payload, expire)
 
-    return {"accessToken": token, "options": cookie_options}
+    return {"access_token": token, "options": cookie_options}
 
 
 def create_refresh_token(account_id: int, expire_delta: timedelta = None) -> str:
@@ -149,8 +149,8 @@ async def set_token_cookies(res: Response, account_id: int) -> str:
         refresh_token_info = create_refresh_token(account_id)
 
         res.set_cookie(
-            key="accessToken",
-            value=access_token_info["accessToken"],
+            key="access_token",
+            value=access_token_info["access_token"],
             httponly=access_token_info["options"]["httponly"],
             secure=access_token_info["options"]["secure"],
             expires=access_token_info["options"]["expires"],
@@ -169,7 +169,7 @@ async def set_token_cookies(res: Response, account_id: int) -> str:
             detail="Error generating tokens",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-    return access_token_info["accessToken"]
+    return access_token_info["access_token"]
 
 
 def decode_token(token: str) -> Optional[dict]:

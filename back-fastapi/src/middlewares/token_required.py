@@ -20,7 +20,7 @@ def token_required(redirect_url: str = None):
                     cookie.split("=")[0]: cookie.split("=")[1]
                     for cookie in cookie_header.split("; ")
                 }
-                token = cookies.get("accessToken")
+                token = cookies.get("access_token")
             print("token_required() token:", token)
 
             if token is None:

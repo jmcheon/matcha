@@ -18,7 +18,7 @@ class AccountDTO:
     github_id: Optional[str] = None
     last_modified_at: Optional[datetime] = None
     deleted_at: Optional[datetime] = None
-    accessToken: Optional[str] = None
+    access_token: Optional[str] = None
     refreshToken: Optional[str] = None
     google_access_token: Optional[str] = None
     google_refresh_token: Optional[str] = None
@@ -65,7 +65,7 @@ class AccountDTO:
                 "created_at": "created_at",
                 "last_modified_at": "last_modified_at",
                 "deleted_at": "deleted_at",
-                "access_token": "accessToken",
+                "access_token": "access_token",
             }
 
             return {mapping.get(k, k): v for k, v in db_record.items()}
@@ -98,7 +98,7 @@ class RegisterAccountDTO:
     password: Optional[str] = None
     status: Optional[AccountStatus] = None
     accountId: Optional[int] = None
-    accessToken: Optional[str] = None
+    access_token: Optional[str] = None
 
 
 @dataclass

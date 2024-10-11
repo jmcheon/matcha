@@ -65,7 +65,7 @@ export const useAuth = () => {
         method: 'POST',
         headers: {
           ...cookie,
-          Authorization: `Bearer ${accountData.value.accessToken}`,
+          Authorization: `Bearer ${accountData.value.access_token}`,
         },
       });
       console.log('doRefreshTokenServer data:', data);
@@ -106,7 +106,7 @@ export const useAuth = () => {
     });
     try {
       const profileResponse = await axios.get('/profile', {
-        headers: { Authorization: `Bearer ${data.accessToken}` },
+        headers: { Authorization: `Bearer ${data.access_token}` },
       });
 
       console.log(profileResponse);

@@ -37,7 +37,7 @@ async def register(
         created_account = await account_service.create_account(data)
         access_token = await auth_service.set_token_cookies(res, created_account.accountId)
         await email_service.send_verification_email(created_account, lang, access_token)
-        created_account.accessToken = access_token
+        created_account.access_token = access_token
         return created_account
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"code": e.detail})
@@ -88,9 +88,9 @@ async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
 
 
 @router.delete("/logout", status_code=status.HTTP_200_OK, response_model=None)
-async def logout(res: Response, accessToken: str = Cookie(None)):
-    print("logout():", accessToken)
-    return await auth_service.logout(res, accessToken)
+async def logout(res: Response, access_token: str = Cookie(None)):
+    print("logout():", access_token)
+    return await auth_service.logout(res, access_token)
 
 
 @router.post("/refresh", status_code=status.HTTP_200_OK, response_model=None)
@@ -110,7 +110,7 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
     account_id = account.accountId
     token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
-    await email_service.send_password_reset_email({"email": email}, lang, token_info["accessToken"])
+    await email_service.send_password_reset_email({"email": email}, lang, token_info["access_token"])
 
 
 @router.get("/reset-password", status_code=status.HTTP_200_OK, response_model=None)

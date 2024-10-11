@@ -6,8 +6,8 @@ export const useAxios = () => {
   const api = axios.create({
     baseURL,
     headers: {
-      Authorization: accountData.value.accessToken
-        ? `Bearer ${accountData.value.accessToken}`
+      Authorization: accountData.value.access_token
+        ? `Bearer ${accountData.value.access_token}`
         : undefined,
     },
     withCredentials: true,

@@ -18,7 +18,7 @@ class AccountDTO:
     github_id: Optional[str] = None
     last_modified_at: Optional[datetime] = None
     deleted_at: Optional[datetime] = None
-    accessToken: Optional[str] = None
+    access_token: Optional[str] = None
     refreshToken: Optional[str] = None
     google_access_token: Optional[str] = None
     google_refresh_token: Optional[str] = None

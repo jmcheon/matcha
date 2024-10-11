@@ -54,16 +54,3 @@ async def generate_profile(
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
         )
-
-
-# # TODO: data validation: account_id, new_password, confirm_password
-# @router.post("/update-password/", status_code=status.HTTP_200_OK, response_model=None)
-# @token_required()
-# async def update_account_password(req: Request, data: dict) -> Optional[dict]:
-#     print("update_account_password()", data)
-#     new_password, confirm_password, account_id = data.values()
-#     if new_password != confirm_password:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST, detail="Passwords do not match"
-#         )
-#     await account_service.update_account_password(account_id, new_password)

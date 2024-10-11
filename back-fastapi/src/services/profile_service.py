@@ -1,3 +1,5 @@
+from typing import Optional
+
 import src.repositories.account_repository as account_repository
 import src.repositories.profile_repository as profile_repository
 from constants import AccountStatus
@@ -12,7 +14,8 @@ async def generate_profile(account_id: int, data: GenerateProfileDTO) -> Profile
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
         )
-    existingProfile: ProfileDTO = await profile_repository.get_by_account_id(account_id)
+
+    existingProfile: Optional[ProfileDTO] = await profile_repository.get_by_account_id(account_id)
     if existingProfile:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="EMAIL_ALREADY_EXISTS")
 
@@ -20,6 +23,6 @@ async def generate_profile(account_id: int, data: GenerateProfileDTO) -> Profile
 
     await account_repository.update_status(account_id, AccountStatus.ONLINE.value)
 
-    profile = await profile_repository.get_profile(account_id)
+    profile: ProfileDTO = await profile_repository.get_profile(account_id)
 
     return profile.to_dict()

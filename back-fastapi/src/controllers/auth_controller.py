@@ -210,8 +210,9 @@ async def google_callback(code: str, lang: str = Query("en")):
         return RedirectResponse(f"{NGINX_HOST}/{lang}/error?message={user_info['error']}")
 
     google_id = user_info.get("id")
-    username = user_info.get("username")
+    username = user_info.get("userinfo")
     email = user_info.get("email")
+    print("profile:", google_id, user_info, email)
 
     account = await account_service.create_account_by_google(
         google_id, username, email, access_token, refresh_token

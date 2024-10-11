@@ -44,15 +44,14 @@ async def create(username: str, email: str, password: str, account_status: str) 
 
 
 async def create_google(
-    google_id: str, google_access_token: str, google_refresh_token: str, account_status: str
+    google_id: str, account_status: str, google_access_token: str, google_refresh_token: str
 ) -> int:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
-            print("creating account...", account_status)
+            print("creating google account...", account_status)
             await cursor.execute(
-                "INSERT INTO account (google_id, status, google_access_token, google_refresh_token)"
-                + " VALUES (%s, %s, %s, %s)",
-                (google_id, account_status, google_access_token, google_refresh_token),
+                "INSERT INTO account (google_id, status) VALUES (%s, %s, %s, %s)",
+                (google_id, account_status),
             )
             await connection.commit()
             print("account google created: ", google_id)

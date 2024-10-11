@@ -57,7 +57,7 @@ async def create_account_by_google(
         account_id (int): Created account id
     """
     print("create_account_by_google(): ", google_id, username, email, access_token, refresh_token)
-    await account_repository.check(username, email)
+    # await account_repository.check(username, email)
 
     return await account_repository.create_google(
         google_id, AccountStatus.INCOMPLETE_SOCIAL.value, access_token, refresh_token

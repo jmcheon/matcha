@@ -4,7 +4,8 @@ import type { AccountData } from '~/types';
 
 export const useAuth = () => {
   const axios = useAxios();
-  const BACK_HOST = useRuntimeConfig().public.NGINX_HOST;
+  // const BACK_HOST = useRuntimeConfig().public.NGINX_HOST;
+  const BACK_HOST = useRuntimeConfig().public.BACK_HOST;
   const { accountData, profileData } = storeToRefs(useUserStore());
   const refreshTokenIntervalId = ref();
   const tokenDurationMins = Number(

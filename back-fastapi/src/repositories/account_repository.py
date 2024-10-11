@@ -43,6 +43,28 @@ async def create(username: str, email: str, password: str, account_status: str) 
             )
 
 
+async def create_google(
+    google_id: str, google_access_token: str, google_refresh_token: str, account_status: str
+) -> int:
+    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
+        try:
+            print("creating account...", account_status)
+            await cursor.execute(
+                "INSERT INTO account (google_id, status, google_access_token, google_refresh_token)"
+                + " VALUES (%s, %s, %s, %s)",
+                (google_id, account_status, google_access_token, google_refresh_token),
+            )
+            await connection.commit()
+            print("account google created: ", google_id)
+            return cursor.lastrowid
+        except Exception as e:
+            print(e)
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=str(e),
+            )
+
+
 async def update_status(account_id: int, account_status: str) -> None:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:

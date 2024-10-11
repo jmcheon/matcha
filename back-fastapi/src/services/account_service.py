@@ -39,6 +39,31 @@ async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:
     return result
 
 
+async def create_account_by_google(
+    google_id: int, username: str, email: str, access_token: str, refresh_token: str
+) -> int:
+    """
+    Create a new account after checking for existing username and email.
+
+    Args:
+        username (str): The desired username for the new account.
+        email (str): The email address for the new account.
+        password (str): The password for the new account.
+
+    Raises:
+        HTTPException: If there are issues during account creation.
+
+    Returns:
+        account_id (int): Created account id
+    """
+    print("create_account_by_google(): ", google_id, username, email, access_token, refresh_token)
+    await account_repository.check(username, email)
+
+    return await account_repository.create_google(
+        google_id, AccountStatus.INCOMPLETE_SOCIAL.value, access_token, refresh_token
+    )
+
+
 async def update_account_status(account_id: int, account_status: str) -> None:
     """
     Update the status of an account.

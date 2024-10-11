@@ -9,8 +9,11 @@ aiomysql
 cryptography
 passlib
 
+# email verification
+aiosmtplib
+
 # token
 python-jose # python JWT
 
-# email verification
-aiosmtplib
+# oauth
+httpx

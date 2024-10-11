@@ -1,10 +1,11 @@
 from datetime import timedelta
 
+import httpx
 import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 import src.services.email_service as email_service
-from constants import NGINX_HOST
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request, Response, status
+from constants import GOOGLE_CALLBACK_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NGINX_HOST
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
 from src.models.dtos.account_dto import (
     CredentialAccountDTO,
@@ -156,3 +157,65 @@ async def reset_password(res: Response, req: Request, token: str, lang: str = Qu
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
         )
+
+
+# oauth2_scheme = OAuth2AuthorizationCodeBearer(
+#     authorizationUrl="https://accounts.google.com/o/oauth2/v2/auth",
+#     tokenUrl="https://oauth2.googleapis.com/token",
+# )
+
+
+@router.get("/google", status_code=status.HTTP_200_OK, response_model=None)
+async def google_login():
+    print("google()")
+
+    return RedirectResponse(
+        "https://accounts.google.com/o/oauth2/v2/auth?response_type=code&"
+        + f"client_id={GOOGLE_CLIENT_ID}&redirect_uri={GOOGLE_CALLBACK_URL}&"
+        + "scope=profile email&access_type=offline&prompt=consent"
+    )
+
+
+@router.get("/auth/google/callback", status_code=status.HTTP_200_OK, response_model=None)
+async def google_callback(code: str, lang: str = Query("en")):
+    print("google/callback()")
+    async with httpx.AsyncClient() as client:
+        token_response = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "code": code,
+                "client_id": GOOGLE_CLIENT_ID,
+                "client_secret": GOOGLE_CLIENT_SECRET,
+                "redirect_uri": GOOGLE_CALLBACK_URL,
+                "grant_type": "authorization_code",
+            },
+        )
+    token_response_data = token_response.json()
+
+    if "error" in token_response_data:
+        return RedirectResponse(f"{NGINX_HOST}/{lang}/error?message={token_response_data['error']}")
+
+    access_token = token_response_data.get("access_token")
+    refresh_token = token_response_data.get("refresh_token")
+
+    async with httpx.AsyncClient() as client:
+        user_response = await client.get(
+            "https://www.googleapis.com/oauth2/v1/userinfo",
+            headers={"Authorization": f"Bearer {access_token}"},
+        )
+
+    user_info = user_response.json()
+
+    if "error" in user_info:
+        return RedirectResponse(f"{NGINX_HOST}/{lang}/error?message={user_info['error']}")
+
+    google_id = user_info.get("id")
+    username = user_info.get("username")
+    email = user_info.get("email")
+
+    account = await account_service.create_account_by_google(
+        google_id, username, email, access_token, refresh_token
+    )
+
+    # if account:
+    return {"message": "Successfully logged in!", "account": account}

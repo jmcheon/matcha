@@ -3,9 +3,9 @@ from enum import Enum
 
 
 class AccountStatus(Enum):
+    PENDING_VERIFICATION = "pending_verification"
     INCOMPLETE_SOCIAL = "incomplete_social"
     INCOMPLETE_PROFILE = "incomplete_profile"
-    PENDING_VERIFICATION = "pending_verification"
     ONLINE = "online"
     OFFLINE = "offline"
 
@@ -31,6 +31,14 @@ JWT_SECRET = os.getenv("JWT_SECRET", "i_do_not_care_anymore")
 JWT_ACCESS_DURATION = int(os.getenv("JWT_ACCESS_DURATION"))
 JWT_REFRESH_DURATION = int(os.getenv("JWT_REFRESH_DURATION"))
 
-# google email
+# Google email
 GMAIL_ID = os.getenv("GMAIL_ID")
 GMAIL_PASSWORD = os.getenv("GMAIL_PASSWORD")
+
+# Google oauth
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+# GOOGLE_CALLBACK_URL = os.getenv("GOOGLE_CALLBACK_URL")
+# GOOGLE_CALLBACK_URL = NGINX_HOST + "/auth/google/callback"
+GOOGLE_CALLBACK_URL = "http://localhost:8080/auth/google/callback"

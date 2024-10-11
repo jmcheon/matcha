@@ -148,17 +148,17 @@ export async function updateAccountPasswordAndStatus(
   );
 }
 
-export const updateAccountStatus = async (accountId: number, status: string): Promise<void> => {
+export const updateAccountStatus = async (account_id: number, status: string): Promise<void> => {
   const connection = await pool.getConnection();
   try {
     const query = 'UPDATE account SET status = ? WHERE account_id = ?';
-    const [result]: any = await connection.query(query, [status, accountId]);
+    const [result]: any = await connection.query(query, [status, account_id]);
 
     if (result.affectedRows === 0) {
-      throw new Error(`Account with ID ${accountId} not found`);
+      throw new Error(`Account with ID ${account_id} not found`);
     }
 
-    console.log(`Account ${accountId} updated successfully to status ${status}`);
+    console.log(`Account ${account_id} updated successfully to status ${status}`);
   } finally {
     connection.release();
   }

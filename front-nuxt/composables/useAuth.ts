@@ -29,7 +29,7 @@ export const useAuth = () => {
       const { data } = await axios.post(`${endpoint}?lang=${lang}`, payload);
       // Set user data and trigger the refresh auth process
       console.log('doRegister data:', data);
-      accountData.value = { ...accountData.value, ...data };
+      accountData.value = data;
       console.log('doRegister acconutData:', accountData.value);
       startRefreshAuth();
 
@@ -57,7 +57,7 @@ export const useAuth = () => {
   };
 
   const doRefreshTokenServer = async () => {
-    if (accountData.value.accountId) return;
+    if (accountData.value.account_id) return;
 
     const cookie = useRequestHeaders(['cookie']);
     try {
@@ -65,7 +65,7 @@ export const useAuth = () => {
         method: 'POST',
         headers: {
           ...cookie,
-          Authorization: `Bearer ${accountData.value.accessToken}`,
+          Authorization: `Bearer ${accountData.value.access_token}`,
         },
       });
       console.log('doRefreshTokenServer data:', data);
@@ -105,8 +105,8 @@ export const useAuth = () => {
       password: info.password,
     });
     try {
-      const profileResponse = await axios.get('/api/profile/', {
-        headers: { Authorization: `Bearer ${data.accessToken}` },
+      const profileResponse = await axios.get('/profile', {
+        headers: { Authorization: `Bearer ${data.access_token}` },
       });
 
       console.log(profileResponse);
@@ -124,9 +124,9 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
-    console.log('doLogin data:', data);
-    accountData.value = { ...accountData.value, ...data };
-    console.log('doLogin acconutData:', accountData.value);
+    console.log('data check', data);
+    accountData.value = data;
+    console.log('account data check', accountData.value);
     startRefreshAuth();
   };
 

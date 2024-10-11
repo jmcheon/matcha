@@ -4,29 +4,10 @@ import src.repositories.account_repository as account_repository
 import src.services.auth_service as auth_service
 from constants import AccountStatus
 from fastapi import HTTPException, status
+from src.models.dto import AccountDTO, RegisterAccountDTO
 
 
-async def check_account(username: str, email: str) -> None:
-    """
-    Check if an account already exists for the given username or email.
-
-    Args:
-        username (str): The username to check.
-        email (str): The email to check.
-
-    Raises:
-        HTTPException: If the username or email already exists in the database
-                        with a 409 Conflict status code.
-    """
-    if not (username or email):
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="All fields are required",
-        )
-    await account_repository.check(username, email)
-
-
-async def create_account(username: str, email: str, password: str) -> int:
+async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:
     """
     Create a new account after checking for existing username and email.
 
@@ -41,20 +22,21 @@ async def create_account(username: str, email: str, password: str) -> int:
     Returns:
         account_id (int): Created account id
     """
-    print("create_account(): ", username, email, password)
-    await check_account(username, email)
-
-    if not password:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Password can not be empty",
-        )
-    hashed_password = auth_service.hash_password(password)
-    print("all passed", hashed_password)
-
-    return await account_repository.create(
-        username, email, hashed_password, AccountStatus.PENDING_VERIFICATION.value
+    print("create_account(): ", data.username, data.email, data.password)
+    await account_repository.check(data.username, data.email)
+    hashed_password = auth_service.hash_password(data.password)
+    account_id = await account_repository.create(
+        data.username, data.email, hashed_password, AccountStatus.PENDING_VERIFICATION.value
     )
+
+    result = RegisterAccountDTO(
+        account_id=account_id,
+        status=AccountStatus.PENDING_VERIFICATION.value,
+        username=data.username,
+        email=data.email,
+        password=None,  # Exclude the password in the response for security reasons
+    )
+    return result
 
 
 async def update_account_status(account_id: int, account_status: str) -> None:
@@ -132,23 +114,7 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
     return await account_repository.get_by_id(account_id)
 
 
-async def get_account_by_username(username: str) -> Optional[dict]:
-    """
-    Retrieve an account by its username.
-
-    Args:
-        username (str): The username of the account to retrieve.
-
-    Returns:
-        Optional[dict]: A dictionary containing the account details or None if account not found.
-
-    Raises:
-        HTTPException: Any bad requests.
-    """
-    return await account_repository.get_by_username(username)
-
-
-async def get_account_by_email(email: str) -> Optional[dict]:
+async def get_account_by_email(email: str) -> Optional[AccountDTO]:
     """
     Retrieve an account by its email.
 

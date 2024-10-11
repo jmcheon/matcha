@@ -3,6 +3,7 @@ from typing import Optional
 from aiomysql import DictCursor
 from fastapi import HTTPException, status
 from src.models.db import get_db_connection
+from src.models.dto import AccountDTO
 
 
 async def check(username: str, email: str) -> None:
@@ -12,14 +13,14 @@ async def check(username: str, email: str) -> None:
         if rows > 0:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Account already exists",
+                detail="USERNAME_ALREADY_EXISTS",
             )
         # check by email
         rows = await cursor.execute("SELECT username FROM account WHERE email = %s", (email,))
         if rows > 0:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail="Account already exists",
+                detail="EMAIL_ALREADY_EXISTS",
             )
 
 
@@ -93,14 +94,14 @@ async def update_password(account_id: int, hashed_password: str) -> None:
             )
 
 
-async def get_by_id(account_id: int) -> Optional[dict]:
+async def get_by_id(account_id: int) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
             account = await cursor.fetchone()
             # print("account: ", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)
@@ -110,14 +111,14 @@ async def get_by_id(account_id: int) -> Optional[dict]:
             )
 
 
-async def get_by_username(username: str) -> Optional[dict]:
+async def get_by_username(username: str) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute("SELECT * FROM account WHERE username = %s", (username,))
             account = await cursor.fetchone()
             # print("account: ", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)
@@ -127,15 +128,14 @@ async def get_by_username(username: str) -> Optional[dict]:
             )
 
 
-async def get_by_email(email: str) -> Optional[dict]:
+async def get_by_email(email: str) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             print("get_by_email():", email)
             await cursor.execute("SELECT * FROM account WHERE email = %s", (email,))
             account = await cursor.fetchone()
-            # print("account: ", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)
@@ -145,16 +145,18 @@ async def get_by_email(email: str) -> Optional[dict]:
             )
 
 
-async def authenticate(username: str, hashed_password: str) -> Optional[dict]:
+async def authenticate(username: str, hashed_password: str) -> Optional[AccountDTO]:
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
-                "SELECT account_id, username FROM account WHERE username = %s AND password = %s",
+                "SELECT account_id, username, status FROM account"
+                + " WHERE username = %s AND password = %s",
                 (username, hashed_password),
             )
             account = await cursor.fetchone()
+            print("account", account)
             if account:
-                return dict(account)
+                return AccountDTO.from_dict(dict(account))
             return None
         except Exception as e:
             print(e)

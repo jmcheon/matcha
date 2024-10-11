@@ -20,7 +20,7 @@ def token_required(redirect_url: str = None):
                     cookie.split("=")[0]: cookie.split("=")[1]
                     for cookie in cookie_header.split("; ")
                 }
-                token = cookies.get("accessToken")
+                token = cookies.get("access_token")
             print("token_required() token:", token)
 
             if token is None:
@@ -41,7 +41,7 @@ def token_required(redirect_url: str = None):
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
                     )
-            kwargs["data"]["account_id"] = payload["accountId"]
+            kwargs["data"]["account_id"] = payload["account_id"]
             return await func(req, *args, **kwargs)
 
         return wrapper

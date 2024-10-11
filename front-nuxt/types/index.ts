@@ -1,8 +1,8 @@
 export interface AccountData {
-  accountId?: number;
+  account_id?: number;
   email?: string;
   status?: string;
-  accessToken?: string;
+  access_token?: string;
   google_id?: string;
   intra42_id?: string;
   github_id?: string;

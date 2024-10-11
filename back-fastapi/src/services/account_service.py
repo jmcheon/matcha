@@ -30,7 +30,7 @@ async def create_account(data: RegisterAccountDTO) -> RegisterAccountDTO:
     )
 
     result = RegisterAccountDTO(
-        accountId=account_id,
+        account_id=account_id,
         status=AccountStatus.PENDING_VERIFICATION.value,
         username=data.username,
         email=data.email,

@@ -7,11 +7,11 @@ from constants import AccountStatus
 
 @dataclass
 class AccountDTO:
-    status: Optional[AccountStatus] = None
-    created_at: Optional[datetime] = None
-    accountId: Optional[int] = None
+    account_id: Optional[int] = None
     username: Optional[str] = None
     email: Optional[str] = None
+    status: Optional[AccountStatus] = None
+    created_at: Optional[datetime] = None
     password: Optional[str] = None
     google_id: Optional[str] = None
     intra42_id: Optional[str] = None
@@ -47,7 +47,7 @@ class AccountDTO:
     def from_dict(cls, data: Dict[str, Any]) -> "AccountDTO":
         def map_account_fields(db_record: Dict[str, Any]) -> Dict[str, Any]:
             mapping = {
-                "account_id": "accountId",
+                "account_id": "account_id",
                 "username": "username",
                 "email": "email",
                 "password": "password",
@@ -88,7 +88,7 @@ class AccountDTO:
 #     email: str
 #     status: Optional[AccountStatus]
 #     password: Optional[str]
-#     accountId: Optional[int]
+#     account_id: Optional[int]
 
 
 @dataclass
@@ -97,7 +97,7 @@ class RegisterAccountDTO:
     email: str
     password: Optional[str] = None
     status: Optional[AccountStatus] = None
-    accountId: Optional[int] = None
+    account_id: Optional[int] = None
     access_token: Optional[str] = None
 
 

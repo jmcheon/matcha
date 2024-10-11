@@ -45,9 +45,9 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_USER_CREDENTIALS"}
         )
-    account.access_token = await set_token_cookies(res, account.accountId)
+    account.access_token = await set_token_cookies(res, account.account_id)
     if account.status == AccountStatus.OFFLINE.value:
-        await account_service.update_account_status(account.accountId, AccountStatus.ONLINE.value)
+        await account_service.update_account_status(account.account_id, AccountStatus.ONLINE.value)
     return account.to_dict()
 
 
@@ -57,7 +57,7 @@ async def logout(res: Response, token: str):
 
     try:
         payload = jwt.decode(token, JWT_SECRET)
-        account_id = payload["accountId"]
+        account_id = payload["account_id"]
 
         await save_refresh_token(account_id, "")
         account_status = await account_service.get_account_status(account_id)
@@ -78,7 +78,7 @@ async def refresh(res: Response, token: str) -> dict:
 
     try:
         payload = jwt.decode(token, JWT_SECRET)
-        account_id = payload["accountId"]
+        account_id = payload["account_id"]
 
         res.delete_cookie(key="access_token", domain=DOMAIN, httponly=True, path="/")
         res.delete_cookie(key="refresh_token", domain=DOMAIN, httponly=True, path="/")
@@ -116,7 +116,7 @@ def create_access_token(account_id: int, expire_delta: timedelta = None) -> str:
 
 
 def create_refresh_token(account_id: int, expire_delta: timedelta = None) -> str:
-    payload = {"accountId": account_id}
+    payload = {"account_id": account_id}
     if expire_delta:
         expire = datetime.now(timezone.utc) + expire_delta
     else:

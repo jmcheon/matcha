@@ -35,7 +35,7 @@ async def register(
     """
     try:
         created_account = await account_service.create_account(data)
-        access_token = await auth_service.set_token_cookies(res, created_account.accountId)
+        access_token = await auth_service.set_token_cookies(res, created_account.account_id)
         await email_service.send_verification_email(created_account, lang, access_token)
         created_account.access_token = access_token
         return created_account
@@ -60,7 +60,7 @@ async def request_email(res: Response, data: dict, lang: str = Query("en")):
     )
 
     return {
-        "accountId": account_id,
+        "account_id": account_id,
         "username": username,
         "email": email,
         "accessToken": access_token,
@@ -108,7 +108,7 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
     account = await account_service.get_account_by_email(email)
     if not account:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
-    account_id = account.accountId
+    account_id = account.account_id
     token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
     await email_service.send_password_reset_email({"email": email}, lang, token_info["access_token"])
 
@@ -130,7 +130,7 @@ async def reset_password(res: Response, token: str, lang: str = Query("en")) -> 
         # example
         redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-password"
         return RedirectResponse(url=redirect_url, headers=res.headers)
-    account_id = payload["accountId"]
+    account_id = payload["account_id"]
     await auth_service.set_token_cookies(res, account_id)
     redirect_url = f"{NGINX_HOST}/{lang}/auth/reset-password"
     return RedirectResponse(url=redirect_url, headers=res.headers)

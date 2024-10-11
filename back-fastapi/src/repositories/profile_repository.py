@@ -12,10 +12,10 @@ async def get_by_account_id(account_id: int) -> Optional[ProfileDTO]:
         try:
             await cursor.execute("SELECT * FROM profile WHERE account_id = %s", (account_id,))
             profile = await cursor.fetchone()
-            print("profile: ", profile)
+            if profile:
+                return ProfileDTO.from_dict(dict(profile))
             return None
         except Exception as e:
-            print(e)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e),
@@ -62,7 +62,7 @@ async def get_profile(account_id: int) -> Optional[ProfileDTO]:
         try:
             select_query = """
             SELECT profile_id, account_id, first_name, last_name, image_paths, location, gender,
-            like_gender, height, interests, bio, fame_score
+            like_gender, height, interests, bio, fame_score, user_language
             FROM profile
             WHERE account_id = %s
             """

@@ -33,6 +33,7 @@ export const useProfile = () => {
   };
 
   const generateProfile = async (profileInfo: ProfileData) => {
+    console.log("profile", profileInfo)
     const result = await axios.post('/profile', profileInfo);
     return result.data;
   };

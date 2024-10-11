@@ -143,7 +143,7 @@ async def get_account_status(account_id: int) -> str:
     Raises:
         HTTPException: Any bad requests.
     """
-    account = await account_repository.get_by_id(account_id)
+    account: AccountDTO = await account_repository.get_by_id(account_id)
     if account is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
-    return account["status"]
+    return account.status

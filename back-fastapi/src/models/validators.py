@@ -95,9 +95,9 @@ def validate_account_register(data: RegisterAccountDTO) -> RegisterAccountDTO:
     validate_password(data.password)
     return data
 
+
 def validate_profile_generate(data: GenerateProfileDTO):
     validate_string_field(data.first_name, "first_name", DEFAULT_MIN, DEFAULT_MAX)
     validate_string_field(data.last_name, "last_name", DEFAULT_MIN, DEFAULT_MAX)
     validate_string_field(data.bio, "bio", 12, 140)
     return data
-

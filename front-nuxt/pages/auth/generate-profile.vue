@@ -99,6 +99,7 @@
   const iLike = ref('');
   const bio = ref('');
   const interests = ref('');
+  const { locale } = useI18n();
   const { t } = useI18n();
   const { generateProfile } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
@@ -132,6 +133,7 @@
       height: height.value,
       like_gender: iLike.value,
       bio: bio.value,
+      user_language: locale.value,
       interests: interests.value.split(',').map((tag) => tag.trim()),
     };
 

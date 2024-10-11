@@ -17,6 +17,7 @@ class ProfileDTO:
     interests: Optional[List[str]] = None
     image_paths: Optional[List[str]] = None
     bio: Optional[str] = None
+    user_language: Optional[str] = None
     fame_score: Optional[int] = None
 
     def __post_init__(self):
@@ -48,6 +49,7 @@ class ProfileDTO:
                 "like_gender": "like_gender",
                 "interests": "interests",
                 "image_paths": "image_paths",
+                "user_language": "user_language",
                 "bio": "bio",
                 "fame_score": "fame_score",
             }

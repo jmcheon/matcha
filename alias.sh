@@ -29,6 +29,7 @@ alias back-dev-seed-run='docker compose -f docker-compose.yml -f docker-compose.
 
 
 ## docker related commands
+alias docker-rm-db-goinfre="docker run --rm -v ./db-mysql/dev:/mnt -u 0 alpine sh -c \"rm -rf /mnt/*\""
 alias docker-rm-all-images='docker rmi $(docker images -a -q)'
 alias docker-rm-all-containers='docker rm $(docker ps -a -q)'
 alias docker-rm-all-volumes='docker volume rm $(docker volume ls -q --filter dangling=true)'

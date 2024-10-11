@@ -19,7 +19,7 @@ class AccountDTO:
     last_modified_at: Optional[datetime] = None
     deleted_at: Optional[datetime] = None
     access_token: Optional[str] = None
-    refreshToken: Optional[str] = None
+    refresh_token: Optional[str] = None
     google_access_token: Optional[str] = None
     google_refresh_token: Optional[str] = None
     github_access_token: Optional[str] = None
@@ -54,7 +54,7 @@ class AccountDTO:
                 "google_id": "google_id",
                 "intra42_id": "intra42_id",
                 "github_id": "github_id",
-                "refresh_token": "refreshToken",
+                "refresh_token": "refresh_token",
                 "google_access_token": "google_access_token",
                 "google_refresh_token": "google_refresh_token",
                 "github_access_token": "github_access_token",

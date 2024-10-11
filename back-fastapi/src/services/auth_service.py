@@ -132,7 +132,7 @@ def create_refresh_token(account_id: int, expire_delta: timedelta = None) -> str
         "expires": expire,
     }
 
-    return {"refreshToken": token, "options": cookie_options}
+    return {"refresh_token": token, "options": cookie_options}
 
 
 async def save_refresh_token(account_id: int, refresh_token: str) -> None:
@@ -156,14 +156,14 @@ async def set_token_cookies(res: Response, account_id: int) -> str:
             expires=access_token_info["options"]["expires"],
         )
         res.set_cookie(
-            key="refreshToken",
-            value=refresh_token_info["refreshToken"],
+            key="refresh_token",
+            value=refresh_token_info["refresh_token"],
             httponly=refresh_token_info["options"]["httponly"],
             secure=refresh_token_info["options"]["secure"],
             expires=refresh_token_info["options"]["expires"],
         )
 
-        await save_refresh_token(account_id, refresh_token_info["refreshToken"])
+        await save_refresh_token(account_id, refresh_token_info["refresh_token"])
     except Exception:
         raise HTTPException(
             detail="Error generating tokens",

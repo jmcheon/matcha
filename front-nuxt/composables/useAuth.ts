@@ -57,7 +57,7 @@ export const useAuth = () => {
   };
 
   const doRefreshTokenServer = async () => {
-    if (accountData.value.accountId) return;
+    if (accountData.value.account_id) return;
 
     const cookie = useRequestHeaders(['cookie']);
     try {

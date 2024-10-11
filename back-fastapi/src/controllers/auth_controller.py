@@ -94,9 +94,9 @@ async def logout(res: Response, access_token: str = Cookie(None)):
 
 
 @router.post("/refresh", status_code=status.HTTP_200_OK, response_model=None)
-async def refresh(res: Response, refreshToken: str = Cookie(None)):
-    print("refresh():", refreshToken)
-    return await auth_service.refresh(res, refreshToken)
+async def refresh(res: Response, refresh_token: str = Cookie(None)):
+    print("refresh():", refresh_token)
+    return await auth_service.refresh(res, refresh_token)
 
 
 # TODO: data validation: email

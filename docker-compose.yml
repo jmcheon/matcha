@@ -45,7 +45,8 @@ services:
     ports:
       - "${DB_PORT}:3306" # 접근 포트 설정 (컨테이너 외부:컨테이너 내부)
     container_name: "db-mysql"
-    image: mysql:latest
+    # image: mysql:latest
+    image: mysql:8.0-bullseye
     volumes:
       - ./db-mysql/scripts:/docker-entrypoint-initdb.d
     environment:

@@ -23,3 +23,4 @@ $MYPATH/bin/conda init zsh
 $MYPATH/bin/conda config --set auto_activate_base false
 source ~/.zshrc
 
+conda create -n matcha-fastapi python=3.10

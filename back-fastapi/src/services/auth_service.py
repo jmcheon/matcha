@@ -43,7 +43,7 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     account: AccountDTO = await account_repository.authenticate(data.username, hashed_password)
     if not account:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_USER_CREDENTIALS"}
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="INVALID_USER_CREDENTIALS"
         )
     account.access_token = await set_token_cookies(res, account.account_id)
     if account.status == AccountStatus.OFFLINE.value:

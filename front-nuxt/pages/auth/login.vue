@@ -110,17 +110,17 @@
   const dirty = ref(false);
   const errorGlobal = ref('');
 
-  // const { usernameValidator, passwordValidator } = useValidator();
-  // const { error: errorUsername } = usernameValidator(dirty, username, t);
-  // const { error: errorPassword } = passwordValidator(dirty, password, t);
+  const { usernameValidator, passwordValidator } = useValidator();
+  const { error: errorUsername } = usernameValidator(dirty, username, t);
+  const { error: errorPassword } = passwordValidator(dirty, password, t);
 
   // Handle traditional login form submission
   const handleLogin = async () => {
     dirty.value = true;
 
-    // if (errorUsername.value || errorPassword.value) {
-    //   return;
-    // }
+    if (errorUsername.value || errorPassword.value) {
+      return;
+    }
     if (!username.value || !password.value) return;
     // Add your login logic here
     try {

@@ -90,6 +90,13 @@ class AccountDTO:
 #     password: Optional[str]
 #     account_id: Optional[int]
 
+@dataclass
+class GeneralAccountDTO:
+    username: str
+    email: str
+    status: Optional[AccountStatus] = None
+    account_id: Optional[int] = None
+    access_token: Optional[str] = None
 
 @dataclass
 class RegisterAccountDTO:

@@ -6,8 +6,8 @@ import src.services.email_service as email_service
 from constants import NGINX_HOST
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from src.models.dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
-from src.models.validators import validate_account_register
+from src.models.dto import AccountDTO, CredentialAccountDTO, GeneralAccountDTO, RegisterAccountDTO
+from src.models.validators import validate_account, validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
 router = APIRouter(
@@ -22,7 +22,7 @@ async def register(
     res: Response,
     data: RegisterAccountDTO = Depends(validate_account_register),
     lang: str = Query("en"),
-):
+) -> RegisterAccountDTO:
     """
     Register a new user account.
 
@@ -34,11 +34,7 @@ async def register(
         HTTPException: If the account already exists or if there are issues during registration.
     """
     try:
-        created_account = await account_service.create_account(data)
-        access_token = await auth_service.set_token_cookies(res, created_account.account_id)
-        await email_service.send_verification_email(created_account, lang, access_token)
-        created_account.access_token = access_token
-        return created_account
+        return await account_service.create_account(data)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
@@ -47,24 +43,24 @@ async def register(
         )
 
 
-# TODO: data validation: account_id, username, email
 @router.post("/request-email", status_code=status.HTTP_200_OK, response_model=None)
-async def request_email(res: Response, data: dict, lang: str = Query("en")):
-    print(data)
-    account_id, username, email = data.values()
-    access_token = await auth_service.set_token_cookies(res, account_id)
-    print("access token:", access_token)
-
-    await email_service.send_verification_email(
-        {"account_id": account_id, "username": username, "email": email}, lang, access_token
-    )
-
-    return {
-        "account_id": account_id,
-        "username": username,
-        "email": email,
-        "accessToken": access_token,
-    }
+async def request_email(
+    res: Response,
+    data: GeneralAccountDTO = Depends(validate_account),
+    lang: str = Query("en"),
+) -> GeneralAccountDTO:
+    try:
+        print(data)
+        access_token = await auth_service.set_token_cookies(res, data.account_id)
+        await email_service.send_verification_email(data, lang, access_token)
+        data.access_token = access_token
+        return data
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        )
 
 
 @router.get("/verify-email", status_code=status.HTTP_200_OK, response_model=None)
@@ -79,7 +75,7 @@ async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     try:
         return await auth_service.authenticate(res, data)
     except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content={"code":e.detail})
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception as e:
         print("e2", e)
         return JSONResponse(
@@ -93,9 +89,7 @@ async def logout(res: Response, accessToken: str = Cookie(None)):
         print("logout():", accessToken)
         return await auth_service.logout(res, accessToken)
     except HTTPException as e:
-        return JSONResponse(
-            status_code=e.status_code, content={"code": e.detail}
-        )
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
@@ -122,9 +116,7 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
             {"email": email}, lang, token_info["accessToken"]
         )
     except HTTPException as e:
-        return JSONResponse(
-            status_code=e.status_code, content={"code": e.detail}
-        )
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}

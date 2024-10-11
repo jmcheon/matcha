@@ -6,12 +6,12 @@ from aiosmtplib import SMTP
 from constants import BACK_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
 from fastapi import HTTPException, Response, status
 from fastapi.responses import RedirectResponse
-from src.models.dto import RegisterAccountDTO
+from src.models.dto import GeneralAccountDTO
 
 
 # TODO: data validation
 # TODO: exception handling
-async def send_verification_email(data: RegisterAccountDTO, lang: str, token: str) -> None:
+async def send_verification_email(data: GeneralAccountDTO, lang: str, token: str) -> None:
     print("send_verification_email():", data, lang)
 
     subject_template = {

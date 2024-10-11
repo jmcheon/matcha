@@ -32,7 +32,7 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     account: AccountDTO = await account_repository.get_by_username(data.username)
     if not account:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail={"code": "INVALID_LOGIN"}
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_LOGIN"
         )
     hashed_password = account.password
     verified = verify_password(data.password, hashed_password)

@@ -154,3 +154,6 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# miniconda setup script
+Miniconda3-latest-Linux-x86_64.sh

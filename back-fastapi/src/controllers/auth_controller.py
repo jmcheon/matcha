@@ -40,7 +40,7 @@ async def register(
         created_account.accessToken = access_token
         return created_account
     except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content=e.detail)
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}

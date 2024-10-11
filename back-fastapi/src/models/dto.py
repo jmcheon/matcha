@@ -19,7 +19,7 @@ class AccountDTO:
     last_modified_at: Optional[datetime] = None
     deleted_at: Optional[datetime] = None
     access_token: Optional[str] = None
-    refreshToken: Optional[str] = None
+    refresh_token: Optional[str] = None
     google_access_token: Optional[str] = None
     google_refresh_token: Optional[str] = None
     github_access_token: Optional[str] = None

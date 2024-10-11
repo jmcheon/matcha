@@ -79,7 +79,7 @@ async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     try:
         return await auth_service.authenticate(res, data)
     except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content=e.detail)
+        return JSONResponse(status_code=e.status_code, content={"code":e.detail})
     except Exception as e:
         print("e2", e)
         return JSONResponse(

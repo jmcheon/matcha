@@ -13,14 +13,14 @@ async def check(username: str, email: str) -> None:
         if rows > 0:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail={"code": "USERNAME_ALREADY_EXISTS"},
+                detail="USERNAME_ALREADY_EXISTS",
             )
         # check by email
         rows = await cursor.execute("SELECT username FROM account WHERE email = %s", (email,))
         if rows > 0:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail={"code": "EMAIL_ALREADY_EXISTS"},
+                detail="EMAIL_ALREADY_EXISTS",
             )
 
 

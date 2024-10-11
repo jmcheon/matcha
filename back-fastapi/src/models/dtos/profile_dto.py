@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Optional
 
 @dataclass
 class ProfileDTO:
-    accountId: Optional[int] = None
-    profileId: Optional[int] = None
+    account_id: Optional[int] = None
+    profile_id: Optional[int] = None
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     location: Optional[str] = None
@@ -39,8 +39,8 @@ class ProfileDTO:
     def from_dict(cls, data: Dict[str, Any]) -> "ProfileDTO":
         def map_account_fields(db_record: Dict[str, Any]) -> Dict[str, Any]:
             mapping = {
-                "profile_id": "profileId",
-                "account_id": "accountId",
+                "profile_id": "profile_id",
+                "account_id": "account_id",
                 "first_name": "first_name",
                 "last_name": "last_name",
                 "location": "location",

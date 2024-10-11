@@ -4,6 +4,7 @@ from constants import DEFAULT_MAX, DEFAULT_MIN
 from fastapi import HTTPException
 
 from src.models.dtos.account_dto import RegisterAccountDTO
+from src.models.dtos.profile_dto import GenerateProfileDTO
 
 
 def validate_string_field(value: str, field_name: str, min_length: int, max_length: int) -> None:
@@ -93,3 +94,10 @@ def validate_account_register(data: RegisterAccountDTO) -> RegisterAccountDTO:
     validate_string_field(data.username, "username", DEFAULT_MIN, DEFAULT_MAX)
     validate_password(data.password)
     return data
+
+def validate_profile_generate(data: GenerateProfileDTO):
+    validate_string_field(data.first_name, "first_name", DEFAULT_MIN, DEFAULT_MAX)
+    validate_string_field(data.last_name, "last_name", DEFAULT_MIN, DEFAULT_MAX)
+    validate_string_field(data.bio, "bio", 12, 140)
+    return data
+

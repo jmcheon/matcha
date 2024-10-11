@@ -12,5 +12,6 @@ export const useAxios = () => {
     },
     withCredentials: true,
   });
+  console.log('useAuth:', api);
   return api;
 };

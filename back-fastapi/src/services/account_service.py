@@ -111,7 +111,12 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
     Raises:
         HTTPException: Any bad requests.
     """
-    return await account_repository.get_by_id(account_id)
+    account = await account_repository.get_by_id(account_id)
+    if account is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
+        )
+    return account
 
 
 async def get_account_by_email(email: str) -> Optional[AccountDTO]:
@@ -122,12 +127,17 @@ async def get_account_by_email(email: str) -> Optional[AccountDTO]:
         email (str): The email of the account to retrieve.
 
     Returns:
-        Optional[dict]: A dictionary containing the account details or None if account not found.
+        dict: A dictionary containing the account details.
 
     Raises:
         HTTPException: Any bad requests.
     """
-    return await account_repository.get_by_email(email)
+    account = await account_repository.get_by_email(email)
+    if account is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
+        )
+    return account
 
 
 async def get_account_status(account_id: int) -> str:
@@ -145,5 +155,7 @@ async def get_account_status(account_id: int) -> str:
     """
     account = await account_repository.get_by_id(account_id)
     if account is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
+        )
     return account["status"]

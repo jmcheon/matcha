@@ -58,8 +58,7 @@ async def verify_email(res: Response, token: str, lang: str):
         return RedirectResponse(url=redirect_url, headers=res.headers)
     account_id = payload["account_id"]
 
-    account = await account_service.get_account_by_id(account_id)
-    # print("service verify_email() account:", account)
+    await account_service.get_account_by_id(account_id)
 
     await account_service.update_account_status(account_id, AccountStatus.INCOMPLETE_PROFILE.value)
     await auth_service.set_token_cookies(res, account_id)

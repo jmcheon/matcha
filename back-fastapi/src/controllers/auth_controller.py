@@ -88,9 +88,18 @@ async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
 
 
 @router.delete("/logout", status_code=status.HTTP_200_OK, response_model=None)
-async def logout(res: Response, access_token: str = Cookie(None)):
-    print("logout():", access_token)
-    return await auth_service.logout(res, access_token)
+async def logout(res: Response, accessToken: str = Cookie(None)):
+    try:
+        print("logout():", accessToken)
+        return await auth_service.logout(res, accessToken)
+    except HTTPException as e:
+        return JSONResponse(
+            status_code=e.status_code, content={"code": e.detail}
+        )
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        )
 
 
 @router.post("/refresh", status_code=status.HTTP_200_OK, response_model=None)
@@ -102,15 +111,24 @@ async def refresh(res: Response, refresh_token: str = Cookie(None)):
 # TODO: data validation: email
 @router.post("/forgot-password", status_code=status.HTTP_200_OK, response_model=None)
 async def forgot_password(data: dict, lang: str = Query("en")) -> None:
-    (email,) = data.values()
-    print("forgot-password():", data, lang, email)
+    try:
+        (email,) = data.values()
+        print("forgot-password():", data, lang, email)
 
-    account = await account_service.get_account_by_email(email)
-    if not account:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
-    account_id = account.account_id
-    token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
-    await email_service.send_password_reset_email({"email": email}, lang, token_info["access_token"])
+        account = await account_service.get_account_by_email(email)
+        account_id = account["account_id"]
+        token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
+        await email_service.send_password_reset_email(
+            {"email": email}, lang, token_info["accessToken"]
+        )
+    except HTTPException as e:
+        return JSONResponse(
+            status_code=e.status_code, content={"code": e.detail}
+        )
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        )
 
 
 @router.get("/reset-password", status_code=status.HTTP_200_OK, response_model=None)

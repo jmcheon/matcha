@@ -37,8 +37,8 @@ async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     hashed_password = account.password
     verified = verify_password(data.password, hashed_password)
     if verified is False:
-        HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail={"code": "INVALID_USER_CREDENTIALS"}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="INVALID_USER_CREDENTIALS"
         )
     account: AccountDTO = await account_repository.authenticate(data.username, hashed_password)
     if not account:
@@ -85,8 +85,6 @@ async def refresh(res: Response, token: str) -> dict:
 
         access_token = await set_token_cookies(res, account_id)
         account = await account_service.get_account_by_id(account_id)
-        if not account:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
 
     except ExpiredSignatureError or JWTError:
         pass
@@ -142,7 +140,6 @@ async def save_refresh_token(account_id: int, refresh_token: str) -> None:
 
 async def set_token_cookies(res: Response, account_id: int) -> str:
     try:
-        # account check
         await account_service.get_account_by_id(account_id)
 
         access_token_info = create_access_token(account_id)

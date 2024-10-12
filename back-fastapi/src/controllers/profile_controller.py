@@ -21,12 +21,13 @@ async def get_profile(res: Response, access_token: str = Cookie(None)) -> Option
         )
     try:
         payload = auth_service.decode_token(access_token)
-        profile: ProfileDTO = await profile_repository.get_by_account_id(payload["account_id"])
+        profile: Optional[ProfileDTO] = await profile_repository.get_by_account_id(
+            payload["account_id"]
+        )
         if not profile:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="PROFILE_NOT_FOUND")
         return profile
     except HTTPException as e:
-        print("e is here", e)
         return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
         return JSONResponse(
@@ -50,6 +51,8 @@ async def generate_profile(
         payload = auth_service.decode_token(access_token)
         profile: ProfileDTO = await profile_service.generate_profile(payload["account_id"], data)
         return profile
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}

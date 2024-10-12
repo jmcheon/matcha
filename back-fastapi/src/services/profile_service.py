@@ -23,6 +23,6 @@ async def generate_profile(account_id: int, data: GenerateProfileDTO) -> Profile
 
     await account_repository.update_status(account_id, AccountStatus.ONLINE.value)
 
-    profile: ProfileDTO = await profile_repository.get_profile(account_id)
+    profile: ProfileDTO = await profile_repository.get_by_account_id(account_id)
 
     return profile.to_dict()

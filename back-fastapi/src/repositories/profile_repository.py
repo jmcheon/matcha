@@ -50,30 +50,6 @@ async def insert_profile(account_id: int, data: GenerateProfileDTO) -> None:
             )
             await connection.commit()
         except Exception as e:
-            print(e)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=str(e),
-            )
-
-
-async def get_profile(account_id: int) -> Optional[ProfileDTO]:
-    async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
-        try:
-            select_query = """
-            SELECT profile_id, account_id, first_name, last_name, image_paths, location, gender,
-            like_gender, height, interests, bio, fame_score, user_language
-            FROM profile
-            WHERE account_id = %s
-            """
-            # Fetch the profile for the given account_id
-            await cursor.execute(select_query, (account_id,))
-            profile = await cursor.fetchone()  # Fetch the inserted profile
-            print("selected query", profile)
-            return ProfileDTO.from_dict(dict(profile))
-
-        except Exception as e:
-            print(e)
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=str(e),

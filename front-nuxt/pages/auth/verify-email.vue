@@ -10,11 +10,7 @@
       <v-card-actions class="justify-center">
         <p class="text-center text-sm">
           {{ $t('AuthVerifyEmail.requestEmail') }}
-          <v-btn
-            text
-            class="text-blue-500"
-            @click="handleRequestEmail"
-          >
+          <v-btn text class="text-blue-500" @click="handleRequestEmail">
             Resend Email
           </v-btn>
         </p>
@@ -31,6 +27,7 @@
 
   const { doRequestEmail } = useAuth();
   const { locale } = useI18n();
+  const { t } = useI18n();
   const loading = ref(false);
   const dirty = ref(false);
   const errorGlobal = ref('');
@@ -54,5 +51,5 @@
     } finally {
       loading.value = false;
     }
-  }
+  };
 </script>

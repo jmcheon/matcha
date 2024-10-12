@@ -6,7 +6,7 @@ import src.services.email_service as email_service
 from constants import NGINX_HOST
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from src.models.dto import AccountDTO, CredentialAccountDTO, GeneralAccountDTO, RegisterAccountDTO
+from src.models.dto import CredentialAccountDTO, GeneralAccountDTO, RegisterAccountDTO
 from src.models.validators import validate_account, validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
@@ -50,7 +50,7 @@ async def request_email(
     lang: str = Query("en"),
 ) -> GeneralAccountDTO:
     try:
-        print(data)
+        print("request-email()", data)
         access_token = await auth_service.set_token_cookies(res, data.account_id)
         await email_service.send_verification_email(data, lang, access_token)
         data.access_token = access_token
@@ -65,13 +65,19 @@ async def request_email(
 
 @router.get("/verify-email", status_code=status.HTTP_200_OK, response_model=None)
 async def verify_email(res: Response, token: str, lang: str = Query("en")):
-    print(token, lang)
-    return await email_service.verify_email(res, token, lang)
+    try:
+        print(token, lang)
+        return await email_service.verify_email(res, token, lang)
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        )
 
 
-# TODO: data validation: username, password
 @router.post("/login", status_code=status.HTTP_200_OK, response_model=None)
-async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
+async def login(res: Response, data: CredentialAccountDTO) -> GeneralAccountDTO:
     try:
         return await auth_service.authenticate(res, data)
     except HTTPException as e:
@@ -128,16 +134,11 @@ async def reset_password(res: Response, token: str, lang: str = Query("en")) -> 
     print("reset-password():", token, lang)
 
     if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token is required",
-        )
+        redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-passord"
+        return RedirectResponse(url=redirect_url, headers=res.headers)
     payload = auth_service.decode_token(token)
     # TODO: token 만료 시 redirection
     if payload is None:
-        # temp exception
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
-        # example
         redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-password"
         return RedirectResponse(url=redirect_url, headers=res.headers)
     account_id = payload["account_id"]

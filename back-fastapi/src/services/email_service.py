@@ -4,7 +4,7 @@ import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 from aiosmtplib import SMTP
 from constants import BACK_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
-from fastapi import HTTPException, Response, status
+from fastapi import Response
 from fastapi.responses import RedirectResponse
 from src.models.dto import GeneralAccountDTO
 
@@ -42,19 +42,13 @@ async def send_verification_email(data: GeneralAccountDTO, lang: str, token: str
 
 async def verify_email(res: Response, token: str, lang: str):
     if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Token is required",
-        )
-    # TODO: access token 만료시 에러처리
+        redirect_url = f"{NGINX_HOST}/{lang}/auth/verify-email"
+        return RedirectResponse(url=redirect_url, headers=res.headers)
     payload = auth_service.decode_token(token)
     print("service verify_email() payload:", payload)
     # access token 만료시
     if payload is None:
-        # temp exception
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
-        # example
-        redirect_url = f"{NGINX_HOST}/{lang}/auth/request-email"
+        redirect_url = f"{NGINX_HOST}/{lang}/auth/verify-email"
         return RedirectResponse(url=redirect_url, headers=res.headers)
     account_id = payload["account_id"]
 

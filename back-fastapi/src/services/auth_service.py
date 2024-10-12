@@ -14,7 +14,7 @@ from constants import (
 from fastapi import HTTPException, Response, status
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
-from src.models.dto import AccountDTO, CredentialAccountDTO
+from src.models.dto import AccountDTO, CredentialAccountDTO, GeneralAccountDTO
 
 # Password hasing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -28,12 +28,10 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-async def authenticate(res: Response, data: CredentialAccountDTO) -> AccountDTO:
+async def authenticate(res: Response, data: CredentialAccountDTO) -> GeneralAccountDTO:
     account: AccountDTO = await account_repository.get_by_username(data.username)
     if not account:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_LOGIN"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_LOGIN")
     hashed_password = account.password
     verified = verify_password(data.password, hashed_password)
     if verified is False:

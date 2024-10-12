@@ -6,7 +6,7 @@ import src.services.email_service as email_service
 from constants import NGINX_HOST
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from src.models.dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
+from src.models.dtos.account_dto import AccountDTO, CredentialAccountDTO, RegisterAccountDTO
 from src.models.validators import validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
@@ -79,9 +79,8 @@ async def login(res: Response, data: CredentialAccountDTO) -> AccountDTO:
     try:
         return await auth_service.authenticate(res, data)
     except HTTPException as e:
-        return JSONResponse(status_code=e.status_code, content={"code":e.detail})
-    except Exception as e:
-        print("e2", e)
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
+    except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
         )
@@ -110,7 +109,9 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
     account_id = account.account_id
     token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
-    await email_service.send_password_reset_email({"email": email}, lang, token_info["access_token"])
+    await email_service.send_password_reset_email(
+        {"email": email}, lang, token_info["access_token"]
+    )
 
 
 @router.get("/reset-password", status_code=status.HTTP_200_OK, response_model=None)

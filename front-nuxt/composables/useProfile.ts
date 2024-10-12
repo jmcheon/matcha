@@ -32,14 +32,15 @@ export const useProfile = () => {
     await axios.post('/api/update-password/', userInfo);
   };
 
-  const generateProfile = async (userInfo: ProfileData) => {
-    const result = await axios.post('/api/profile', userInfo);
+  const generateProfile = async (profileInfo: ProfileData) => {
+    console.log("profile", profileInfo)
+    const result = await axios.post('/profile', profileInfo);
     return result.data;
   };
 
   const getSocialProfileImage = async (socialLoginType: string) => {
     console.log('socialLoginType', socialLoginType);
-    const result = await axios.get('/api/profile/social-image', {
+    const result = await axios.get('/profile/social-image', {
       params: {
         type: socialLoginType,
       },
@@ -52,6 +53,6 @@ export const useProfile = () => {
     getSocialProfileImage,
     updateProfileImage,
     updateProfile,
-    updateAccountPassword
+    updateAccountPassword,
   };
 };

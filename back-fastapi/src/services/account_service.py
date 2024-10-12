@@ -158,4 +158,4 @@ async def get_account_status(account_id: int) -> str:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
         )
-    return account["status"]
+    return account.status

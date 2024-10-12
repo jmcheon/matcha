@@ -4,8 +4,9 @@ import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 import src.services.email_service as email_service
 from constants import NGINX_HOST
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
+from src.middlewares.token_required import token_required
 from src.models.dto import CredentialAccountDTO, GeneralAccountDTO, RegisterAccountDTO
 from src.models.validators import validate_account, validate_account_register
 
@@ -90,10 +91,10 @@ async def login(res: Response, data: CredentialAccountDTO) -> GeneralAccountDTO:
 
 
 @router.delete("/logout", status_code=status.HTTP_200_OK, response_model=None)
-async def logout(res: Response, accessToken: str = Cookie(None)):
+async def logout(res: Response, access_token: str = Cookie(None)):
     try:
-        print("logout():", accessToken)
-        return await auth_service.logout(res, accessToken)
+        print("logout():", access_token)
+        return await auth_service.logout(res, access_token)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"code": e.detail})
     except Exception:
@@ -116,10 +117,10 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
         print("forgot-password():", data, lang, email)
 
         account = await account_service.get_account_by_email(email)
-        account_id = account["account_id"]
+        account_id = account.account_id
         token_info = auth_service.create_access_token(account_id, timedelta(hours=24))
         await email_service.send_password_reset_email(
-            {"email": email}, lang, token_info["accessToken"]
+            {"email": email}, lang, token_info["access_token"]
         )
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"code": e.detail})
@@ -130,18 +131,26 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
 
 
 @router.get("/reset-password", status_code=status.HTTP_200_OK, response_model=None)
-async def reset_password(res: Response, token: str, lang: str = Query("en")) -> None:
-    print("reset-password():", token, lang)
+# @token_required(redirect_path="auth/forgot-password")
+async def reset_password(res: Response, req: Request, token: str, lang: str = Query("en")) -> None:
+    try:
+        print("reset-password():", token, lang)
 
-    if token is None:
-        redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-passord"
+        if token is None:
+            redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-passord"
+            return RedirectResponse(url=redirect_url, headers=res.headers)
+        payload = auth_service.decode_token(token)
+        # TODO: token 만료 시 redirection
+        if payload is None:
+            redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-password"
+            return RedirectResponse(url=redirect_url, headers=res.headers)
+        account_id = payload["account_id"]
+        await auth_service.set_token_cookies(res, account_id)
+        redirect_url = f"{NGINX_HOST}/{lang}/auth/reset-password"
         return RedirectResponse(url=redirect_url, headers=res.headers)
-    payload = auth_service.decode_token(token)
-    # TODO: token 만료 시 redirection
-    if payload is None:
-        redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-password"
-        return RedirectResponse(url=redirect_url, headers=res.headers)
-    account_id = payload["account_id"]
-    await auth_service.set_token_cookies(res, account_id)
-    redirect_url = f"{NGINX_HOST}/{lang}/auth/reset-password"
-    return RedirectResponse(url=redirect_url, headers=res.headers)
+    except HTTPException as e:
+        return JSONResponse(status_code=e.status_code, content={"code": e.detail})
+    except Exception:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
+        )

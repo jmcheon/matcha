@@ -114,6 +114,12 @@ class CredentialAccountDTO(AccountDTO):
     password: str
 
 
+@dataclass
+class CredentialAccountDTO(AccountDTO):
+    username: str
+    password: str
+
+
 # @dataclass
 # class DetailedAccountDTO(AccountDTO):
 #     first_name: str

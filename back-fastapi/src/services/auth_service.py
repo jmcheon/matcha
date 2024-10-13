@@ -14,7 +14,7 @@ from constants import (
 from fastapi import HTTPException, Response, status
 from jose import ExpiredSignatureError, JWTError, jwt
 from passlib.context import CryptContext
-from src.models.dto import AccountDTO, CredentialAccountDTO, GeneralAccountDTO
+from src.models.dtos.account_dto import AccountDTO, CredentialAccountDTO, GeneralAccountDTO
 
 # Password hasing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

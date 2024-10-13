@@ -3,7 +3,7 @@ from typing import Optional
 from aiomysql import DictCursor
 from fastapi import HTTPException, status
 from src.models.db import get_db_connection
-from src.models.dto import AccountDTO
+from src.models.dtos.account_dto import AccountDTO
 
 
 async def check(username: str, email: str) -> None:

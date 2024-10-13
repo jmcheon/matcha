@@ -99,6 +99,7 @@
   const iLike = ref('');
   const bio = ref('');
   const interests = ref('');
+  const { locale } = useI18n();
   const { t } = useI18n();
   const { generateProfile } = useProfile();
   const { profileData } = storeToRefs(useUserStore());
@@ -124,14 +125,15 @@
       return;
 
     const generatedProfile = {
-      firstName: firstName.value,
-      lastName: lastName.value,
+      first_name: firstName.value,
+      last_name: lastName.value,
       location: location.value,
-      gender: gender.value,
       age: age.value,
+      gender: gender.value,
       height: height.value,
-      iLike: iLike.value,
+      like_gender: iLike.value,
       bio: bio.value,
+      user_language: locale.value,
       interests: interests.value.split(',').map((tag) => tag.trim()),
     };
 

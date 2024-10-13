@@ -6,7 +6,7 @@ from aiosmtplib import SMTP
 from constants import BACK_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
 from fastapi import Response
 from fastapi.responses import RedirectResponse
-from src.models.dto import GeneralAccountDTO
+from src.models.dtos.account_dto import GeneralAccountDTO
 
 
 # TODO: data validation

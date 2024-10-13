@@ -6,8 +6,11 @@ import src.services.email_service as email_service
 from constants import NGINX_HOST
 from fastapi import APIRouter, Cookie, Depends, HTTPException, Query, Request, Response, status
 from fastapi.responses import JSONResponse, RedirectResponse
-from src.middlewares.token_required import token_required
-from src.models.dto import CredentialAccountDTO, GeneralAccountDTO, RegisterAccountDTO
+from src.models.dtos.account_dto import (
+    CredentialAccountDTO,
+    GeneralAccountDTO,
+    RegisterAccountDTO,
+)
 from src.models.validators import validate_account, validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
@@ -83,8 +86,7 @@ async def login(res: Response, data: CredentialAccountDTO) -> GeneralAccountDTO:
         return await auth_service.authenticate(res, data)
     except HTTPException as e:
         return JSONResponse(status_code=e.status_code, content={"code": e.detail})
-    except Exception as e:
-        print("e2", e)
+    except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"code": "GENERAL_ERROR"}
         )

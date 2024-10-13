@@ -4,7 +4,7 @@ import src.services.account_service as account_service
 from fastapi import APIRouter, HTTPException, Request, status
 from src.middlewares.token_required import token_required
 
-router = APIRouter(tags=["Account"])
+router = APIRouter(prefix="/account", tags=["Account"])
 
 
 @router.get("/account/{account_id}", status_code=status.HTTP_200_OK, response_model=None)

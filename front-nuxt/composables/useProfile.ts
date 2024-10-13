@@ -1,4 +1,4 @@
-import type { AccountData, ProfileData } from '~/types';
+import type { ProfileData } from '~/types';
 
 const MAX_IMAGE_SIZE = 5242880; // 5MB
 
@@ -23,14 +23,6 @@ export const useProfile = () => {
       withCredentials: true, // Add this line to send cookies
     });
     return response;
-  };
-
-  const updateProfile = async (userId: string, userInfo: AccountData) => {
-    await axios.patch('/account/' + userId, userInfo);
-  };
-
-  const updateAccountPassword = async (userInfo: AccountData) => {
-    await axios.post('/update-password/', userInfo);
   };
 
   const getProfile = async () => {
@@ -67,7 +59,5 @@ export const useProfile = () => {
     getProfile,
     getSocialProfileImage,
     updateProfileImage,
-    updateProfile,
-    updateAccountPassword,
   };
 };

@@ -1,8 +1,7 @@
-import aiomysql
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import FastAPI
 from src.controllers import account_controller, auth_controller, profile_controller
 from src.middlewares import cors_middleware
-from src.models.db import database, get_db_connection
+from src.models.db import database
 
 app = FastAPI()
 
@@ -22,16 +21,6 @@ async def shutdown_event():
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
-
-@app.get("/accounts/{account_id}")
-async def read_account(account_id: int, connection=Depends(get_db_connection)):
-    async with connection.cursor(aiomysql.DictCursor) as cursor:
-        await cursor.execute("SELECT * FROM account WHERE account_id = %s", (account_id,))
-        account = await cursor.fetchone()
-        if account is None:
-            raise HTTPException(detail="Account not found", status_code=status.HTTP_404_NOT_FOUND)
-        return account
 
 
 app.include_router(auth_controller.router)

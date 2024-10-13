@@ -71,7 +71,7 @@
   const dirty = ref(false);
 
   const { accountData } = storeToRefs(useUserStore());
-  const { updateProfile } = useProfile();
+  const { updateAccount } = useAccount();
   const { updateAccountPassword } = useAccount();
 
   const { passwordValidator } = useValidator();
@@ -97,7 +97,7 @@
       loading.value = true;
       console.log('reset-password', accountData.value);
       // Simulate API call for resetting password
-      // await updateProfile(accountData.value.account_id, {
+      // await updateAccount(accountData.value.account_id, {
       //   password: newPassword.value,
       // });
       await updateAccountPassword({

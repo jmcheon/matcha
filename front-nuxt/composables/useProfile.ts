@@ -1,9 +1,10 @@
-import type { AccountData, ProfileData } from '~/types';
+import type { ProfileData } from '~/types';
 
 const MAX_IMAGE_SIZE = 5242880; // 5MB
 
 export const useProfile = () => {
   const axios = useAxios();
+  const { profileData } = storeToRefs(useUserStore());
 
   const updateProfileImage = async (imagesToUpload: any) => {
     const formData = new FormData();
@@ -15,7 +16,7 @@ export const useProfile = () => {
       console.log(`${key}: ${value}`);
     }
 
-    const response = await axios.post('/api/profile/upload_image', formData, {
+    const response = await axios.post('/profile/upload_image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -24,16 +25,21 @@ export const useProfile = () => {
     return response;
   };
 
-  const updateProfile = async (userId: string, userInfo: AccountData) => {
-    await axios.patch('/api/account/' + userId, userInfo);
-  };
+  const getProfile = async () => {
+    try {
+      const profileResponse = await axios.get('/profile');
 
-  const updateAccountPassword = async (userInfo: AccountData) => {
-    await axios.post('/api/update-password/', userInfo);
+      console.log(profileResponse);
+      // Store profile data in the state
+      profileData.value = profileResponse.data;
+    } catch (error) {
+      // Handle the error by setting profileData to null
+      profileData.value = null;
+    }
   };
 
   const generateProfile = async (profileInfo: ProfileData) => {
-    console.log("profile", profileInfo)
+    console.log('profile', profileInfo);
     const result = await axios.post('/profile', profileInfo);
     return result.data;
   };
@@ -50,9 +56,8 @@ export const useProfile = () => {
   };
   return {
     generateProfile,
+    getProfile,
     getSocialProfileImage,
     updateProfileImage,
-    updateProfile,
-    updateAccountPassword,
   };
 };

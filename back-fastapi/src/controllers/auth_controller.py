@@ -15,7 +15,7 @@ from src.models.validators import validate_account, validate_account_register
 
 # fastapi dev랑 run(prod)으로 실행시 각가 다르게 동작
 router = APIRouter(
-    # prefix="/auth",
+    prefix="/auth",
     tags=["Auth"]
 )
 

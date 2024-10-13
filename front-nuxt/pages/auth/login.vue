@@ -103,6 +103,7 @@
   const username = ref('');
   const password = ref('');
   const { doLogin, onGoogleLogin, onGithubLogin, onFtLogin } = useAuth();
+  const { getProfile } = useProfile();
   const { isEmailVerified, isProfileGenerated, isProfileImageUploaded } =
     storeToRefs(useUserStore());
   const { t } = useI18n();
@@ -130,6 +131,7 @@
         username: username.value,
         password: password.value,
       });
+      await getProfile();
       if (isEmailVerified.value) {
         if (isProfileGenerated.value) {
           // User is verified and has a generated profile

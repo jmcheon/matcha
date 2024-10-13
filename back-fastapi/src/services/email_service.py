@@ -3,7 +3,7 @@ from email.message import EmailMessage
 import src.services.account_service as account_service
 import src.services.auth_service as auth_service
 from aiosmtplib import SMTP
-from constants import BACK_HOST, GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
+from constants import GMAIL_ID, GMAIL_PASSWORD, NGINX_HOST, AccountStatus
 from fastapi import Response
 from fastapi.responses import RedirectResponse
 from src.models.dtos.account_dto import GeneralAccountDTO
@@ -20,9 +20,9 @@ async def send_verification_email(data: GeneralAccountDTO, lang: str, token: str
     }
 
     html_template = {
-        "en": f'<a href="{BACK_HOST}/verify-email?token={token}&lang=en">'
+        "en": f'<a href="{NGINX_HOST}/api/verify-email?token={token}&lang=en">'
         + f"Verify your email for username: {data.username}</a>",
-        "fr": f'<a href="{BACK_HOST}/verify-email?token={token}&lang=fr">'
+        "fr": f'<a href="{NGINX_HOST}/api/verify-email?token={token}&lang=fr">'
         + f"Vérifiez votre email pour votre username: {data.username}</a>",
     }
 
@@ -73,8 +73,8 @@ async def send_password_reset_email(data: dict, lang: str, token: str) -> None:
     }
 
     html_template = {
-        "en": f'<a href="{BACK_HOST}/reset-password?token={token}&lang=en">Password reset for Matcha</a>',
-        "fr": f'<a href="{BACK_HOST}/reset-password?token={token}&lang=fr">Reinitialisation du mot de passe pour Matcha</a>',
+        "en": f'<a href="{NGINX_HOST}/api/reset-password?token={token}&lang=en">Password reset for Matcha</a>',
+        "fr": f'<a href="{NGINX_HOST}/api/reset-password?token={token}&lang=fr">Reinitialisation du mot de passe pour Matcha</a>',
     }
 
     subject = subject_template.get(lang, subject_template["en"])

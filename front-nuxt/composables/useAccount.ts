@@ -1,7 +1,7 @@
 import type { AccountData } from '~/types';
 
 export const useAccount = () => {
-  const axios = useAxios();
+  const axios = useAxios('/account');
   // const { accountData } = storeToRefs(useUserStore());
 
   const updateAccountPassword = async (userInfo: AccountData) => {
@@ -9,7 +9,12 @@ export const useAccount = () => {
     await axios.post('/update-password/', userInfo);
   };
 
+  const updateAccount = async (userId: string, userInfo: AccountData) => {
+    await axios.patch('/account/' + userId, userInfo);
+  };
+
   return {
     updateAccountPassword,
+    updateAccount,
   };
 };

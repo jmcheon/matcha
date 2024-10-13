@@ -1,11 +1,9 @@
-import type { AxiosInstance } from 'axios';
-
 import type { AccountData } from '~/types';
 
 export const useAuth = () => {
-  const axios = useAxios();
+  const axios = useAxios('/auth');
   const NGINX_HOST = useRuntimeConfig().public.NGINX_HOST;
-  const { accountData, profileData } = storeToRefs(useUserStore());
+  const { accountData } = storeToRefs(useUserStore());
   const refreshTokenIntervalId = ref();
   const tokenDurationMins = Number(
     useRuntimeConfig().public.JWT_ACCESS_DURATION,
@@ -105,34 +103,14 @@ export const useAuth = () => {
       username: info.username,
       password: info.password,
     });
-    try {
-      const profileResponse = await axios.get('/profile', {
-        headers: { Authorization: `Bearer ${data.access_token}` },
-      });
-
-      console.log(profileResponse);
-      // Store profile data in the state
-      profileData.value = profileResponse.data;
-    } catch (error) {
-      // Handle the error by setting profileData to null
-      profileData.value = null;
-
-      // // Optionally, you can handle specific error statuses
-      // if (axios.isAxiosError(error) && error.response) {
-      //   const statusCode = error.response.status;
-      //   if (statusCode === 400) {
-      //     // Handle 400 Bad Request error specifically if needed
-      //   }
-      //   // Handle other status codes as necessary
-    }
     console.log('doLogin data check', data);
     accountData.value = { ...accountData.value, ...data };
     console.log('doLogin account data check', accountData.value);
     startRefreshAuth();
   };
 
-  const doLogout = async (api: AxiosInstance) => {
-    await api.delete('/logout');
+  const doLogout = async () => {
+    await axios.delete('/logout');
     accountData.value = {} as AccountData;
     stopRefreshAuth();
   };
@@ -145,11 +123,11 @@ export const useAuth = () => {
   };
 
   const onGoogleLogin = () =>
-    (window.location.href = `${NGINX_HOST}/api/google`);
+    (window.location.href = `${NGINX_HOST}/api/auth/google`);
 
-  const onFtLogin = () => (window.location.href = `${NGINX_HOST}/api/ft`);
+  const onFtLogin = () => (window.location.href = `${NGINX_HOST}/api/auth/ft`);
   const onGithubLogin = () => {
-    window.location.href = `${NGINX_HOST}/api/github`;
+    window.location.href = `${NGINX_HOST}/api/auth/github`;
   };
 
   return {

@@ -84,12 +84,11 @@
     showDropdown.value = false;
   });
 
-  const axios = useAxios();
   const { doLogout } = useAuth();
 
   const handleAction = async (value) => {
     if (value === 'menu-logout') {
-      await doLogout(axios);
+      await doLogout();
       await navigateTo({ path: localePath('index') });
     }
   };

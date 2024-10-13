@@ -4,8 +4,7 @@ import type { AccountData } from '~/types';
 
 export const useAuth = () => {
   const axios = useAxios();
-  // const BACK_HOST = useRuntimeConfig().public.NGINX_HOST;
-  const BACK_HOST = useRuntimeConfig().public.BACK_HOST;
+  const NGINX_HOST = useRuntimeConfig().public.NGINX_HOST;
   const { accountData, profileData } = storeToRefs(useUserStore());
   const refreshTokenIntervalId = ref();
   const tokenDurationMins = Number(
@@ -145,11 +144,12 @@ export const useAuth = () => {
     await axios.post(`/forgot-password?lang=${lang}`, info);
   };
 
-  const onGoogleLogin = () => (window.location.href = `${BACK_HOST}/google`);
+  const onGoogleLogin = () =>
+    (window.location.href = `${NGINX_HOST}/api/google`);
 
-  const onFtLogin = () => (window.location.href = `${BACK_HOST}/ft`);
+  const onFtLogin = () => (window.location.href = `${NGINX_HOST}/api/ft`);
   const onGithubLogin = () => {
-    window.location.href = `${BACK_HOST}/github`;
+    window.location.href = `${NGINX_HOST}/api/github`;
   };
 
   return {

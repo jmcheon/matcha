@@ -135,17 +135,15 @@ async def forgot_password(data: dict, lang: str = Query("en")) -> None:
 
 @router.get("/reset-password", status_code=status.HTTP_200_OK, response_model=None)
 # @token_required(redirect_path="auth/forgot-password")
-async def reset_password(res: Response, req: Request, token: str, lang: str = Query("en")) -> None:
+async def reset_password(res: Response, token: str, lang: str = Query("en")) -> None:
     try:
         print("reset-password():", token, lang)
+        redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-passord"
 
         if token is None:
-            redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-passord"
             return RedirectResponse(url=redirect_url, headers=res.headers)
         payload = auth_service.decode_token(token)
-        # TODO: token 만료 시 redirection
         if payload is None:
-            redirect_url = f"{NGINX_HOST}/{lang}/auth/forgot-password"
             return RedirectResponse(url=redirect_url, headers=res.headers)
         account_id = payload["account_id"]
         await auth_service.set_token_cookies(res, account_id)

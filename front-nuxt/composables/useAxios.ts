@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const useAxios = () => {
-  const baseURL = useRuntimeConfig().public.BACK_HOST;
+  const baseURL = `${useRuntimeConfig().public.NGINX_HOST}/api`;
   const { accountData } = storeToRefs(useUserStore());
   const api = axios.create({
     baseURL,

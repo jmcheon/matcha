@@ -32,11 +32,11 @@ class EmailService {
       const template = {
         en: {
           subject: '[Matcha-reloaded] Verify your email',
-          html: `<a href="${process.env.BACK_HOST}/verify-email?token=${token}&lang=${lang}">Verify your email for username: ${data.username}</a>`,
+          html: `<a href="${process.env.NGINX_HOST}/verify-email?token=${token}&lang=${lang}">Verify your email for username: ${data.username}</a>`,
         },
         fr: {
           subject: '[Matcha-reloaded] Verifier votre email',
-          html: `<a href="${process.env.BACK_HOST}/verify-email?token=${token}&lang=${lang}">Verifier votre email pour vorte username: ${data.username}</a>`,
+          html: `<a href="${process.env.NGINX_HOST}/verify-email?token=${token}&lang=${lang}">Verifier votre email pour vorte username: ${data.username}</a>`,
         },
       };
 
@@ -98,11 +98,11 @@ class EmailService {
       const template = {
         en: {
           subject: 'Password reset for Matcha',
-          html: `<a href="${process.env.BACK_HOST}/reset-password?token=${token}&lang=${lang}">Password reset for Matcha</a>`,
+          html: `<a href="${process.env.NGINX_HOST}/reset-password?token=${token}&lang=${lang}">Password reset for Matcha</a>`,
         },
         fr: {
           subject: 'Réinitialisation du mot de passe pour Matcha',
-          html: `<a href="${process.env.BACK_HOST}/reset-password?token=${token}&lang=${lang}">Réinitialisation du mot de passe pour Matcha</a>`,
+          html: `<a href="${process.env.NGINX_HOST}/reset-password?token=${token}&lang=${lang}">Réinitialisation du mot de passe pour Matcha</a>`,
         },
       };
       const mailOptions = {

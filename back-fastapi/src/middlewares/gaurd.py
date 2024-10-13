@@ -7,15 +7,15 @@ from fastapi import HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 
 
-def gaurd(redirect_path: str = None):
+def guard(redirect_path: str = None):
     def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-        print("gaurd() decorator", func.__annotations__)
+        print("guard() decorator", func.__annotations__)
 
         @wraps(func)
         async def wrapper(res: Response, req: Request, *args, **kwargs):
-            print("gaurd() wrapper", args, kwargs)
+            print("guard() wrapper", args, kwargs)
             token = req.headers.get("Authorization")
-            print("gaurd() token:", token)
+            print("guard() token:", token)
             cookie_header = req.headers.get("cookie")
             if cookie_header:
                 cookies = {
@@ -23,7 +23,7 @@ def gaurd(redirect_path: str = None):
                     for cookie in cookie_header.split("; ")
                 }
                 token = cookies.get("access_token")
-            print("gaurd() token:", token)
+            print("guard() token:", token)
 
             if token is None:
                 if redirect_path is not None:
@@ -39,7 +39,7 @@ def gaurd(redirect_path: str = None):
                 token = token.split(" ")[1]
             payload = auth_service.decode_token(token)
 
-            print("gaurd() payload:", payload)
+            print("guard() payload:", payload)
             # token 만료시
             if payload is None:
                 if redirect_path is not None:

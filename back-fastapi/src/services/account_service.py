@@ -98,7 +98,7 @@ async def update_account_password(account_id: str, password: str) -> None:
     await account_repository.update_password(account_id, hashed_password)
 
 
-async def get_account_by_id(account_id: int) -> Optional[dict]:
+async def get_account_by_id(account_id: int) -> AccountDTO:
     """
     Retrieve an account by its ID.
 
@@ -106,15 +106,20 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
         account_id (int): The ID of the account to retrieve.
 
     Returns:
-        Optional[dict]: A dictionary containing the account details or None if account not found.
+        AccountDTO: AccountDTO containing the account details.
 
     Raises:
         HTTPException: Any bad requests.
     """
-    return await account_repository.get_by_id(account_id)
+    account = await account_repository.get_by_id(account_id)
+    if account is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
+        )
+    return account
 
 
-async def get_account_by_email(email: str) -> Optional[AccountDTO]:
+async def get_account_by_email(email: str) -> AccountDTO:
     """
     Retrieve an account by its email.
 
@@ -122,12 +127,17 @@ async def get_account_by_email(email: str) -> Optional[AccountDTO]:
         email (str): The email of the account to retrieve.
 
     Returns:
-        Optional[dict]: A dictionary containing the account details or None if account not found.
+        AccountDTO: AccountDTO containing the account details.
 
     Raises:
         HTTPException: Any bad requests.
     """
-    return await account_repository.get_by_email(email)
+    account = await account_repository.get_by_email(email)
+    if account is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
+        )
+    return account
 
 
 async def get_account_status(account_id: int) -> str:
@@ -145,5 +155,7 @@ async def get_account_status(account_id: int) -> str:
     """
     account: AccountDTO = await account_repository.get_by_id(account_id)
     if account is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account not found")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="INVALID_USER_CREDENTIALS"
+        )
     return account.status

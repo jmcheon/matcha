@@ -149,7 +149,7 @@ async def authenticate(username: str, hashed_password: str) -> Optional[AccountD
     async with get_db_connection() as connection, connection.cursor(DictCursor) as cursor:
         try:
             await cursor.execute(
-                "SELECT account_id, username, status FROM account"
+                "SELECT account_id, username, status, email FROM account"
                 + " WHERE username = %s AND password = %s",
                 (username, hashed_password),
             )

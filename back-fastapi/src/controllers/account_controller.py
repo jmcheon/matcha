@@ -17,7 +17,7 @@ async def get_account_by_id(account_id: int) -> Optional[dict]:
 # TODO: data validation: account_id, new_password, confirm_password
 @router.post("/update-password/", status_code=status.HTTP_200_OK, response_model=None)
 @token_required()
-async def update_account_password(req: Request, data: dict) -> Optional[dict]:
+async def update_account_password(req: Request, data: dict) -> None:
     print("update_account_password()", data)
     new_password, confirm_password, account_id = data.values()
     if new_password != confirm_password:

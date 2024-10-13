@@ -42,6 +42,7 @@ export const useAuth = () => {
 
   const doRequestEmail = async (lang: string) => {
     try {
+      console.log('doRequestEmail accountData:', accountData.value);
       const { data } = await axios.post(
         `/request-email?lang=${lang}`,
         accountData.value,
@@ -124,9 +125,9 @@ export const useAuth = () => {
       //   }
       //   // Handle other status codes as necessary
     }
-    console.log('data check', data);
-    accountData.value = data;
-    console.log('account data check', accountData.value);
+    console.log('doLogin data check', data);
+    accountData.value = { ...accountData.value, ...data };
+    console.log('doLogin account data check', accountData.value);
     startRefreshAuth();
   };
 

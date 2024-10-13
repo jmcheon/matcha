@@ -35,7 +35,8 @@
   },
   "AuthVerifyEmail": {
     "description": "Please check your mail box",
-    "title": "Waiting for your email confirmation"
+    "title": "Waiting for your email confirmation",
+    "requestEmail": "Have trouble verifying email?"
   },
   "Error": {
     "404": "Page not found",
